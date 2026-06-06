@@ -10,4 +10,4 @@ Single source of truth for AI-generated CVs. Structured from [`../raw/Master_Pro
 - New evidence (flagship progress, certs) → [`../learning/backlog.md`](../learning/backlog.md)
 - Phase 2 feedback → Section 7 in [`../skills/gap-report.md`](../skills/gap-report.md)
 
-**Generate a CV:** [`../documents/prompts/cv-from-offer.md`](../documents/prompts/cv-from-offer.md)
+**Generate a CV:** Run [`docs/agents/cv-generator.md`](../docs/agents/cv-generator.md) with an offer file from [`job-offers/_offer-template.md`](../job-offers/_offer-template.md). Quick prompt: [`documents/prompts/cv-from-offer.md`](../documents/prompts/cv-from-offer.md).

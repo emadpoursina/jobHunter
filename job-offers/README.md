@@ -10,7 +10,13 @@ Use [`docs/agents/job-offer-research.md`](../docs/agents/job-offer-research.md) 
 by-country/<country_code>/research.md
 ```
 
-Then add individual offer files with [`_offer-template.md`](_offer-template.md) when you apply or need full detail.
+Then add individual offer files with [`_offer-template.md`](_offer-template.md) when you apply or need full detail. Example: [`by-country/de/offer-check24-agile-fullstack-nodejs-react.md`](by-country/de/offer-check24-agile-fullstack-nodejs-react.md).
+
+## Generate a tailored CV
+
+1. Create or fill an offer file under `by-country/<code>/`
+2. Run [`docs/agents/cv-generator.md`](../docs/agents/cv-generator.md)
+3. Output → `documents/generated/CV_<Company>_<JobTitle>_<Date>.md`
 
 ## Layout
 

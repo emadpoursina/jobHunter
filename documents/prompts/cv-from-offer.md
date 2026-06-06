@@ -1,34 +1,65 @@
 # Prompt: CV from job offer
 
-Use with your AI tool. Attach `profile/master-profile.md` and the job offer file.
+Run the [CV generator agent](../../docs/agents/cv-generator.md) with the inputs below.
 
 ---
 
-You are tailoring a CV for a backend / full-stack software developer applying for migration via job offer.
+## Invocation (Cursor / AI)
 
-**Inputs**
+```
+You are the CV Generator Agent for jobHunter.
 
-1. Master profile (below) — only use facts present there; do not invent experience.
-2. Job offer — match keywords and emphasis to stated requirements.
+Follow docs/agents/cv-generator.md exactly.
 
-**Output**
+Inputs:
+1. Master profile: profile/master-profile.md
+2. Job offer: [PASTE OFFER FILE PATH, e.g. job-offers/by-country/de/offer-check24-fullstack-nodejs-react.md]
 
-- One-page CV in markdown
-- Sections: Summary, Experience, Skills, Education, Languages
-- Lead with requirements marked "required" in the offer
-- Tone: professional, concrete, metric-backed where profile provides numbers
+Produce:
+1. Tailored CV (output format from agent spec)
+2. Tailoring Report (append after CV)
 
-**Master profile**
+Hard rules:
+- Do not fabricate any skill or experience
+- Skills marked "Learning" in the profile are NOT proficient
+- Save output to documents/generated/CV_[Company]_[JobTitle]_[YYYY-MM-DD].md
+- Update applications/pipeline.md with stage: draft
+- Update the job offer file Application section with the generated CV path
+```
 
-<!-- paste master-profile.md -->
+---
 
-**Job offer**
+## Before you run
 
-<!-- paste offer requirements -->
+1. Master profile is filled → [`profile/master-profile.md`](../../profile/master-profile.md)
+2. Job offer file exists → copy [`job-offers/_offer-template.md`](../../job-offers/_offer-template.md) to `job-offers/by-country/<code>/offer-<company>-<role-slug>.md`
+3. Paste full job description and fill Required / Nice-to-have skills tables
 
-**Checklist before send (human)**
+---
+
+## After generation — human review (required)
+
+Review the **Tailoring Report** first, especially **Risks & Gaps**.
 
 - [ ] Every claim exists in master profile
 - [ ] Role title and seniority fit the offer
 - [ ] Visa / location / language statements accurate
-- [ ] No AI filler or generic buzzwords without evidence
+- [ ] No Learning skills presented as proficient
+- [ ] Risks acceptable — proceed, adjust CV, or skip this offer
+
+Only move pipeline stage to `reviewed` → `sent` after you approve.
+
+**Rule:** 100% human review before any CV is sent. Store only reviewed versions in [`generated/`](../generated/).
+
+---
+
+## Output naming
+
+```
+documents/generated/CV_<CompanySlug>_<JobTitleSlug>_<YYYY-MM-DD>.md
+```
+
+Examples:
+
+- `CV_Check24_AgileFullStackNodeReact_2026-06-06.md`
+- `CV_LemonOne_FullStackNodeReactServerless_2026-06-06.md`

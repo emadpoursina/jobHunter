@@ -159,6 +159,6 @@ After saving, the human (or a follow-up step) may copy high-value offers into in
 
 1. Merge skills into [`skills/requirements-summary.md`](../../skills/requirements-summary.md)
 2. Compare against master profile → update [`skills/gap-report.md`](../../skills/gap-report.md)
-3. For applications, use [`documents/prompts/cv-from-offer.md`](../../documents/prompts/cv-from-offer.md)
+3. For applications, create an offer file from [`job-offers/_offer-template.md`](../../job-offers/_offer-template.md), then run [`docs/agents/cv-generator.md`](../../docs/agents/cv-generator.md)
 
 Run this agent **once per priority country**, independently.

@@ -1,29 +1,71 @@
 # Job offer: <!-- Company — Role title -->
 
-- **Country:**
-- **Company:**
-- **Role title:**
-- **Seniority:** <!-- mid / senior / etc. -->
-- **URL:**
-- **Date posted:**
-- **Source:** <!-- LinkedIn, careers page, etc. -->
-- **Visa / sponsorship mention:** <!-- quote or "not stated" -->
-- **Sample round:** <!-- Phase 1 corpus | live application -->
+> Input file for the [CV generator agent](../docs/agents/cv-generator.md).  
+> Save as: `job-offers/by-country/<code>/offer-<company-slug>-<role-slug>.md`
 
-## Requirements (paste or bullet)
+## JOB OFFER
 
--
+| Field | Value |
+|-------|--------|
+| **Job title** | |
+| **Company** | |
+| **Location** | <!-- City, Country --> |
+| **Country code** | <!-- de / nl / ca / ie / pt --> |
+| **Work type** | <!-- Remote / Hybrid / On-site --> |
+| **Seniority** | <!-- junior / mid / senior / lead --> |
+| **Salary range** | <!-- or Not Listed --> |
+| **Visa sponsorship** | <!-- Yes / No / Not Mentioned — quote if Yes --> |
+| **Source URL** | |
+| **Date collected** | <!-- YYYY-MM-DD --> |
+| **Sample round** | <!-- Phase 1 corpus \| live application --> |
+
+### Job description summary
+
+<!-- Paste full job description or close summary -->
+
+### Required skills
+
+1.
+2.
+3.
+4.
+5.
+
+### Nice-to-have skills
+
+1.
+2.
+3.
+
+### About the company
+
+<!-- 1–2 sentences from website or posting -->
+
+### Tone of job posting
+
+<!-- startup casual / enterprise formal / scale-up balanced -->
+
+### Primary focus
+
+<!-- backend-heavy / full-stack / frontend-leaning -->
+
+### Special instructions
+
+<!-- e.g. "They specifically mention TDD" or "Values open source" -->
+
+---
 
 ## Skills extracted
-
-<!-- Tag skills for skills/requirements-summary.md -->
 
 | Skill | Required / nice-to-have | In my profile? |
 |-------|-------------------------|----------------|
 | | | |
 
+---
+
 ## Application
 
 - **Applied:** <!-- yes / no -->
-- **Application ID:** <!-- link to applications/pipeline.md row -->
-- **Generated CV:** `documents/generated/...`
+- **Pipeline ID:** <!-- link to applications/pipeline.md row -->
+- **Generated CV:** `documents/generated/CV_...md`
+- **Stage:** <!-- draft / reviewed / sent -->

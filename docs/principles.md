@@ -31,7 +31,7 @@ For each priority country document:
 ## Applications (Phase 2)
 
 - **Master profile first** — [`../profile/master-profile.md`](../profile/master-profile.md); never invent beyond it in CVs.
-- **AI drafts, human approves** — 100% review before send; verify facts, tone, and role alignment.
+- **AI drafts, human approves** — 100% review before send; verify facts, tone, and role alignment. Agent: [`agents/cv-generator.md`](agents/cv-generator.md).
 - **Phase 2 ∥ Phase 3** — apply while upskilling; do not block applications on gap closure.
 - **Feedback loop** — rejection reasons and interview notes update `skills/gap-report.md` and `learning/backlog.md`.
 

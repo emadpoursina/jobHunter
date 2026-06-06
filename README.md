@@ -106,6 +106,8 @@ flowchart LR
 
 **Folders:** [`profile/`](profile/), [`documents/`](documents/), [`applications/`](applications/)
 
+**Agent:** [`docs/agents/cv-generator.md`](docs/agents/cv-generator.md) — reads master profile + offer file → `documents/generated/CV_<Company>_<Role>_<Date>.md`
+
 ---
 
 ### Phase 3 — Close skill gaps (parallel with Phase 2)
@@ -151,7 +153,8 @@ jobHunter/
 │   ├── phase1-country-research.md     # Phase 1 — country selection & checklist
 │   └── agents/
 │       ├── README.md
-│       └── job-offer-research.md      # Phase 1 — find offers per country
+│       ├── job-offer-research.md      # Phase 1 — find offers per country
+│       └── cv-generator.md            # Phase 2 — tailored CV + tailoring report
 │
 ├── networking/                        # Phase 0
 │   ├── README.md
@@ -207,7 +210,8 @@ jobHunter/
 3. Merge market skills into `skills/requirements-summary.md`; reconcile with [`skills/skill-map.md`](skills/skill-map.md) → update [`skills/gap-report.md`](skills/gap-report.md).
 4. Work [`learning/backlog.md`](learning/backlog.md) via [`learning/flagship-project.md`](learning/flagship-project.md) **in parallel** with applications.
 5. Keep [`profile/master-profile.md`](profile/master-profile.md) updated as skills ship.
-6. Track applications in `applications/pipeline.md`, networking in `networking/`, metrics in `metrics/by-country.md`.
+6. Create offer files from [`job-offers/_offer-template.md`](job-offers/_offer-template.md); run [CV generator agent](docs/agents/cv-generator.md) → `documents/generated/`.
+7. Track applications in `applications/pipeline.md`, networking in `networking/`, metrics in `metrics/by-country.md`.
 
 ---
 
@@ -215,4 +219,6 @@ jobHunter/
 
 **Phase 1 (partial):** Five priority countries defined ([`countries/`](countries/)). Job-offer research complete for Germany, Canada, Netherlands, Portugal (40 offers). Skill gap report updated ([`skills/gap-report.md`](skills/gap-report.md)). Ireland offers pending.
 
-**Next:** Ireland job-offer research; close critical gaps (AWS, Jest, CI/CD) via [`learning/backlog.md`](learning/backlog.md) in parallel with applications.
+**Phase 2 (in progress):** Master profile complete ([`profile/master-profile.md`](profile/master-profile.md)). CV generator agent ready ([`docs/agents/cv-generator.md`](docs/agents/cv-generator.md)). Example offer: [`job-offers/by-country/de/offer-check24-agile-fullstack-nodejs-react.md`](job-offers/by-country/de/offer-check24-agile-fullstack-nodejs-react.md).
+
+**Next:** Run CV generator on first live application; Ireland job-offer research; close critical gaps (AWS, Jest, CI/CD) via [`learning/backlog.md`](learning/backlog.md) in parallel with applications.

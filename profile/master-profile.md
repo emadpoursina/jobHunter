@@ -369,7 +369,8 @@ When this profile is passed to an AI to generate a tailored CV, use these rules:
 7. **Never fabricate** — only use information present in this document. If a skill is marked **Learning**, do not present it as proficient.
 8. **Output format** — Markdown, one page preferred, two pages maximum.
 
-**Prompt template:** [`../documents/prompts/cv-from-offer.md`](../documents/prompts/cv-from-offer.md)
+**Prompt template:** [`../docs/agents/cv-generator.md`](../docs/agents/cv-generator.md)  
+**Quick invocation:** [`../documents/prompts/cv-from-offer.md`](../documents/prompts/cv-from-offer.md)
 
 **Skill map reference:** [`../skills/skill-map.md`](../skills/skill-map.md)  
 **Gap report reference:** [`../skills/gap-report.md`](../skills/gap-report.md)
