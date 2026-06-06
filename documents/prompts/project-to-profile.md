@@ -87,7 +87,7 @@ Do not commit — user reviews first.
 - [ ] No duplicate project entries
 - [ ] URLs and Status are accurate
 
-Sync skills separately if needed: [`skills/skill-map.md`](../../skills/skill-map.md)
+Sync skills separately if needed: `[skills/skill-map.md](../../skills/skill-map.md)`
 
 ---
 
@@ -101,3 +101,4 @@ Examples:
 
 - `ProjectProfile_RoustaTV_2026-06-06.md`
 - `ProjectProfile_FlagshipSaaS_2026-06-06.md`
+

@@ -33,10 +33,34 @@ Inspect, in order of reliability:
 1. **README**, `package.json`, `composer.json`, Docker/CI configs, env examples
 2. **Source tree** — `src/`, `apps/`, `packages/`, API routes, models, auth, tests
 3. **Deploy artifacts** — Dockerfile, `docker-compose`, GitHub Actions, AWS/Terraform, nginx configs
-4. **Git** — first/last meaningful commit dates (for duration, if not documented elsewhere)
-5. **Live URLs** — only if explicitly documented or verifiable; otherwise `Not available`
+4. **Local Git** — first/last meaningful commit dates (for duration, if not documented elsewhere)
+5. **GitHub CLI (`gh`)** — when the remote is GitHub and `gh auth status` succeeds (see below)
+6. **Live URLs** — homepage from `gh repo view`, README, or deploy config; otherwise `Not available`
 
-Record only what you can evidence from the repo or user-provided context.
+Record only what you can evidence from the repo, `gh` output, or user-provided context.
+
+### GitHub CLI (`gh`) — optional but preferred for GitHub repos
+
+If `git remote get-url origin` points to GitHub, run `gh` before guessing metadata. Do **not** use `gh` for private facts the user did not authorize (issues content, collaborator lists) unless needed for role/duration.
+
+| Command | Use for |
+|---------|---------|
+| `gh repo view --json name,description,homepageUrl,url,isPrivate,createdAt,pushedAt,primaryLanguage,repositoryTopics,languages` | Name, product description, **homepage URL**, repo URL, visibility, activity dates, topics, language mix |
+| `gh repo view` (plain) | Human-readable summary when JSON is overkill |
+| `gh run list --limit 5` | Evidence of CI/CD (GitHub Actions in use) |
+| `gh release list --limit 3` | Release/deploy cadence if applicable |
+| `gh api repos/{owner}/{repo}/contributors --jq '.[0:5]'` | Contributor counts only — infer sole vs team dev; do not name others on the profile |
+
+**Field mapping from `gh`:**
+
+- `homepageUrl` → **URL** (if product is live; else keep README/deploy evidence)
+- `url` → **GitHub / repo**
+- `createdAt` / first local commit (whichever is earlier and meaningful) → start of **Duration**
+- `pushedAt` → recent activity; `Archived` if repo is archived (`gh repo view --json isArchived`)
+- `repositoryTopics` + `languages` → cross-check **Technologies** (never replace dependency scan)
+- `isPrivate` → often **Private / Internal** unless user gives a public product URL
+
+If `gh` is missing or unauthenticated, fall back to local git + files only and note `GitHub metadata: not fetched (gh unavailable)`.
 
 ---
 
