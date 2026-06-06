@@ -1,14 +1,14 @@
-# jobHunter
+# jobHunter — Emad Poursina
 
-A workflow for finding, qualifying, and applying to **backend / full-stack software developer** roles with **migration via job offer** (skilled-worker visa routes).
+Personal workflow for finding, qualifying, and applying to **backend / full-stack JavaScript** roles with **migration via job offer** (employer visa sponsorship required).
 
 ## Target role
 
-- **Primary:** Backend software developer
-- **Secondary:** Full-stack software developer (when listings overlap)
-- **Migration path:** Employer-sponsored or points-based skilled migration tied to a concrete job offer
-
-Only sample and apply to offers that match this role family and seniority band. Ignore unrelated outliers.
+- **Primary:** Backend / Node.js engineer (NestJS path)
+- **Secondary:** Full-stack JavaScript (React, Next.js, TypeScript)
+- **Experience band:** 7+ years, mid–senior
+- **Migration path:** Employer visa sponsorship (Iranian passport)
+- **Upskilling:** One flagship project — see [`skills/skill-map.md`](skills/skill-map.md) and [`learning/flagship-project.md`](learning/flagship-project.md)
 
 ---
 
@@ -167,12 +167,13 @@ jobHunter/
 │   └── by-country/                    # One subfolder per country (you create)
 │       └── .gitkeep
 │
-├── skills/                            # Phase 1 & 3 — gaps & extracted requirements
+├── skills/                            # Phase 1 & 3 — gaps, skill map, market requirements
 │   ├── README.md
+│   ├── skill-map.md                   # Full curriculum + flagship project reference
 │   ├── gap-report.md
 │   └── requirements-summary.md
 │
-├── profile/                           # Phase 2 — master profile
+├── profile/                           # Phase 2 — Emad's master profile
 │   ├── README.md
 │   └── master-profile.md
 │
@@ -188,9 +189,10 @@ jobHunter/
 │   ├── pipeline.md
 │   └── _application-template.md
 │
-├── learning/                          # Phase 3 — upskilling backlog
+├── learning/                          # Phase 3 — upskilling backlog + flagship project
 │   ├── README.md
-│   └── backlog.md
+│   ├── backlog.md
+│   └── flagship-project.md
 │
 └── metrics/                           # Cross-cutting — conversion by country
     ├── README.md
@@ -199,14 +201,15 @@ jobHunter/
 
 ### How to use
 
-1. Copy `_country-template.md` into `countries/` for each of your five priority countries.
-2. Run the [job offer research agent](docs/agents/job-offer-research.md) per country → `job-offers/by-country/<country-code>/research.md`.
-3. Fill `profile/master-profile.md`, merge skills into `skills/requirements-summary.md`, then `skills/gap-report.md`.
-4. Start `applications/pipeline.md` and `learning/backlog.md` in parallel.
-5. Log networking in `networking/` and update `metrics/by-country.md` weekly.
+1. Define five priority countries in `countries/` (copy `_country-template.md`).
+2. Run the [job offer research agent](docs/agents/job-offer-research.md) per country → `job-offers/by-country/<code>/research.md`.
+3. Merge market skills into `skills/requirements-summary.md`; reconcile with [`skills/skill-map.md`](skills/skill-map.md) → update [`skills/gap-report.md`](skills/gap-report.md).
+4. Work [`learning/backlog.md`](learning/backlog.md) via [`learning/flagship-project.md`](learning/flagship-project.md) **in parallel** with applications.
+5. Keep [`profile/master-profile.md`](profile/master-profile.md) updated as skills ship.
+6. Track applications in `applications/pipeline.md`, networking in `networking/`, metrics in `metrics/by-country.md`.
 
 ---
 
 ## Status
 
-Architecture and folder scaffold defined. Populate templates and begin Phase 1 sampling.
+Profile and skill map populated. Next: pick five countries, run Phase 1 research agents, name and start the flagship project.

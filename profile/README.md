@@ -1,5 +1,5 @@
 # Master profile
 
-[`master-profile.md`](master-profile.md) is the single source of truth for AI-generated CVs and cover letters.
+[`master-profile.md`](master-profile.md) — **Emad Poursina**, full-stack JavaScript engineer, 7+ years.
 
-After Phase 3 learning, add evidence here before regenerating documents.
+Single source of truth for AI-generated CVs. Sync skills from [`../skills/skill-map.md`](../skills/skill-map.md) and evidence from [`../learning/backlog.md`](../learning/backlog.md).

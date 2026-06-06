@@ -1,5 +1,9 @@
 # Phase 3 — Learning
 
-[`backlog.md`](backlog.md) tracks upskilling prioritized from Phase 1 gaps and Phase 2 feedback.
+| File | Purpose |
+|------|---------|
+| [`skill-map.md`](../skills/skill-map.md) | What to learn and how it maps to the flagship project |
+| [`backlog.md`](backlog.md) | Prioritized waves (NestJS → GraphQL → tests → AWS → CI/CD) |
+| [`flagship-project.md`](flagship-project.md) | Single build that proves the skills |
 
-Runs **in parallel** with applications. Mark items done and mirror evidence in `profile/master-profile.md`.
+Runs **in parallel** with Phase 2 applications. Mark items `done` in the backlog, then update [`../profile/master-profile.md`](../profile/master-profile.md).
