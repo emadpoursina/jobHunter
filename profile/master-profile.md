@@ -168,6 +168,8 @@ React, Next.js, Node.js, React Native, MongoDB, PostgreSQL, TypeScript, Docker, 
 
 ## 5. Projects
 
+**Add or refresh a project:** Extract from the project repo with [`documents/prompts/project-to-profile.md`](../documents/prompts/project-to-profile.md) (Step 1), then merge into this section (Step 2). Agent spec: [`docs/agents/project-profile-extractor.md`](../docs/agents/project-profile-extractor.md).
+
 ### Project 1: Rousta TV
 
 ```
@@ -370,7 +372,8 @@ When this profile is passed to an AI to generate a tailored CV, use these rules:
 8. **Output format** — Markdown, one page preferred, two pages maximum.
 
 **Prompt template:** [`../docs/agents/cv-generator.md`](../docs/agents/cv-generator.md)  
-**Quick invocation:** [`../documents/prompts/cv-from-offer.md`](../documents/prompts/cv-from-offer.md)
+**Quick invocation:** [`../documents/prompts/cv-from-offer.md`](../documents/prompts/cv-from-offer.md)  
+**Add project:** [`../documents/prompts/project-to-profile.md`](../documents/prompts/project-to-profile.md)
 
 **Skill map reference:** [`../skills/skill-map.md`](../skills/skill-map.md)  
 **Gap report reference:** [`../skills/gap-report.md`](../skills/gap-report.md)

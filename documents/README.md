@@ -3,7 +3,8 @@
 | Path | Purpose |
 |------|---------|
 | [`prompts/cv-from-offer.md`](prompts/cv-from-offer.md) | Copy-paste invocation for the CV generator agent |
-| [`generated/`](generated/) | Generated CVs + tailoring reports — one file per application |
+| [`prompts/project-to-profile.md`](prompts/project-to-profile.md) | Extract a project in its repo, then merge into master profile |
+| [`generated/`](generated/) | Generated CVs, tailoring reports, project profile extractions |
 
 ## CV generation workflow
 
