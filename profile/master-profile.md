@@ -200,6 +200,32 @@ Product URL:    https://voicedash.ai (private codebase — no public repo)
 
 ---
 
+### Role 5
+
+```
+Company:        Villion
+Role Title:     Full-Stack Developer (mostly mobile app)
+Type:           Contract (monthly salary), Remote
+Start Date:     2025-11
+End Date:       Present
+Duration:       2025-11 – Present
+
+Your responsibilities:
+- Joined mid-project on a remote team; primary focus on the React Native iOS member app
+- Started with manual scenario testing on a complex luxury concierge app; built Miro flowcharts
+  to map user paths and surface edge cases and bugs
+- Progressed from small fixes and polish to component work and full features as trust grew
+- Refactored AI-generated spaghetti code in the mobile codebase toward clearer structure
+- Redesigned and reimplemented the trip feature with legacy support after fixing bad architecture
+
+Technologies used:
+React Native, Expo, JavaScript, TypeScript
+
+Product URL:    https://joinvillion.com
+```
+
+---
+
 ## 5. Projects
 
 **Add or refresh a project:** Extract from the project repo with [`documents/prompts/project-to-profile.md`](../documents/prompts/project-to-profile.md) (Step 1), then merge into this section (Step 2). Agent spec: [`docs/agents/project-profile-extractor.md`](../docs/agents/project-profile-extractor.md).
