@@ -148,6 +148,7 @@ jobHunter/
 ├── README.md                          # This file — architecture & workflow
 ├── docs/
 │   ├── principles.md                  # Decision log & workflow rules
+│   ├── phase1-country-research.md     # Phase 1 — country selection & checklist
 │   └── agents/
 │       ├── README.md
 │       └── job-offer-research.md      # Phase 1 — find offers per country
@@ -212,4 +213,6 @@ jobHunter/
 
 ## Status
 
-Profile and skill map populated. Next: pick five countries, run Phase 1 research agents, name and start the flagship project.
+**Phase 1 (partial):** Five priority countries defined ([`countries/`](countries/)). Job-offer research complete for Germany, Canada, Netherlands, Portugal (40 offers). Skill gap report updated ([`skills/gap-report.md`](skills/gap-report.md)). Ireland offers pending.
+
+**Next:** Ireland job-offer research; close critical gaps (AWS, Jest, CI/CD) via [`learning/backlog.md`](learning/backlog.md) in parallel with applications.

@@ -85,8 +85,12 @@ When `done`, add evidence to [`../profile/master-profile.md`](../profile/master-
 
 ## From Phase 1 / Phase 2
 
-<!-- Add rows when job-offer research or interview feedback surfaces new gaps -->
+Market-validated from 40 offers (DE, NL, CA, PT) — see [`../skills/gap-report.md`](../skills/gap-report.md):
 
 | Priority | Skill / topic | Source | Action | Status | Evidence link |
 |----------|---------------|--------|--------|--------|---------------|
-| | | Phase 1 / Phase 2 | | | |
+| P1 | AWS core (EC2, S3, Lambda, IAM) | Phase 1 — 22/40 offers | Wave 4 flagship deploy | todo | |
+| P1 | Jest unit + integration tests | Phase 1 — 20/40 offers | Wave 3 coverage in CI | todo | |
+| P1 | GitHub Actions CI/CD | Phase 1 — 20/40 offers | Wave 5 pipeline | todo | |
+| P2 | GraphQL | Phase 1 — 15/40 offers | Wave 2 Apollo stack | todo | |
+| P2 | Redis | Phase 1 — 12/40 offers | Wave 2 cache/sessions | todo | |
