@@ -37,17 +37,17 @@ Honest skill levels for AI tailoring. Skills marked **Learning** must not be pre
 
 | Skill | Level | Years of Experience | Notes |
 |---|---|---|---|
-| Node.js | Expert | 7+ | Used in all projects since 2019 |
-| Express | Expert | 7+ | Main framework until NestJS migration |
+| Node.js | Expert | 7+ | All projects since 2019; VoiceDash — API, cron, Socket.IO |
+| Express | Expert | 7+ | Main framework until NestJS migration; VoiceDash — primary backend |
 | NestJS | Beginner / Learning | — | Flagship project — modules, guards, providers |
-| TypeScript | Advanced | 4+ | Used across all recent projects |
-| REST API Design | Expert | 7+ | Versioning, status codes, error handling, `/api/v1/` |
+| TypeScript | Advanced | 4+ | VoiceDash analytics-service (Bun/TS); used across all recent projects |
+| REST API Design | Expert | 7+ | Versioning, status codes, error handling; VoiceDash — `/api/*`, correlation IDs |
 | GraphQL | Beginner / Learning | — | Flagship project — NestJS + Apollo Server |
-| Authentication systems | Advanced | 4+ | Rousta TV — RBAC; summary CV term |
-| JWT Authentication | Advanced | 4+ | Rousta TV — token-based auth + RBAC |
-| OAuth2 / Passport.js | Beginner / Learning | — | Flagship project — Google/GitHub login |
-| Role-Based Access Control | Advanced | 4+ | Rousta TV — implemented in REST APIs |
-| WebSockets / Socket.io | Intermediate | 2+ | Side projects (e.g. spyfall) |
+| Authentication systems | Advanced | 4+ | Rousta TV — RBAC; VoiceDash — magic link, OAuth, team invites |
+| JWT Authentication | Advanced | 4+ | Rousta TV — token-based auth + RBAC; VoiceDash — JWT sessions |
+| OAuth2 / Passport.js | Beginner / Learning | — | VoiceDash — Google/Apple OAuth in production; flagship — Passport.js |
+| Role-Based Access Control | Advanced | 4+ | Rousta TV — REST APIs; VoiceDash — team plan RBAC endpoints |
+| WebSockets / Socket.io | Advanced | 3+ | VoiceDash — production Socket.IO audio streaming; side projects (e.g. spyfall) |
 | Microservices | Beginner / Learning | — | Flagship project — planned service split |
 
 ### Databases
@@ -55,8 +55,8 @@ Honest skill levels for AI tailoring. Skills marked **Learning** must not be pre
 | Skill | Level | Years of Experience | Notes |
 |---|---|---|---|
 | PostgreSQL | Advanced | 4+ | Used in production projects; flagship project — deepening with Art of PostgreSQL |
-| MongoDB | Advanced | 7+ | Primary DB in Rousta TV, Task Manager, Quiz Manager, CRM |
-| Redis | Beginner / Learning | — | Flagship project — sessions, cache, BullMQ queues |
+| MongoDB | Advanced | 7+ | Rousta TV, Task Manager, Quiz Manager, CRM, VoiceDash (15 Mongoose models) |
+| Redis | Intermediate | 1+ | VoiceDash — BullMQ analytics queue in production; flagship — sessions, cache |
 | Prisma | Beginner / Learning | — | Flagship project — ORM + migrations |
 | TypeORM | Beginner | — | Evaluated; Prisma chosen for flagship |
 
@@ -64,7 +64,7 @@ Honest skill levels for AI tailoring. Skills marked **Learning** must not be pre
 
 | Skill | Level | Years of Experience | Notes |
 |---|---|---|---|
-| React | Expert | 7+ | Used in all full-stack projects |
+| React | Expert | 7+ | All full-stack projects; VoiceDash — Electron renderer UI |
 | Next.js | Advanced | 3+ | App Router, SSR, SSG, API routes, middleware |
 | Redux / Zustand | Intermediate | 2+ | Redux in earlier projects; Zustand in flagship |
 | HTML / CSS | Expert | 7+ | Responsive layouts, semantic HTML |
@@ -73,8 +73,11 @@ Honest skill levels for AI tailoring. Skills marked **Learning** must not be pre
 
 | Skill | Level | Years of Experience | Notes |
 |---|---|---|---|
-| Docker | Advanced | 4+ | Containerised all production services |
-| Docker Compose | Advanced | 3+ | Local dev stacks (app + postgres + redis + mongo) |
+| Docker | Expert | 4+ | Owned full dockerization at VoiceDash; all production services containerised |
+| Docker Compose | Advanced | 3+ | VoiceDash — staging + production side-by-side; local dev stacks elsewhere |
+| Release management | Intermediate | 1+ | VoiceDash — git tags, rollbacks, server/client release alignment, rollout decisions |
+| Git branching workflows | Advanced | 2+ | Protected `main`, feature branches, staging vs production paths — VoiceDash; prior lead roles |
+| Multi-environment deployment | Advanced | 1+ | VoiceDash — parallel staging + production Docker stacks on shared VPS |
 | Nginx | Advanced | 4+ | Reverse proxy, SSL termination, static serving |
 | Linux | Advanced | 7+ | Ubuntu server administration, shell scripting |
 | AWS EC2 | Beginner / Learning | — | Flagship project — deploy backend services |
@@ -95,10 +98,15 @@ Honest skill levels for AI tailoring. Skills marked **Learning** must not be pre
 
 | Skill | Level | Years | Notes |
 |---|---|---|---|
-| WordPress (custom dev) | Expert | 5+ | Plugins, themes, performance, security — freelance role since 2020 |
+| WordPress (custom dev) | Expert | 5+ | Plugins, themes, performance, security; VoiceDash — marketing analytics tracker plugin |
 | React Native | Advanced | 2+ | SaaS projects — freelance full-stack role |
-| System Architecture | Advanced | 4+ | Rousta TV and SaaS platform architecture |
-| Remote Team Collaboration | Expert | 7+ | All roles remote |
+| Electron | Advanced | 1+ | VoiceDash — desktop app; coordinated desktop releases with backend deploys |
+| Stripe | Intermediate | 1+ | VoiceDash — Checkout, webhooks, billing portal, plan catalog |
+| System Architecture | Advanced | 4+ | Rousta TV, VoiceDash, SaaS platforms; incremental refactor of AI MVP → stable system |
+| Brownfield / legacy refactoring | Intermediate | 1+ | VoiceDash — gradual untangling of AI-generated spaghetti toward scalable architecture |
+| Code review & pull requests | Advanced | 2+ | VoiceDash — PR reviews, task assignment; Technical Lead 2019–2023 |
+| Product & release judgment | Intermediate | 1+ | VoiceDash — what to ship, update risk, keeping changes aligned with existing architecture |
+| Remote Team Collaboration | Expert | 7+ | All roles remote; VoiceDash — weekly reporting, delegating tasks to other developers |
 
 ---
 
@@ -162,6 +170,32 @@ What you did:
 
 Technologies used:
 React, Next.js, Node.js, React Native, MongoDB, PostgreSQL, TypeScript, Docker, Nginx, Linux
+```
+
+---
+
+### Role 4
+
+```
+Company:        VoiceDash
+Role Title:     Full-Stack Developer → Backend & DevOps Engineer
+Type:           Contract (monthly salary), Remote
+Start Date:     2025
+End Date:       Present
+Duration:       2025 – Present
+
+Your responsibilities:
+- Developed and maintained the AI dictation SaaS (Electron desktop + Node.js backend)
+- Owned Docker Compose deployment, staging/production environments, and release process
+- Performed code reviews, weekly reporting, and task assignment for other developers
+- Aligned server and desktop client releases; managed tags, rollbacks, and rollout risk
+- Refactored AI-generated MVP incrementally toward a stable, scalable architecture
+
+Technologies used:
+Electron, React, Node.js, Express, MongoDB, Socket.IO, Docker, Docker Compose,
+TypeScript, BullMQ, Redis, Stripe, Sentry
+
+Product URL:    https://voicedash.ai (private codebase — no public repo)
 ```
 
 ---
@@ -284,6 +318,54 @@ Progress: See learning/flagship-project.md and learning/backlog.md
 
 ---
 
+### Project 6: VoiceDash
+
+```
+Name:           VoiceDash
+URL:            https://voicedash.ai
+Status:         Live
+Type:           AI dictation SaaS (Electron desktop + Node.js backend)
+Employer:       VoiceDash — see Role 4 (contract, monthly salary)
+Role:           Developer → Backend & DevOps lead (Docker, releases, code review, team coordination)
+Duration:       2025 – Present
+Confidentiality: Private codebase — do not share source or repo in applications or interviews
+
+What it does:
+AI-powered dictation product: an Electron desktop app records voice via push-to-talk or
+hands-free hotkeys, streams audio to a backend over Socket.IO, and returns transcriptions
+pasted into the user's active application. Includes subscription billing, team plans,
+per-user dynamic config, and analytics. Production backend runs in Docker Compose on a
+shared VPS with separate staging and production environments.
+
+Role progression:
+- Started as a full-stack developer on the product
+- Shifted to backend focus when the stack was dockerized; owned Docker Compose layout,
+  multi-environment VPS setup, and release process end-to-end
+- Took on coordination work: code review, PR workflow, weekly reporting, and task
+  assignment for other developers
+
+Your contributions:
+- Built and maintained core backend flows: dictation pipeline, dynamic STT/LLM routing,
+  billing webhooks, auth, background jobs, and observability
+- Owned Docker Compose deployment (api, cron, mongo, analytics-service, Redis) with
+  staging and production running side-by-side on one host
+- Ran release management: git tags, rollbacks, deciding which features ship, and aligning
+  server and Electron client updates so deploys stay compatible
+- Enforced Git branching workflow — feature branches, protected `main`, no direct pushes
+  to production branch; changes validated in staging before release
+- Led code reviews and PR feedback; reported progress weekly and broke work into tasks
+  for other developers on the team
+- Refactored an AI-generated MVP incrementally — preserving loyalty to the existing
+  architecture instead of rewrite churn — until the codebase became stable and scalable
+- Judged rollout risk per change (backend-only vs client+server coupling) before release
+
+Technologies:
+Electron, React, Node.js, Express, MongoDB, Socket.IO, Docker, Docker Compose,
+TypeScript, BullMQ, Redis, Stripe, Sentry
+```
+
+---
+
 ## 6. Education
 
 ```
@@ -313,10 +395,13 @@ Completed:
 ## 8. Soft Skills & Working Style
 
 ```
-Leadership:         Technical Lead (2019–2023) — architecture, deployment, platform maintenance
+Leadership:         Technical Lead (2019–2023); VoiceDash — code review, weekly reporting,
+                    task assignment, release ownership
 Remote work:        7+ years fully remote — async communication, self-managed
-Problem solving:    Practical, delivery-focused approach to full-stack SaaS development
+Problem solving:    Practical, delivery-focused; incremental refactor over big-bang rewrites
+                    (VoiceDash — stabilising AI-generated MVP while respecting existing architecture)
 Communication:      Fluent in English (written and spoken)
+Release mindset:    Staging before production; server/client deploy alignment; rollback-ready tags
 Preferred work style: Remote collaboration
 Availability:       Immediate
 Open to:            Full-time, remote or hybrid, relocation with visa sponsorship
@@ -351,7 +436,8 @@ Deal breakers:          No unpaid overtime; no 24/7 on-call without compensation
 ```
 GitHub:         https://github.com/emadpoursina
 LinkedIn:       https://www.linkedin.com/in/emadpoursina/
-Portfolio:      Rousta TV (https://roustatv.com/), Quiz Manager (https://azmoon.sujiland.com/login)
+Portfolio:      Rousta TV (https://roustatv.com/), Quiz Manager (https://azmoon.sujiland.com/login),
+                VoiceDash (https://voicedash.ai — live product, private codebase)
 Blog:           —
 Open source:    fa.javascript.info (Persian translation of Modern JavaScript Tutorial)
 ```
@@ -369,7 +455,8 @@ When this profile is passed to an AI to generate a tailored CV, use these rules:
 5. **Quantify where possible** — use numbers from Section 5 (scale/metrics) whenever available.
 6. **Adjust seniority language** — for senior roles use "architected", "led", "designed". For mid roles use "built", "implemented", "developed".
 7. **Never fabricate** — only use information present in this document. If a skill is marked **Learning**, do not present it as proficient.
-8. **Output format** — Markdown, one page preferred, two pages maximum.
+8. **Private projects** — VoiceDash has a private codebase; cite https://voicedash.ai only. Never list a git repo or source link for VoiceDash.
+9. **Output format** — Markdown, one page preferred, two pages maximum.
 
 **Prompt template:** [`../docs/agents/cv-generator.md`](../docs/agents/cv-generator.md)  
 **Quick invocation:** [`../documents/prompts/cv-from-offer.md`](../documents/prompts/cv-from-offer.md)  
