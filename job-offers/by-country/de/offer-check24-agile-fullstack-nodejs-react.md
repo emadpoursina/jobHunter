@@ -17,27 +17,29 @@
 | **Visa sponsorship** | Yes — Relocation support listed |
 | **Source URL** | https://relocate.me/germany/munich/check24/agile-fullstack-nodejs-react-web-developer-331 |
 | **Date collected** | 2026-06-06 |
-| **Sample round** | Phase 1 corpus |
+| **Sample round** | live application |
+
+> **Note:** Relocate.me listing marked archived (2026-06-06). Verify on [jobs.check24.de](https://jobs.check24.de) before applying; similar InsurTech full-stack roles exist (TypeScript/React, CI/CD, testing).
 
 ### Job description summary
 
-CHECK24 is seeking an agile full-stack web developer to build and maintain customer-facing web applications using Node.js and React. The role involves working in cross-functional agile teams, designing REST APIs, and delivering features across the full stack. Relocation support is available for international candidates.
+Build and grow innovative insurance applications used daily by thousands of users. Develop features with product managers and QA; scout and implement new technologies; participate in feature planning and estimations; advance Node.js micro-service and micro-app architectures. Stack mentioned: Node.js, React/Redux, Docker, ES6, MongoDB, Redis, Sentry, Elasticsearch. Relocation support to Germany available.
 
 ### Required skills
 
-1. Node.js
-2. React
-3. TypeScript
-4. REST API design
-5. JavaScript (ES6+)
+1. Node.js / JavaScript (ES6+)
+2. React (modern frontend frameworks)
+3. SaaS platform experience (create or maintain)
+4. SOLID, KISS, YAGNI — well-crafted code
+5. Unit testing (ava, mocha, chai, sinon)
 
 ### Nice-to-have skills
 
 1. Docker
-2. MongoDB or PostgreSQL
-3. Next.js
-4. Unit testing (Jest)
-5. CI/CD (GitLab CI / GitHub Actions)
+2. MongoDB / Redis
+3. CSS preprocessors (PostCSS) and BEM / SUIT-CSS
+4. Microservices architecture
+5. Elasticsearch
 
 ### About the company
 
@@ -64,18 +66,19 @@ Agile team environment — emphasise Tech Lead experience and remote collaborati
 | Node.js | Required | ✅ |
 | React | Required | ✅ |
 | TypeScript | Required | ✅ |
-| REST API design | Required | ✅ |
+| SaaS platform experience | Required | ✅ |
+| Unit testing (mocha/chai/sinon) | Required | ⚠️ Learning (Jest — not mocha) |
+| SOLID / clean code | Required | ✅ (implicit) |
 | Docker | Nice-to-have | ✅ |
-| PostgreSQL / MongoDB | Nice-to-have | ✅ |
-| Next.js | Nice-to-have | ✅ |
-| Jest unit testing | Nice-to-have | ❌ Learning |
-| GitHub Actions CI/CD | Nice-to-have | ❌ Learning |
+| MongoDB / Redis | Nice-to-have | ✅ |
+| Microservices | Nice-to-have | ⚠️ Learning |
+| PostCSS / BEM | Nice-to-have | ✅ (CSS/Tailwind) |
 
 ---
 
 ## Application
 
 - **Applied:** no
-- **Pipeline ID:**
-- **Generated CV:**
+- **Pipeline ID:** DE-002
+- **Generated CV:** `documents/generated/CV_Check24_AgileFullStackNodeReact_2026-06-06.md`
 - **Stage:** draft
