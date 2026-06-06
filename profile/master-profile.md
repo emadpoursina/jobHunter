@@ -1,8 +1,8 @@
 # Master Profile — Backend Developer
 
 > Emad Poursina  
-> This document is the single source of truth for generating tailored CVs.  
-> Fill every section as completely as possible. The more detail here, the better the AI can tailor your CV.
+> Version: 2.0 — Updated 2026-06-06  
+> This document is the single source of truth for generating tailored CVs.
 
 ---
 
@@ -25,13 +25,13 @@ Languages:         Farsi (Native), English (Fluent), German (A1 — learning)
 
 ## 2. Professional Summary
 
-Full-Stack JavaScript Engineer with 7+ years of web development experience, specializing in scalable SaaS platforms using Next.js, Node.js, and TypeScript. Strong background in REST API design, authentication systems, and Docker-based deployments. Experienced in remote team collaboration. Four years as Technical Lead (2019–2023) leading web platform development, architecture, and deployment. Currently upskilling via a flagship portfolio project covering NestJS, GraphQL, AWS, Jest testing, and GitHub Actions CI/CD. Seeking relocation opportunities in Germany and senior backend or full-stack roles in Europe and Canada with employer visa sponsorship.
+Full-Stack JavaScript Engineer with 7+ years of experience building scalable SaaS platforms using Node.js, TypeScript, React, and Next.js. Strong background in REST API design, JWT authentication, role-based access control, and Docker-based deployments. Four years as Technical Lead (2019–2023) owning architecture and delivery. Currently backend & DevOps lead on VoiceDash — a live AI dictation SaaS (Electron, Socket.IO, Docker Compose, Stripe, BullMQ/Redis) — and mobile developer on Villion — a live luxury concierge platform (React Native/Expo member app within a team monorepo spanning Azure Functions, MongoDB, Next.js admin, Stripe, SignalR chat, and a LiveKit AI concierge agent). Also building a flagship portfolio project to add AWS, NestJS, GraphQL, Jest testing, and PostgreSQL advanced patterns. Seeking senior backend or full-stack roles in Europe or Canada with visa sponsorship; Germany is the primary relocation target.
 
 ---
 
 ## 3. Core Skills
 
-Honest skill levels for AI tailoring. Skills marked **Learning** must not be presented as proficient on CVs.
+Honest skill levels for AI tailoring. Skills marked **Learning** must not be presented as proficient on CVs. Skills noted as **team context** describe platforms you contribute to — do not present as end-to-end ownership on CVs.
 
 ### Backend
 
@@ -40,22 +40,26 @@ Honest skill levels for AI tailoring. Skills marked **Learning** must not be pre
 | Node.js | Expert | 7+ | All projects since 2019; VoiceDash — API, cron, Socket.IO |
 | Express | Expert | 7+ | Main framework until NestJS migration; VoiceDash — primary backend |
 | NestJS | Beginner / Learning | — | Flagship project — modules, guards, providers |
-| TypeScript | Advanced | 4+ | VoiceDash analytics-service (Bun/TS); used across all recent projects |
+| TypeScript | Advanced | 4+ | VoiceDash analytics-service (Bun/TS); Villion mobile; all recent projects |
 | REST API Design | Expert | 7+ | Versioning, status codes, error handling; VoiceDash — `/api/*`, correlation IDs |
 | GraphQL | Beginner / Learning | — | Flagship project — NestJS + Apollo Server |
 | Authentication systems | Advanced | 4+ | Rousta TV — RBAC; VoiceDash — magic link, OAuth, team invites |
 | JWT Authentication | Advanced | 4+ | Rousta TV — token-based auth + RBAC; VoiceDash — JWT sessions |
 | OAuth2 / Passport.js | Beginner / Learning | — | VoiceDash — Google/Apple OAuth in production; flagship — Passport.js |
 | Role-Based Access Control | Advanced | 4+ | Rousta TV — REST APIs; VoiceDash — team plan RBAC endpoints |
-| WebSockets / Socket.io | Advanced | 3+ | VoiceDash — production Socket.IO audio streaming; side projects (e.g. spyfall) |
+| WebSockets / Socket.IO | Advanced | 3+ | VoiceDash — production Socket.IO audio streaming; side projects (e.g. spyfall) |
+| WebSockets / Real-time (SignalR) | Beginner | — | Villion platform — team context; concierge chat integration touchpoints |
+| Serverless Functions | Beginner | — | Villion platform — team context (~208 Azure HTTP/timer functions in monorepo) |
+| Stripe Payments | Advanced | 1+ | VoiceDash — Checkout, webhooks, billing portal; Villion platform — team context |
+| AI Integration (LLM/STT/TTS) | Intermediate | 1+ | VoiceDash — dictation pipeline, dynamic STT/LLM routing; Villion — LiveKit agent (team context) |
 | Microservices | Beginner / Learning | — | Flagship project — planned service split |
 
 ### Databases
 
 | Skill | Level | Years of Experience | Notes |
 |---|---|---|---|
-| PostgreSQL | Advanced | 4+ | Used in production projects; flagship project — deepening with Art of PostgreSQL |
-| MongoDB | Advanced | 7+ | Rousta TV, Task Manager, Quiz Manager, CRM, VoiceDash (15 Mongoose models) |
+| PostgreSQL | Advanced | 4+ | Used in production projects; deepening with Art of PostgreSQL |
+| MongoDB | Expert | 7+ | Rousta TV, Task Manager, Quiz Manager, CRM, VoiceDash (15 Mongoose models); Villion platform — team context (20+ collections) |
 | Redis | Intermediate | 1+ | VoiceDash — BullMQ analytics queue in production; flagship — sessions, cache |
 | Prisma | Beginner / Learning | — | Flagship project — ORM + migrations |
 | TypeORM | Beginner | — | Evaluated; Prisma chosen for flagship |
@@ -65,26 +69,32 @@ Honest skill levels for AI tailoring. Skills marked **Learning** must not be pre
 | Skill | Level | Years of Experience | Notes |
 |---|---|---|---|
 | React | Expert | 7+ | All full-stack projects; VoiceDash — Electron renderer UI |
-| Next.js | Advanced | 3+ | App Router, SSR, SSG, API routes, middleware |
-| Redux / Zustand | Intermediate | 2+ | Redux in earlier projects; Zustand in flagship |
-| HTML / CSS | Expert | 7+ | Responsive layouts, semantic HTML |
+| Next.js | Advanced | 3+ | App Router, SSR, SSG, API routes, middleware; Villion admin — team context (Next.js 15) |
+| React Native / Expo | Advanced | 2+ | Villion mobile — Expo 54, 166+ screens, EAS/TestFlight; earlier SaaS freelance |
+| Redux / Zustand / Jotai | Intermediate | 2+ | Villion mobile uses Jotai; Zustand in flagship; Redux in earlier projects |
+| HTML / CSS / Tailwind | Expert | 7+ | Responsive layouts, semantic HTML; Tailwind on Villion admin — team context |
 
 ### DevOps & Infrastructure
 
 | Skill | Level | Years of Experience | Notes |
 |---|---|---|---|
-| Docker | Expert | 4+ | Owned full dockerization at VoiceDash; all production services containerised |
+| Docker | Expert | 4+ | Owned full dockerization at VoiceDash; Villion LiveKit agent Dockerfile — team context |
 | Docker Compose | Advanced | 3+ | VoiceDash — staging + production side-by-side; local dev stacks elsewhere |
 | Release management | Intermediate | 1+ | VoiceDash — git tags, rollbacks, server/client release alignment, rollout decisions |
 | Git branching workflows | Advanced | 2+ | Protected `main`, feature branches, staging vs production paths — VoiceDash; prior lead roles |
 | Multi-environment deployment | Advanced | 1+ | VoiceDash — parallel staging + production Docker stacks on shared VPS |
 | Nginx | Advanced | 4+ | Reverse proxy, SSL termination, static serving |
 | Linux | Advanced | 7+ | Ubuntu server administration, shell scripting |
+| GitHub Actions / CI/CD | Beginner / Learning | — | Flagship project — lint → test → deploy; Villion team — PR lint/build matrix (exposure) |
+| Azure Functions | Beginner | — | Villion platform — team context (v4 runtime, ~208 HTTP + timer triggers) |
+| Azure Blob Storage | Beginner | — | Villion platform — team context (presigned upload endpoints) |
+| Azure SignalR | Beginner | — | Villion platform — team context (concierge chat) |
+| Azure Communication (Email/SMS) | Beginner | — | Villion platform — team context (transactional messaging) |
+| Netlify | Beginner | — | Villion admin + marketing deploy — team context |
 | AWS EC2 | Beginner / Learning | — | Flagship project — deploy backend services |
 | AWS S3 | Beginner / Learning | — | Flagship project — file uploads, static assets |
 | AWS RDS | Beginner / Learning | — | Flagship project — production PostgreSQL |
-| AWS Lambda | Beginner / Learning | — | Flagship project — serverless trigger (e.g. image resize) |
-| GitHub Actions / CI/CD | Beginner / Learning | — | Flagship project — lint → test → deploy pipeline |
+| AWS Lambda | Beginner / Learning | — | Flagship project — serverless trigger (Azure Functions experience transferable) |
 
 ### Testing
 
@@ -99,10 +109,9 @@ Honest skill levels for AI tailoring. Skills marked **Learning** must not be pre
 | Skill | Level | Years | Notes |
 |---|---|---|---|
 | WordPress (custom dev) | Expert | 5+ | Plugins, themes, performance, security; VoiceDash — marketing analytics tracker plugin |
-| React Native | Advanced | 2+ | SaaS projects — freelance full-stack role; Villion — Expo iOS app, booking flows, trip feature |
 | Electron | Advanced | 1+ | VoiceDash — desktop app; coordinated desktop releases with backend deploys |
-| Stripe | Intermediate | 1+ | VoiceDash — Checkout, webhooks, billing portal, plan catalog |
-| System Architecture | Advanced | 4+ | Rousta TV, VoiceDash, SaaS platforms; incremental refactor of AI MVP → stable system |
+| System Architecture | Advanced | 4+ | Rousta TV, VoiceDash, SaaS platforms; Villion monorepo — team context |
+| Agile / Scrum | Intermediate | 4+ | Technical Lead 2019–2023 — sprint planning, delivery coordination |
 | Brownfield / legacy refactoring | Intermediate | 1+ | VoiceDash, Villion — gradual untangling of AI-generated spaghetti toward clearer mobile architecture |
 | Manual QA & test planning | Intermediate | 1+ | Villion — scenario testing, Miro flowcharts to map paths and surface edge cases |
 | Code review & pull requests | Advanced | 2+ | VoiceDash — PR reviews, task assignment; Technical Lead 2019–2023 |
@@ -168,6 +177,7 @@ End Date:       Present
 What you did:
 - Built different SaaS projects across React, Next.js, and React Native
 - Full-stack development on social platforms, quiz systems, CRM, and task management apps
+- Contract work on VoiceDash (backend & DevOps) and Villion (mobile) — see Roles 4–5
 
 Technologies used:
 React, Next.js, Node.js, React Native, MongoDB, PostgreSQL, TypeScript, Docker, Nginx, Linux
@@ -321,9 +331,9 @@ Type:           Full-stack SaaS with microservices architecture
 Role:           Sole developer
 
 Purpose:
-Built specifically to demonstrate and close market skill gaps identified in Phase 1 research
-(40 job offers across DE, NL, CA, PT): AWS, Jest testing, GitHub Actions CI/CD,
-NestJS, GraphQL, Redis, PostgreSQL advanced patterns.
+Built to close remaining market skill gaps identified in Phase 1 research (40 job offers
+across DE, NL, CA, PT): AWS, Jest testing, NestJS, GraphQL, Redis, PostgreSQL advanced patterns.
+Note: GitHub Actions CI/CD exposure from Villion team workflows; production CI/CD ownership via flagship.
 
 Planned features:
 - NestJS backend with REST + GraphQL (Apollo Server)
@@ -397,18 +407,26 @@ TypeScript, BullMQ, Redis, Stripe, Sentry
 
 ```
 Name:           Villion
-URL:            https://joinvillion.com
-Status:         Live
+URL:            https://joinvillion.com (marketing) | https://villionadmin.netlify.app (admin)
+                API: https://villion-api-ecc6ckb6h6gzh0d7.eastus2-01.azurewebsites.net/api
+Status:         Live (production)
 Type:           Luxury concierge & membership platform (React Native iOS member app)
 Employer:       Villion — see Role 5 (contract, monthly salary, remote)
-Role:           Full-stack developer (mostly mobile app)
+Role:           Full-stack developer (mostly mobile app) on a remote team
 Duration:       2025-11 – Present
-Confidentiality: Private codebase — cite https://joinvillion.com only in applications
+Confidentiality: Private codebase — cite public URLs only; never list git repos or source links
 
 What it does:
-Tiered luxury concierge and membership platform. Members use a React Native mobile app to browse
-and book high-end inventory (cars, yachts, villas, hotels, jets, events, wellness, restaurants,
-and related services) and manage membership tiers and booking workflows.
+Tiered luxury concierge and membership platform. Members use a React Native / Expo mobile app to
+browse and book high-end inventory (cars, yachts, villas, hotels, jets, events, wellness, restaurants).
+Operations run on a serverless Azure Functions API backed by MongoDB, with Stripe payments,
+Next.js admin and vendor dashboards, real-time concierge chat, and a LiveKit AI concierge agent.
+
+Platform stack (team monorepo — not solely owned):
+~208 Azure HTTP/timer functions, 20+ MongoDB collections, Next.js 15 admin (79+ App Router pages),
+166+ mobile screens, Stripe PaymentIntents + webhooks, Azure SignalR chat, LiveKit AI agent
+(STT → LLM → TTS), GitHub Actions CI/CD (PR lint/build matrix; staging + prod Azure deploy),
+Netlify (admin + marketing), EAS/TestFlight
 
 Role progression:
 - Joined mid-project on an existing remote team (monthly contract)
@@ -429,8 +447,13 @@ Your contributions:
 - Redesigned and implemented the trip feature — fixed prior architecture, integrated cleanly,
   and kept legacy behaviour working
 
-Technologies:
-React Native, Expo, JavaScript, TypeScript
+Technologies (personal scope):
+React Native, Expo 54, JavaScript, TypeScript, Jotai
+
+Technologies (platform / team context — do not claim sole ownership on CVs):
+Node.js 20+, Azure Functions v4, MongoDB, Stripe, Azure Blob Storage, Azure Communication,
+Azure SignalR, Next.js 15, React 19, Tailwind CSS 4, shadcn/ui, LiveKit (agents SDK + WebRTC),
+Dropbox Sign, Docker, GitHub Actions, Netlify, EAS/TestFlight
 ```
 
 ---
@@ -449,14 +472,16 @@ Period:         2019 – 2023
 ## 7. Certifications & Courses
 
 ```
-Planned (from learning backlog):
-- AWS Cloud Practitioner Essentials — AWS Skill Builder — 2026 (planned)
+Completed:
+- Modern JavaScript (javascript.info) — self-study — contributed Persian translation (fa.javascript.info)
+
+In Progress:
 - The Art of PostgreSQL — self-study — ongoing
 - Use The Index, Luke — self-study — ongoing
 - Designing Data-Intensive Applications — 1 chapter/week — ongoing
 
-Completed:
-- Modern JavaScript (javascript.info) — self-study — contributed Persian translation (fa.javascript.info)
+Planned:
+- AWS Cloud Practitioner Essentials — AWS Skill Builder — 2026
 ```
 
 ---
@@ -465,7 +490,7 @@ Completed:
 
 ```
 Leadership:         Technical Lead (2019–2023); VoiceDash — code review, weekly reporting,
-                    task assignment, release ownership
+                    task assignment, release ownership; Villion — mobile feature ownership on remote team
 Remote work:        7+ years fully remote — async communication, self-managed
 Problem solving:    Practical, delivery-focused; incremental refactor over big-bang rewrites
                     (VoiceDash, Villion — stabilising AI-generated code while respecting existing architecture)
@@ -483,7 +508,7 @@ Open to:            Full-time, remote or hybrid, relocation with visa sponsorshi
 ```
 Target Role:            Senior Backend Engineer / Senior Full-Stack Engineer
 Preferred Stack:        Node.js / NestJS / TypeScript / PostgreSQL
-Open to:                Backend-heavy full-stack roles
+Open to:                Backend-heavy full-stack roles, serverless architectures
 Minimum salary:
   - Germany:            €55,000/year
   - Netherlands:        €65,000/year
@@ -507,7 +532,7 @@ GitHub:         https://github.com/emadpoursina
 LinkedIn:       https://www.linkedin.com/in/emadpoursina/
 Portfolio:      Rousta TV (https://roustatv.com/), Quiz Manager (https://azmoon.sujiland.com/login),
                 VoiceDash (https://voicedash.ai — live product, private codebase),
-                Villion (https://joinvillion.com — live product, private codebase)
+                Villion (https://joinvillion.com, https://villionadmin.netlify.app — live product, private codebase)
 Blog:           —
 Open source:    fa.javascript.info (Persian translation of Modern JavaScript Tutorial)
 ```
@@ -521,12 +546,13 @@ When this profile is passed to an AI to generate a tailored CV, use these rules:
 1. **Match the job offer stack** — emphasise skills that appear in the job description. De-emphasise irrelevant ones.
 2. **Rewrite the summary** — tailor the first paragraph to reflect the company's language and priorities.
 3. **Reorder skills** — put the most relevant skills at the top of the skills section.
-4. **Select 3–4 projects** — choose the ones most relevant to the job offer. Always include the flagship project if the stack matches.
-5. **Quantify where possible** — use numbers from Section 5 (scale/metrics) whenever available.
+4. **Select 3–4 projects** — choose the ones most relevant to the job offer. Default anchors: VoiceDash for backend/DevOps/Docker/Stripe roles; Villion for mobile, full-stack, or luxury/SaaS roles; flagship when NestJS/GraphQL/AWS/Jest match. Include Rousta TV or Quiz Manager for MERN/social/quiz roles.
+5. **Quantify where possible** — VoiceDash: Docker multi-env, Socket.IO streaming, 15 Mongoose models. Villion (personal scope): 166+ screens, trip feature, booking flows. Villion (platform context only): ~208 functions, 79+ admin pages, 20+ collections — cite only when framing team/platform scale, not as sole ownership.
 6. **Adjust seniority language** — for senior roles use "architected", "led", "designed". For mid roles use "built", "implemented", "developed".
-7. **Never fabricate** — only use information present in this document. If a skill is marked **Learning**, do not present it as proficient.
-8. **Private projects** — VoiceDash and Villion have private codebases; cite https://voicedash.ai and https://joinvillion.com only. Never list git repos or source links for either.
-9. **Output format** — Markdown, one page preferred, two pages maximum.
+7. **Never fabricate** — only use information present in this document. If a skill is marked **Learning**, do not present it as proficient. Skills marked "team context" must not be presented as personally built end-to-end.
+8. **Azure → AWS framing** — when applying to AWS-heavy roles, frame Azure Functions experience (Villion platform context) as transferable to Lambda; Azure Blob as S3-equivalent; Azure SignalR as comparable to API Gateway WebSockets.
+9. **Private projects** — VoiceDash and Villion have private codebases; cite public product URLs only. Never list git repos or source links for either.
+10. **Output format** — Markdown, one page preferred, two pages maximum.
 
 **Prompt template:** [`../docs/agents/cv-generator.md`](../docs/agents/cv-generator.md)  
 **Quick invocation:** [`../documents/prompts/cv-from-offer.md`](../documents/prompts/cv-from-offer.md)  

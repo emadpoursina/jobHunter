@@ -1,6 +1,6 @@
 # Master profile (Phase 2)
 
-[`master-profile.md`](master-profile.md) — **Emad Poursina**, full-stack JavaScript engineer, 7+ years.
+[`master-profile.md`](master-profile.md) — **Emad Poursina**, full-stack JavaScript engineer, 7+ years. Profile v2.0 (2026-06-06).
 
 Single source of truth for AI-generated CVs. Structured from [`../raw/Master_Profile_Template.md`](../raw/Master_Profile_Template.md).
 
