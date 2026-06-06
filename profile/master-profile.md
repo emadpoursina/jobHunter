@@ -99,14 +99,15 @@ Honest skill levels for AI tailoring. Skills marked **Learning** must not be pre
 | Skill | Level | Years | Notes |
 |---|---|---|---|
 | WordPress (custom dev) | Expert | 5+ | Plugins, themes, performance, security; VoiceDash — marketing analytics tracker plugin |
-| React Native | Advanced | 2+ | SaaS projects — freelance full-stack role |
+| React Native | Advanced | 2+ | SaaS projects — freelance full-stack role; Villion — Expo iOS app, booking flows, trip feature |
 | Electron | Advanced | 1+ | VoiceDash — desktop app; coordinated desktop releases with backend deploys |
 | Stripe | Intermediate | 1+ | VoiceDash — Checkout, webhooks, billing portal, plan catalog |
 | System Architecture | Advanced | 4+ | Rousta TV, VoiceDash, SaaS platforms; incremental refactor of AI MVP → stable system |
-| Brownfield / legacy refactoring | Intermediate | 1+ | VoiceDash — gradual untangling of AI-generated spaghetti toward scalable architecture |
+| Brownfield / legacy refactoring | Intermediate | 1+ | VoiceDash, Villion — gradual untangling of AI-generated spaghetti toward clearer mobile architecture |
+| Manual QA & test planning | Intermediate | 1+ | Villion — scenario testing, Miro flowcharts to map paths and surface edge cases |
 | Code review & pull requests | Advanced | 2+ | VoiceDash — PR reviews, task assignment; Technical Lead 2019–2023 |
 | Product & release judgment | Intermediate | 1+ | VoiceDash — what to ship, update risk, keeping changes aligned with existing architecture |
-| Remote Team Collaboration | Expert | 7+ | All roles remote; VoiceDash — weekly reporting, delegating tasks to other developers |
+| Remote Team Collaboration | Expert | 7+ | All roles remote; VoiceDash, Villion — remote team work under senior developer |
 
 ---
 
@@ -467,7 +468,7 @@ Leadership:         Technical Lead (2019–2023); VoiceDash — code review, wee
                     task assignment, release ownership
 Remote work:        7+ years fully remote — async communication, self-managed
 Problem solving:    Practical, delivery-focused; incremental refactor over big-bang rewrites
-                    (VoiceDash — stabilising AI-generated MVP while respecting existing architecture)
+                    (VoiceDash, Villion — stabilising AI-generated code while respecting existing architecture)
 Communication:      Fluent in English (written and spoken)
 Release mindset:    Staging before production; server/client deploy alignment; rollback-ready tags
 Preferred work style: Remote collaboration
@@ -505,7 +506,8 @@ Deal breakers:          No unpaid overtime; no 24/7 on-call without compensation
 GitHub:         https://github.com/emadpoursina
 LinkedIn:       https://www.linkedin.com/in/emadpoursina/
 Portfolio:      Rousta TV (https://roustatv.com/), Quiz Manager (https://azmoon.sujiland.com/login),
-                VoiceDash (https://voicedash.ai — live product, private codebase)
+                VoiceDash (https://voicedash.ai — live product, private codebase),
+                Villion (https://joinvillion.com — live product, private codebase)
 Blog:           —
 Open source:    fa.javascript.info (Persian translation of Modern JavaScript Tutorial)
 ```
@@ -523,7 +525,7 @@ When this profile is passed to an AI to generate a tailored CV, use these rules:
 5. **Quantify where possible** — use numbers from Section 5 (scale/metrics) whenever available.
 6. **Adjust seniority language** — for senior roles use "architected", "led", "designed". For mid roles use "built", "implemented", "developed".
 7. **Never fabricate** — only use information present in this document. If a skill is marked **Learning**, do not present it as proficient.
-8. **Private projects** — VoiceDash has a private codebase; cite https://voicedash.ai only. Never list a git repo or source link for VoiceDash.
+8. **Private projects** — VoiceDash and Villion have private codebases; cite https://voicedash.ai and https://joinvillion.com only. Never list git repos or source links for either.
 9. **Output format** — Markdown, one page preferred, two pages maximum.
 
 **Prompt template:** [`../docs/agents/cv-generator.md`](../docs/agents/cv-generator.md)  
