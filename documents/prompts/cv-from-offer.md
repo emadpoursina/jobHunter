@@ -13,7 +13,7 @@ Follow docs/agents/cv-generator.md exactly.
 
 Inputs:
 1. Master profile: profile/master-profile.md
-2. Job offer: [PASTE OFFER FILE PATH, e.g. job-offers/by-country/de/offer-check24-fullstack-nodejs-react.md]
+2. Job offer: [PASTE OFFER FILE PATH, e.g. job-offers/by-country/de/offer-<company>-<role-slug>.md]
 
 Produce:
 1. Tailored CV (output format from agent spec)

@@ -22,7 +22,7 @@ offer_file: <path to job offer markdown>
 Example:
 
 ```
-offer_file: job-offers/by-country/de/offer-check24-fullstack-nodejs-react.md
+offer_file: job-offers/by-country/de/offer-<company>-<role-slug>.md
 ```
 
 Always load the master profile from:

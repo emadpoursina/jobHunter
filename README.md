@@ -219,6 +219,6 @@ jobHunter/
 
 **Phase 1 (partial):** Five priority countries defined ([`countries/`](countries/)). Job-offer research complete for Germany, Canada, Netherlands, Portugal (40 offers). Skill gap report updated ([`skills/gap-report.md`](skills/gap-report.md)). Ireland offers pending.
 
-**Phase 2 (in progress):** Master profile complete ([`profile/master-profile.md`](profile/master-profile.md)). CV generator agent ready ([`docs/agents/cv-generator.md`](docs/agents/cv-generator.md)). Example offer: [`job-offers/by-country/de/offer-check24-agile-fullstack-nodejs-react.md`](job-offers/by-country/de/offer-check24-agile-fullstack-nodejs-react.md).
+**Phase 2 (in progress):** Master profile complete ([`profile/master-profile.md`](profile/master-profile.md)). CV generator agent ready ([`docs/agents/cv-generator.md`](docs/agents/cv-generator.md)). Germany Phase 1 corpus archived — collect **live** offers (~90 days) before creating offer files.
 
-**Next:** Run CV generator on first live application; Ireland job-offer research; close critical gaps (AWS, Jest, CI/CD) via [`learning/backlog.md`](learning/backlog.md) in parallel with applications.
+**Next:** Find live Germany roles with visa sponsorship; Ireland job-offer research; close critical gaps (AWS, Jest, CI/CD) via [`learning/backlog.md`](learning/backlog.md) in parallel with applications.
