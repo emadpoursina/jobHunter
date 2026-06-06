@@ -392,6 +392,48 @@ TypeScript, BullMQ, Redis, Stripe, Sentry
 
 ---
 
+### Project 7: Villion
+
+```
+Name:           Villion
+URL:            https://joinvillion.com
+Status:         Live
+Type:           Luxury concierge & membership platform (React Native iOS member app)
+Employer:       Villion — see Role 5 (contract, monthly salary, remote)
+Role:           Full-stack developer (mostly mobile app)
+Duration:       2025-11 – Present
+Confidentiality: Private codebase — cite https://joinvillion.com only in applications
+
+What it does:
+Tiered luxury concierge and membership platform. Members use a React Native mobile app to browse
+and book high-end inventory (cars, yachts, villas, hotels, jets, events, wellness, restaurants,
+and related services) and manage membership tiers and booking workflows.
+
+Role progression:
+- Joined mid-project on an existing remote team (monthly contract)
+- Started with manual testing — the app was complex with many scenarios and paths
+- Built flowcharts on Miro to map flows; used them to pinpoint problems and edge cases
+- As the senior developer gained confidence, moved from testing into small fixes and polish
+- Took on substantial refactoring where AI-generated code had left spaghetti sections in the mobile app
+- Progressed to component-level work (e.g. improved booking flows, date picker)
+- Now owns full features end-to-end — latest: trip feature (existed but was messy; redesigned
+  architecture, restructured, and reimplemented with legacy support)
+
+Your contributions:
+- Ran structured manual testing across complex booking and membership scenarios
+- Created Miro flowcharts mapping user paths to find bugs and edge cases early
+- Delivered small fixes, UI polish, and incremental refactors on the React Native iOS app
+- Refactored AI-generated mobile code toward maintainable structure without big-bang rewrites
+- Built improved booking flows and reusable components (e.g. date picker)
+- Redesigned and implemented the trip feature — fixed prior architecture, integrated cleanly,
+  and kept legacy behaviour working
+
+Technologies:
+React Native, Expo, JavaScript, TypeScript
+```
+
+---
+
 ## 6. Education
 
 ```
