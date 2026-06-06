@@ -1,5 +1,13 @@
-# Master profile
+# Master profile (Phase 2)
 
 [`master-profile.md`](master-profile.md) — **Emad Poursina**, full-stack JavaScript engineer, 7+ years.
 
-Single source of truth for AI-generated CVs. Sync skills from [`../skills/skill-map.md`](../skills/skill-map.md) and evidence from [`../learning/backlog.md`](../learning/backlog.md).
+Single source of truth for AI-generated CVs. Structured from [`../raw/Master_Profile_Template.md`](../raw/Master_Profile_Template.md).
+
+**Keep in sync:**
+
+- Skills & levels → [`../skills/skill-map.md`](../skills/skill-map.md)
+- New evidence (flagship progress, certs) → [`../learning/backlog.md`](../learning/backlog.md)
+- Phase 2 feedback → Section 7 in [`../skills/gap-report.md`](../skills/gap-report.md)
+
+**Generate a CV:** [`../documents/prompts/cv-from-offer.md`](../documents/prompts/cv-from-offer.md)
