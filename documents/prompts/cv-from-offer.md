@@ -31,8 +31,8 @@ Hard rules:
 
 ## Before you run
 
-1. Master profile is filled → [`profile/master-profile.md`](../../profile/master-profile.md)
-2. Job offer file exists → copy [`job-offers/_offer-template.md`](../../job-offers/_offer-template.md) to `job-offers/by-country/<code>/offer-<company>-<role-slug>.md`
+1. Master profile is filled → `[profile/master-profile.md](../../profile/master-profile.md)`
+2. Job offer file exists → copy `[job-offers/_offer-template.md](../../job-offers/_offer-template.md)` to `job-offers/by-country/<code>/offer-<company>-<role-slug>.md`
 3. Paste full job description and fill Required / Nice-to-have skills tables
 
 ---
@@ -49,7 +49,7 @@ Review the **Tailoring Report** first, especially **Risks & Gaps**.
 
 Only move pipeline stage to `reviewed` → `sent` after you approve.
 
-**Rule:** 100% human review before any CV is sent. Store only reviewed versions in [`generated/`](../generated/).
+**Rule:** 100% human review before any CV is sent. Store only reviewed versions in `[generated/](../generated/)`.
 
 ---
 
@@ -63,3 +63,4 @@ Examples:
 
 - `CV_Check24_AgileFullStackNodeReact_2026-06-06.md`
 - `CV_LemonOne_FullStackNodeReactServerless_2026-06-06.md`
+
