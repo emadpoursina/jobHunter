@@ -15,6 +15,7 @@ Decision log for jobHunter. Update when rules change.
 - **Recency:** Prefer postings from the last ~90 days.
 - **Sources:** Company careers pages, LinkedIn, reputable national boards.
 - **Exclude:** Unrelated titles, intern/junior mismatch, duplicate reposts, unclear visa/sponsorship where that matters.
+- **Agent:** Run [`agents/job-offer-research.md`](agents/job-offer-research.md) per country; output → `job-offers/by-country/<code>/research.md`.
 
 ## Immigration (Phase 1)
 

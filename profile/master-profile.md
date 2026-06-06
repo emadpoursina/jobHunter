@@ -4,14 +4,14 @@
 
 ## Summary
 
-<!-- 2–3 sentences: backend/full-stack focus, years of experience, migration goal -->
+Full-stack JavaScript engineer with 7+ years building web products. Targeting backend / full-stack roles abroad with employer visa sponsorship.
 
 ## Personal
 
-- **Name:**
+- **Name:** Emad Poursina
 - **Location (current):**
-- **Work authorization (current):**
-- **Target migration countries:**
+- **Work authorization (current):** Iranian passport — **visa sponsorship required**
+- **Target migration countries:** <!-- five priority countries -->
 - **Languages:** <!-- language → level -->
 
 ## Experience
@@ -38,15 +38,15 @@
 
 ### Backend
 
--
+- Node.js, TypeScript, REST API
 
 ### Frontend (if full-stack)
 
--
+- React, Next.js
 
 ### DevOps / platform
 
--
+- Docker, Nginx, MongoDB, PostgreSQL
 
 ### Soft / other
 

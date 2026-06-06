@@ -2,16 +2,28 @@
 
 Corpus for Phase 1 skill analysis and Phase 2 applications.
 
+## Agent-assisted research
+
+Use [`docs/agents/job-offer-research.md`](../docs/agents/job-offer-research.md) to collect **10–15 real offers per country**. The agent writes:
+
+```
+by-country/<country_code>/research.md
+```
+
+Then add individual offer files with [`_offer-template.md`](_offer-template.md) when you apply or need full detail.
+
 ## Layout
 
 ```
 by-country/
-  de/          # 10–15 offers for Germany
-  ca/          # 10–15 offers for Canada
-  ...
+  de/
+    research.md    # agent output — summary table + skills frequency
+    offer-*.md     # optional per-offer files from _offer-template.md
+  ca/
+    ...
 ```
 
-Create one subfolder per country under [`by-country/`](by-country/). Copy [`_offer-template.md`](_offer-template.md) for each offer.
+Create one subfolder per country under [`by-country/`](by-country/).
 
 ## Representative offer checklist
 

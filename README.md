@@ -86,6 +86,8 @@ flowchart LR
 
 **Folders:** [`countries/`](countries/), [`job-offers/`](job-offers/), [`skills/`](skills/)
 
+**Agent:** [`docs/agents/job-offer-research.md`](docs/agents/job-offer-research.md) — collects 10–15 verified offers per country into `job-offers/by-country/<code>/research.md`.
+
 ---
 
 ### Phase 2 — Profile, tailored applications & pipeline
@@ -145,7 +147,10 @@ Use metrics to shift Phase 1 effort if a “priority” country underperforms.
 jobHunter/
 ├── README.md                          # This file — architecture & workflow
 ├── docs/
-│   └── principles.md                  # Decision log & workflow rules
+│   ├── principles.md                  # Decision log & workflow rules
+│   └── agents/
+│       ├── README.md
+│       └── job-offer-research.md      # Phase 1 — find offers per country
 │
 ├── networking/                        # Phase 0
 │   ├── README.md
@@ -195,8 +200,8 @@ jobHunter/
 ### How to use
 
 1. Copy `_country-template.md` into `countries/` for each of your five priority countries.
-2. For each country, create `job-offers/by-country/<country-code>/` and add 10–15 offers using `_offer-template.md`.
-3. Fill `profile/master-profile.md`, then `skills/gap-report.md` from the offer corpus.
+2. Run the [job offer research agent](docs/agents/job-offer-research.md) per country → `job-offers/by-country/<country-code>/research.md`.
+3. Fill `profile/master-profile.md`, merge skills into `skills/requirements-summary.md`, then `skills/gap-report.md`.
 4. Start `applications/pipeline.md` and `learning/backlog.md` in parallel.
 5. Log networking in `networking/` and update `metrics/by-country.md` weekly.
 
