@@ -4,14 +4,13 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "concurrently \"npm run dev:server\" \"npm run dev:frontend\"",
-    "dev:server": "node --watch server/index.js",
+    "dev": "concurrently \"bun run dev:server\" \"bun run dev:frontend\"",
+    "dev:server": "bun --watch server/index.js",
     "dev:frontend": "vite frontend",
     "build": "vite build frontend",
-    "start": "node server/index.js"
+    "start": "bun server/index.js"
   },
   "dependencies": {
-    "better-sqlite3": "^11.8.0",
     "cheerio": "^1.0.0",
     "concurrently": "^8.0.0",
     "dotenv": "^16.0.0",

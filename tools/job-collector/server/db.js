@@ -1,4 +1,4 @@
-import Database from 'better-sqlite3';
+import { Database } from 'bun:sqlite';
 import { mkdirSync } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -31,9 +31,9 @@ const DEFAULT_SETTINGS = {
 
 mkdirSync(path.dirname(DB_PATH), { recursive: true });
 
-const sqlite = new Database(DB_PATH);
-sqlite.pragma('journal_mode = WAL');
-sqlite.pragma('foreign_keys = ON');
+const sqlite = new Database(DB_PATH, { create: true });
+sqlite.run('PRAGMA journal_mode = WAL');
+sqlite.run('PRAGMA foreign_keys = ON');
 
 // Convert snake_case object keys to camelCase for API responses
 export function toCamel(obj) {

@@ -39,8 +39,8 @@ order before starting any task:
 
 7. **Use ES modules (`import`/`export`).** No `require()`.
 
-8. **Node.js >= 20.** Use native `fetch()` (no node-fetch), `fs/promises`,
-   and `--watch` for dev restarts.
+8. **Bun runtime.** Use `bun install`, `bun run`, `bun --watch` for dev.
+   Use native `fetch()` (no node-fetch) and `fs/promises`.
 
 9. **Error responses always include `{ error, code }`.** See `09-conventions.md`.
 
@@ -48,7 +48,7 @@ order before starting any task:
 
 ## Stack
 
-- Backend: Node.js 20 + Express 5 + better-sqlite3 + p-queue + Playwright
+- Backend: Bun + Express 5 + bun:sqlite + p-queue + Playwright
 - Frontend: React 18 + Vite 5 + react-router-dom (no CSS framework)
 - LLM: Ollama (default) or Anthropic API, switched via settings DB
 - Database: SQLite at `data/jobs.db`
@@ -56,7 +56,7 @@ order before starting any task:
 ## This project does NOT use
 
 - TypeScript (plain JavaScript only)
-- Prisma or any ORM (better-sqlite3 directly)
+- Prisma or any ORM (bun:sqlite directly)
 - Redux or Zustand (React state only)
 - Tailwind or any CSS framework
 - Docker
