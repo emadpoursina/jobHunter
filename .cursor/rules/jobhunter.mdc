@@ -1,0 +1,63 @@
+# jobHunter — Cursor Rules
+
+## Read these docs before writing any code
+
+All implementation decisions are documented in `cursor-docs/`. Read them in
+order before starting any task:
+
+- `cursor-docs/00-overview.md`   — project purpose, tech stack, non-goals
+- `cursor-docs/01-architecture.md` — folder structure, data flow, layer responsibilities
+- `cursor-docs/02-database.md`   — SQLite schema and helper functions
+- `cursor-docs/03-api.md`        — every Express route with request/response shapes
+- `cursor-docs/04-collectors.md` — collector plugin interface + LinkedIn/Indeed/Manual
+- `cursor-docs/05-pipeline.md`   — parser and CV generator modules
+- `cursor-docs/06-llm-router.md` — unified LLM module (Ollama + Anthropic)
+- `cursor-docs/07-frontend.md`   — React pages, components, api.js
+- `cursor-docs/08-repo-integration.md` — how to read/write the existing repo files
+- `cursor-docs/09-conventions.md` — naming, error handling, logging, env vars
+- `cursor-docs/10-implementation-order.md` — step-by-step build order
+
+## Key rules (always apply)
+
+1. **Follow the implementation order in `10-implementation-order.md`.**
+   Do not implement Phase 3 before Phase 2 is verified.
+
+2. **Never modify existing repo files** outside of `frontend/`, `server/`,
+   `collectors/`, `pipeline/`, and `data/`. The existing Markdown files in
+   `profile/`, `agents/`, `job-offers/`, `documents/`, etc. are read-only from
+   the backend's perspective.
+
+3. **One LLM module (`server/llm.js`).** All LLM calls go through it.
+   No direct `fetch()` to Ollama or Anthropic from pipeline or route files.
+
+4. **Collectors return `RawOffer[]` only.** They do not parse, call the LLM,
+   or write to the DB. That happens in the pipeline stage after collection.
+
+5. **All DB access via `server/db.js` helpers.** No inline SQL in route files.
+
+6. **All repo file paths via `repoPath()`.** No hardcoded absolute paths.
+
+7. **Use ES modules (`import`/`export`).** No `require()`.
+
+8. **Node.js >= 20.** Use native `fetch()` (no node-fetch), `fs/promises`,
+   and `--watch` for dev restarts.
+
+9. **Error responses always include `{ error, code }`.** See `09-conventions.md`.
+
+10. **Log every LLM call, every file write, and every collection run start/end.**
+
+## Stack
+
+- Backend: Node.js 20 + Express 5 + better-sqlite3 + p-queue + Playwright
+- Frontend: React 18 + Vite 5 + react-router-dom (no CSS framework)
+- LLM: Ollama (default) or Anthropic API, switched via settings DB
+- Database: SQLite at `data/jobs.db`
+
+## This project does NOT use
+
+- TypeScript (plain JavaScript only)
+- Prisma or any ORM (better-sqlite3 directly)
+- Redux or Zustand (React state only)
+- Tailwind or any CSS framework
+- Docker
+- Any test framework (out of scope for now)
