@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import express from 'express';
+import { closeBrowser } from '../collectors/linkedin.js';
 import { close as closeDb } from './db.js';
 import settingsRouter from './routes/settings.js';
 import ollamaRouter from './routes/ollama.js';
@@ -33,13 +34,22 @@ app.use((err, _req, res, _next) => {
   res.status(status).json({ error: err.message, code });
 });
 
-function shutdown() {
+async function shutdown() {
+  try {
+    await closeBrowser();
+  } catch (err) {
+    console.warn(`[WARN] [server] Failed to close browser: ${err.message}`);
+  }
   closeDb();
   process.exit(0);
 }
 
-process.on('SIGINT', shutdown);
-process.on('SIGTERM', shutdown);
+process.on('SIGINT', () => {
+  shutdown();
+});
+process.on('SIGTERM', () => {
+  shutdown();
+});
 
 app.listen(PORT, () => {
   console.log(`[INFO] [server] Listening on http://localhost:${PORT}`);

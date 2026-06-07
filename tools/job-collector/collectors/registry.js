@@ -1,6 +1,8 @@
+import linkedin from './linkedin.js';
 import manual from './manual.js';
 
 export const registry = new Map([
+  ['linkedin', linkedin],
   ['manual', manual],
 ]);
 
