@@ -1,10 +1,21 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../api.js';
 import { matchScoreClass } from '../components/JobCard.jsx';
+import RunButton from '../components/RunButton.jsx';
 import StatusBadge from '../components/StatusBadge.jsx';
 
 const RUN_POLL_MS = 3000;
+const SCRAPER_SOURCES = new Set(['linkedin', 'indeed']);
+
+// Merge stored collector config with defaults for run requests
+function normalizeCollectorConfig(stored = {}) {
+  return {
+    queries: Array.isArray(stored.queries) ? stored.queries : [],
+    location: stored.location ?? '',
+    maxResults: stored.maxResults ?? 10,
+  };
+}
 
 // Format run duration from ISO timestamps
 function formatDuration(startedAt, finishedAt) {
@@ -81,6 +92,8 @@ export default function Dashboard() {
   const [runs, setRuns] = useState([]);
   const [stats, setStats] = useState({ total: 0, withCv: 0, applied: 0 });
   const [pollingRuns, setPollingRuns] = useState(false);
+  const [scrapers, setScrapers] = useState([]);
+  const [collectorConfigs, setCollectorConfigs] = useState({});
 
   // Show a dismissible alert for 5 seconds
   const showAlert = useCallback((message, type = 'err') => {
@@ -89,12 +102,14 @@ export default function Dashboard() {
     return () => clearTimeout(timer);
   }, []);
 
-  // Load recent runs and quick stats
+  // Load recent runs, collector config, and quick stats
   const refreshDashboard = useCallback(async () => {
     try {
-      const [{ runs: recentRuns }, { jobs }] = await Promise.all([
+      const [{ runs: recentRuns }, { jobs }, { collectors }, { settings }] = await Promise.all([
         api.getRuns(10),
         api.getJobs(),
+        api.getCollectors(),
+        api.getSettings(),
       ]);
 
       setRuns(recentRuns ?? []);
@@ -103,6 +118,20 @@ export default function Dashboard() {
         withCv: jobs.filter((j) => j.status === 'cv_generated').length,
         applied: jobs.filter((j) => j.status === 'applied').length,
       });
+
+      const enabledScrapers = (collectors ?? []).filter(
+        (collector) => SCRAPER_SOURCES.has(collector.name) && collector.enabled,
+      );
+      setScrapers(enabledScrapers);
+
+      const configs = {};
+      for (const collector of collectors ?? []) {
+        if (!SCRAPER_SOURCES.has(collector.name)) continue;
+        configs[collector.name] = normalizeCollectorConfig(
+          settings.collectors?.[collector.name],
+        );
+      }
+      setCollectorConfigs(configs);
 
       const hasActive = (recentRuns ?? []).some((run) => run.status === 'running');
       setPollingRuns(hasActive);
@@ -129,6 +158,54 @@ export default function Dashboard() {
       const run = await api.getRun(runId);
       if (run.status !== 'running') return run;
       await new Promise((resolve) => setTimeout(resolve, RUN_POLL_MS));
+    }
+  }
+
+  const runningSources = useMemo(
+    () => new Set(runs.filter((run) => run.status === 'running').map((run) => run.source)),
+    [runs],
+  );
+
+  // Start an automated LinkedIn or Indeed collection run
+  async function handleRunCollector(source) {
+    const collector = scrapers.find((entry) => entry.name === source);
+    const config = collectorConfigs[source];
+
+    if (!collector) {
+      showAlert('Collector is not enabled. Enable it in Settings.');
+      return;
+    }
+
+    if (!config?.queries?.length) {
+      showAlert(`Add search queries for ${collector.label} in Settings before running.`);
+      return;
+    }
+
+    setAlert(null);
+
+    try {
+      const { runId } = await api.collect(source, {
+        queries: config.queries,
+        location: config.location,
+        maxResults: config.maxResults,
+      });
+      setPollingRuns(true);
+      const run = await waitForRun(runId);
+
+      if (run.status === 'error') {
+        throw new Error(run.error || 'Collection failed');
+      }
+
+      const found = run.jobsFound ?? 0;
+      const newCount = run.jobsNew ?? 0;
+      showAlert(
+        `${collector.label} finished: ${found} job${found === 1 ? '' : 's'} found, ${newCount} new.`,
+        'info',
+      );
+      await refreshDashboard();
+    } catch (err) {
+      showAlert(err.message);
+      await refreshDashboard();
     }
   }
 
@@ -264,6 +341,36 @@ export default function Dashboard() {
           <span className="stat-value">{stats.applied}</span>
           <span className="stat-label">Applied</span>
         </div>
+      </div>
+
+      <div className="card">
+        <div className="card-title">Automated collectors</div>
+
+        {scrapers.length === 0 ? (
+          <p className="hint">
+            No automated collectors enabled. Enable LinkedIn or Indeed in{' '}
+            <Link to="/settings">Settings</Link>.
+          </p>
+        ) : (
+          <>
+            <div className="run-controls">
+              {scrapers.map((collector) => (
+                <RunButton
+                  key={collector.name}
+                  label={collector.label}
+                  running={runningSources.has(collector.name)}
+                  disabled={!collectorConfigs[collector.name]?.queries?.length}
+                  onClick={() => handleRunCollector(collector.name)}
+                />
+              ))}
+            </div>
+            {scrapers.some((collector) => !collectorConfigs[collector.name]?.queries?.length) && (
+              <p className="hint">
+                Add search queries in <Link to="/settings">Settings</Link> before running.
+              </p>
+            )}
+          </>
+        )}
       </div>
 
       <div className="card">
