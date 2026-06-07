@@ -3,6 +3,7 @@ import express from 'express';
 import { close as closeDb } from './db.js';
 import settingsRouter from './routes/settings.js';
 import ollamaRouter from './routes/ollama.js';
+import jobsRouter from './routes/jobs.js';
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3001;
@@ -15,6 +16,7 @@ app.get('/api/health', (_req, res) => {
 
 app.use('/api/settings', settingsRouter);
 app.use('/api/ollama', ollamaRouter);
+app.use('/api/jobs', jobsRouter);
 
 app.use((_req, res) => {
   res.status(404).json({ error: 'Not found', code: 'NOT_FOUND' });

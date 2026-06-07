@@ -145,6 +145,12 @@ export function insertJob(jobData) {
   return Number(result.lastInsertRowid);
 }
 
+// Delete a job by id; returns true when a row was removed
+export function deleteJob(id) {
+  const result = sqlite.prepare('DELETE FROM jobs WHERE id = ?').run(id);
+  return result.changes > 0;
+}
+
 // Partially update a job by id
 export function updateJob(id, fields) {
   const row = normalizeJobInput(fields);
@@ -265,6 +271,7 @@ export const db = {
   getJobById,
   insertJob,
   updateJob,
+  deleteJob,
   jobExistsByUrl,
   insertRun,
   updateRun,
