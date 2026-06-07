@@ -33,7 +33,7 @@ router.put('/', (req, res) => {
   if (!body || typeof body !== 'object') {
     return res.status(400).json({
       error: 'Request body must be a settings object',
-      code: 'INVALID_BODY',
+      code: 'VALIDATION_ERROR',
     });
   }
 

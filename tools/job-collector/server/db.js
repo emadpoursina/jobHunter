@@ -94,6 +94,10 @@ export function migrate() {
     BEGIN
       UPDATE jobs SET updated_at = datetime('now') WHERE id = NEW.id;
     END;
+
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_jobs_source_url_unique
+    ON jobs(source_url)
+    WHERE source_url IS NOT NULL AND source_url != '';
   `);
 
   seedDefaultSettings();
@@ -133,16 +137,32 @@ export function getJobById(id) {
   return row ? parseJobRow(row) : null;
 }
 
-// Insert a job row and return the new id
+// Insert a job row and return the new id, or null when the source URL is a duplicate
 export function insertJob(jobData) {
+  const sourceUrl = jobData.sourceUrl ?? jobData.source_url ?? null;
+
+  if (sourceUrl && jobExistsByUrl(sourceUrl)) {
+    console.warn(`[WARN] [db] Skipping duplicate job for URL: ${sourceUrl}`);
+    return null;
+  }
+
   const row = normalizeJobInput(jobData);
   const columns = Object.keys(row);
   const placeholders = columns.map(() => '?').join(', ');
   const stmt = sqlite.prepare(
     `INSERT INTO jobs (${columns.join(', ')}) VALUES (${placeholders})`,
   );
-  const result = stmt.run(...columns.map((col) => row[col]));
-  return Number(result.lastInsertRowid);
+
+  try {
+    const result = stmt.run(...columns.map((col) => row[col]));
+    return Number(result.lastInsertRowid);
+  } catch (err) {
+    if (String(err.message).includes('UNIQUE constraint failed')) {
+      console.warn(`[WARN] [db] Skipping duplicate job (race): ${sourceUrl}`);
+      return null;
+    }
+    throw err;
+  }
 }
 
 // Delete a job by id; returns true when a row was removed

@@ -2,6 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import { closeBrowser } from '../collectors/linkedin.js';
 import { close as closeDb } from './db.js';
+import { statusForError } from './errors.js';
 import settingsRouter from './routes/settings.js';
 import ollamaRouter from './routes/ollama.js';
 import pipelineRouter from './routes/pipeline.js';
@@ -27,10 +28,11 @@ app.use((_req, res) => {
   res.status(404).json({ error: 'Not found', code: 'NOT_FOUND' });
 });
 
+// Global error handler — all routes return { error, code }
 app.use((err, _req, res, _next) => {
-  const status = err.status ?? 500;
+  const status = statusForError(err);
   const code = err.code ?? 'INTERNAL_ERROR';
-  console.error(`[ERROR] ${err.message}`, err.stack);
+  console.error(`[ERROR] [server] ${err.message}`, err.stack);
   res.status(status).json({ error: err.message, code });
 });
 

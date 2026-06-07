@@ -85,6 +85,8 @@ async function executeCollectRun(runId, source, config) {
         status: 'parsed',
       });
 
+      if (!jobId) continue;
+
       const job = getJobById(jobId);
       const offerMdPath = await writeOfferMd(job);
       updateJob(jobId, { offerMdPath });

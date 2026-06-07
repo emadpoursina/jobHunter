@@ -91,7 +91,7 @@ async function callOllama({ system, user, maxTokens }) {
     return await withRetry(doFetch);
   } catch (err) {
     if (err.code === 'LLM_ERROR') throw err;
-    throw llmError(`Cannot reach Ollama at ${baseUrl}. Make sure Ollama is running.`);
+    throw llmError(`Cannot reach Ollama at ${baseUrl}. Start Ollama with \`ollama serve\`.`);
   }
 }
 
@@ -154,6 +154,6 @@ export async function getOllamaModels() {
     return (data.models ?? []).map((model) => model.name);
   } catch (err) {
     if (err.code === 'LLM_ERROR') throw err;
-    throw llmError(`Cannot reach Ollama at ${baseUrl}. Make sure Ollama is running.`);
+    throw llmError(`Cannot reach Ollama at ${baseUrl}. Start Ollama with \`ollama serve\`.`);
   }
 }

@@ -1,10 +1,11 @@
 import { Router } from 'express';
 import { getSetting } from '../db.js';
+import { asyncHandler } from '../errors.js';
 
 const router = Router();
 
 // Proxy Ollama /api/tags and return available model names
-router.get('/models', async (_req, res) => {
+router.get('/models', asyncHandler(async (_req, res) => {
   const baseUrl = getSetting('ollama_base_url') ?? 'http://localhost:11434';
 
   try {
@@ -29,6 +30,6 @@ router.get('/models', async (_req, res) => {
       code: 'OLLAMA_UNAVAILABLE',
     });
   }
-});
+}));
 
 export default router;

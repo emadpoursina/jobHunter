@@ -3,6 +3,7 @@ import { generateCv } from '../../pipeline/cv.js';
 import { parseOffer } from '../../pipeline/parser.js';
 import { readRepoFile, writeCvMd, writeOfferMd } from '../../pipeline/repoFiles.js';
 import { getJobById, updateJob } from '../db.js';
+import { asyncHandler } from '../errors.js';
 import { enqueueJob } from '../queue.js';
 
 const router = Router();
@@ -38,7 +39,7 @@ function buildSaveFields(existing, body) {
 }
 
 // Parse raw job listing text into a structured offer preview (no DB write)
-router.post('/parse', async (req, res) => {
+router.post('/parse', asyncHandler(async (req, res) => {
   const text = req.body?.text;
 
   if (!text || typeof text !== 'string' || !text.trim()) {
@@ -50,10 +51,10 @@ router.post('/parse', async (req, res) => {
 
   const offer = await parseOffer({ rawText: text.trim() });
   res.json({ offer });
-});
+}));
 
 // Persist a reviewed offer to the DB and write the offer markdown file
-router.post('/jobs/:id/save', async (req, res) => {
+router.post('/jobs/:id/save', asyncHandler(async (req, res) => {
   const id = parseJobId(req.params.id);
   if (id === null) {
     return res.status(400).json({
@@ -100,7 +101,7 @@ router.post('/jobs/:id/save', async (req, res) => {
 
   const job = updateJob(id, { ...fields, offerMdPath });
   res.status(201).json({ job });
-});
+}));
 
 // Enqueue tailored CV generation for an existing job
 router.post('/jobs/:id/cv', (req, res) => {
@@ -135,7 +136,7 @@ router.post('/jobs/:id/cv', (req, res) => {
 });
 
 // Return the generated CV markdown for a job
-router.get('/jobs/:id/cv', async (req, res) => {
+router.get('/jobs/:id/cv', asyncHandler(async (req, res) => {
   const id = parseJobId(req.params.id);
   if (id === null) {
     return res.status(400).json({
@@ -169,6 +170,6 @@ router.get('/jobs/:id/cv', async (req, res) => {
   }
 
   res.json({ markdown });
-});
+}));
 
 export default router;
