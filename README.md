@@ -8,7 +8,7 @@ Personal workflow for finding, qualifying, and applying to **backend / full-stac
 - **Secondary:** Full-stack JavaScript (React, Next.js, TypeScript)
 - **Experience band:** 7+ years, mid–senior
 - **Migration path:** Employer visa sponsorship (Iranian passport)
-- **Upskilling:** One flagship project — see [`skills/skill-map.md`](skills/skill-map.md) and [`learning/flagship-project.md`](learning/flagship-project.md)
+- **Upskilling:** One flagship project — see [`phase3/skill-map.md`](phase3/skill-map.md) and [`phase3/flagship-project.md`](phase3/flagship-project.md)
 
 ---
 
@@ -82,11 +82,11 @@ flowchart LR
 - Consistent seniority (e.g. mid or senior — pick one band per sampling round)
 - Sources: company careers pages, LinkedIn, national job boards — not aggregator spam
 
-**Outputs:** Priority country files, job-offer corpus, skill gap report.
+**Outputs:** Priority country files, job-offer research corpus, skill gap report.
 
-**Folders:** [`countries/`](countries/), [`job-offers/`](job-offers/), [`skills/`](skills/)
+**Folder:** [`phase1/`](phase1/)
 
-**Agent:** [`docs/agents/job-offer-research.md`](docs/agents/job-offer-research.md) — collects 10–15 verified offers per country into `job-offers/by-country/<code>/research.md`.
+**Agent:** [`docs/agents/job-offer-research.md`](docs/agents/job-offer-research.md) — collects 10–15 verified offers per country into `phase1/job-offers/by-country/<code>/research.md`.
 
 ---
 
@@ -104,9 +104,9 @@ flowchart LR
 
 **Outputs:** Master profile, reviewed CVs, application log, feedback notes.
 
-**Folders:** [`profile/`](profile/), [`documents/`](documents/), [`applications/`](applications/)
+**Folder:** [`phase2/`](phase2/)
 
-**Agent:** [`docs/agents/cv-generator.md`](docs/agents/cv-generator.md) — reads master profile + offer file → `documents/generated/CV_<Company>_<Role>_<Date>.md`
+**Agent:** [`docs/agents/cv-generator.md`](docs/agents/cv-generator.md) — reads master profile + offer file → `phase2/documents/generated/CV_<Company>_<Role>_<Date>.md`
 
 ---
 
@@ -123,7 +123,7 @@ flowchart LR
 
 **Outputs:** Learning backlog, completed items, updated profile, revised gap report.
 
-**Folder:** [`learning/`](learning/)
+**Folder:** [`phase3/`](phase3/)
 
 ---
 
@@ -150,51 +150,34 @@ jobHunter/
 ├── README.md                          # This file — architecture & workflow
 ├── docs/
 │   ├── principles.md                  # Decision log & workflow rules
-│   ├── phase1-country-research.md     # Phase 1 — country selection & checklist
 │   └── agents/
 │       ├── README.md
 │       ├── job-offer-research.md      # Phase 1 — find offers per country
-│       └── cv-generator.md            # Phase 2 — tailored CV + tailoring report
+│       ├── cv-generator.md            # Phase 2 — tailored CV + tailoring report
+│       └── project-profile-extractor.md
 │
 ├── networking/                        # Phase 0
 │   ├── README.md
 │   ├── contacts.md
 │   └── outreach-log.md
 │
-├── countries/                         # Phase 1 — priority countries + visa notes
+├── phase1/                            # Phase 1 — skill gap analysis
 │   ├── README.md
-│   └── _country-template.md
+│   ├── checklist.md                   # Country selection & execution status
+│   ├── countries/                     # Priority countries + visa notes
+│   ├── job-offers/                    # Research corpus (by-country/*/research.md)
+│   └── skills/                        # Gap report + market requirements
 │
-├── job-offers/                        # Phase 1 & 2 — offer corpus
+├── phase2/                            # Phase 2 — applications
 │   ├── README.md
-│   ├── _offer-template.md
-│   └── by-country/                    # One subfolder per country (you create)
-│       └── .gitkeep
+│   ├── profile/                       # Master profile
+│   ├── offers/                        # Live offer files to apply to
+│   ├── documents/                     # AI prompts & generated CVs
+│   └── applications/                  # Pipeline tracking
 │
-├── skills/                            # Phase 1 & 3 — gaps, skill map, market requirements
+├── phase3/                            # Phase 3 — learning & gap closure
 │   ├── README.md
-│   ├── skill-map.md                   # Full curriculum + flagship project reference
-│   ├── gap-report.md
-│   └── requirements-summary.md
-│
-├── profile/                           # Phase 2 — Emad's master profile
-│   ├── README.md
-│   └── master-profile.md
-│
-├── documents/                         # Phase 2 — AI prompts & generated CVs
-│   ├── README.md
-│   ├── prompts/
-│   │   └── cv-from-offer.md
-│   └── generated/                     # One file per application (you create)
-│       └── .gitkeep
-│
-├── applications/                      # Phase 2 — pipeline tracking
-│   ├── README.md
-│   ├── pipeline.md
-│   └── _application-template.md
-│
-├── learning/                          # Phase 3 — upskilling backlog + flagship project
-│   ├── README.md
+│   ├── skill-map.md                   # Full curriculum + flagship layers
 │   ├── backlog.md
 │   └── flagship-project.md
 │
@@ -205,20 +188,20 @@ jobHunter/
 
 ### How to use
 
-1. Define five priority countries in `countries/` (copy `_country-template.md`).
-2. Run the [job offer research agent](docs/agents/job-offer-research.md) per country → `job-offers/by-country/<code>/research.md`.
-3. Merge market skills into `skills/requirements-summary.md`; reconcile with [`skills/skill-map.md`](skills/skill-map.md) → update [`skills/gap-report.md`](skills/gap-report.md).
-4. Work [`learning/backlog.md`](learning/backlog.md) via [`learning/flagship-project.md`](learning/flagship-project.md) **in parallel** with applications.
-5. Keep [`profile/master-profile.md`](profile/master-profile.md) updated as skills ship.
-6. Create offer files from [`job-offers/_offer-template.md`](job-offers/_offer-template.md); run [CV generator agent](docs/agents/cv-generator.md) → `documents/generated/`.
-7. Track applications in `applications/pipeline.md`, networking in `networking/`, metrics in `metrics/by-country.md`.
+1. Define five priority countries in `phase1/countries/` (copy `_country-template.md`).
+2. Run the [job offer research agent](docs/agents/job-offer-research.md) per country → `phase1/job-offers/by-country/<code>/research.md`.
+3. Merge market skills into `phase1/skills/requirements-summary.md`; reconcile with [`phase3/skill-map.md`](phase3/skill-map.md) → update [`phase1/skills/gap-report.md`](phase1/skills/gap-report.md).
+4. Work [`phase3/backlog.md`](phase3/backlog.md) via [`phase3/flagship-project.md`](phase3/flagship-project.md) **in parallel** with applications.
+5. Keep [`phase2/profile/master-profile.md`](phase2/profile/master-profile.md) updated as skills ship.
+6. Create offer files from [`phase2/offers/_offer-template.md`](phase2/offers/_offer-template.md); run [CV generator agent](docs/agents/cv-generator.md) → `phase2/documents/generated/`.
+7. Track applications in `phase2/applications/pipeline.md`, networking in `networking/`, metrics in `metrics/by-country.md`.
 
 ---
 
 ## Status
 
-**Phase 1 (partial):** Five priority countries defined ([`countries/`](countries/)). Job-offer research complete for Germany, Canada, Netherlands, Portugal (40 offers). Skill gap report updated ([`skills/gap-report.md`](skills/gap-report.md)). Ireland offers pending.
+**Phase 1 (partial):** Five priority countries defined ([`phase1/countries/`](phase1/countries/)). Job-offer research complete for Germany, Canada, Netherlands, Portugal (40 offers). Skill gap report updated ([`phase1/skills/gap-report.md`](phase1/skills/gap-report.md)). Ireland offers pending.
 
-**Phase 2 (in progress):** Master profile complete ([`profile/master-profile.md`](profile/master-profile.md)). CV generator agent ready ([`docs/agents/cv-generator.md`](docs/agents/cv-generator.md)). Germany Phase 1 corpus archived — collect **live** offers (~90 days) before creating offer files.
+**Phase 2 (in progress):** Master profile complete ([`phase2/profile/master-profile.md`](phase2/profile/master-profile.md)). CV generator agent ready ([`docs/agents/cv-generator.md`](docs/agents/cv-generator.md)). Germany Phase 1 corpus archived — collect **live** offers (~90 days) before creating offer files in `phase2/offers/`.
 
-**Next:** Find live Germany roles with visa sponsorship; Ireland job-offer research; close critical gaps (AWS, Jest, CI/CD) via [`learning/backlog.md`](learning/backlog.md) in parallel with applications.
+**Next:** Find live Germany roles with visa sponsorship; Ireland job-offer research; close critical gaps (AWS, Jest, CI/CD) via [`phase3/backlog.md`](phase3/backlog.md) in parallel with applications.

@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>jobHunter — Offer Finder & CV Generator</title>
+<style>
+  :root {
+    --bg: #f9f8f6;
+    --surface: #ffffff;
+    --surface2: #f3f2ef;
+    --border: #e2e0da;
+    --border2: #c9c7bf;
+    --text: #1a1918;
+    --text2: #5a5854;
+    --text3: #9a9892;
+    --blue: #1a5fd4;
+    --blue-bg: #eaf0fc;
+    --blue-border: #b3caef;
+    --green: #166534;
+    --green-bg: #dcfce7;
+    --green-border: #86efac;
+    --amber: #92400e;
+    --amber-bg: #fef3c7;
+    --amber-border: #fcd34d;
+    --red: #991b1b;
+    --red-bg: #fee2e2;
+    --radius: 10px;
+    --radius-sm: 6px;
+    --mono: 'Courier New', monospace;
+    --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--sans); background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  .topbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 52px; position: sticky; top: 0; z-index: 10; }
+  .topbar-brand { font-size: 14px; font-weight: 600; letter-spacing: -0.3px; display: flex; align-items: center; gap: 8px; }
+  .topbar-brand span { color: var(--text3); font-weight: 400; }
+  .api-pill { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+  .api-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--border2); }
+  .api-dot.ok { background: #22c55e; }
+  .api-dot.err { background: #ef4444; }
+
+  .layout { display: grid; grid-template-columns: 260px 1fr; min-height: calc(100vh - 52px); }
+
+  .sidebar { background: var(--surface); border-right: 1px solid var(--border); padding: 1.5rem 1rem; display: flex; flex-direction: column; gap: 2px; }
+  .sidebar-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text3); padding: 0 8px; margin: 1rem 0 6px; }
+  .sidebar-label:first-child { margin-top: 0; }
+  .nav-item { display: flex; align-items: center; gap: 8px; padding: 7px 10px; border-radius: var(--radius-sm); font-size: 13px; color: var(--text2); cursor: pointer; border: none; background: none; width: 100%; text-align: left; transition: background 0.1s; }
+  .nav-item:hover { background: var(--surface2); }
+  .nav-item.active { background: var(--blue-bg); color: var(--blue); font-weight: 500; }
+  .nav-item svg { flex-shrink: 0; opacity: 0.7; }
+  .nav-item.active svg { opacity: 1; }
+  .step-num { width: 18px; height: 18px; border-radius: 50%; background: var(--border); font-size: 10px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--text2); }
+  .nav-item.active .step-num { background: var(--blue); color: white; }
+  .nav-item.done .step-num { background: var(--green-bg); color: var(--green); }
+  .nav-item.done { color: var(--text2); }
+
+  .main { padding: 2rem; max-width: 760px; }
+  .page { display: none; }
+  .page.active { display: block; }
+
+  h1 { font-size: 20px; font-weight: 600; margin-bottom: 4px; letter-spacing: -0.3px; }
+  .subtitle { font-size: 13px; color: var(--text3); margin-bottom: 1.5rem; }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; margin-bottom: 1rem; }
+  .card-title { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text3); margin-bottom: 0.75rem; }
+
+  .tabs { display: flex; gap: 4px; margin-bottom: 1rem; }
+  .tab { font-size: 12px; padding: 5px 14px; border-radius: 20px; border: 1px solid var(--border); background: transparent; color: var(--text2); cursor: pointer; transition: all 0.15s; }
+  .tab:hover { background: var(--surface2); }
+  .tab.active { background: var(--blue-bg); color: var(--blue); border-color: var(--blue-border); font-weight: 500; }
+
+  textarea, input[type=text] { width: 100%; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 12px; font-size: 13px; font-family: var(--sans); background: var(--surface2); color: var(--text); resize: vertical; outline: none; transition: border 0.15s; }
+  textarea:focus, input[type=text]:focus { border-color: var(--blue); background: var(--surface); }
+
+  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid var(--border); background: var(--surface); color: var(--text); transition: all 0.15s; }
+  .btn:hover { background: var(--surface2); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-primary { background: var(--blue); color: white; border-color: var(--blue); }
+  .btn-primary:hover:not(:disabled) { opacity: 0.88; }
+  .btn-actions { display: flex; gap: 8px; margin-top: 1rem; align-items: center; }
+
+  .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 1rem; }
+  .meta-cell { background: var(--surface2); border-radius: var(--radius-sm); padding: 10px 12px; }
+  .meta-cell .lbl { font-size: 11px; color: var(--text3); margin-bottom: 2px; }
+  .meta-cell .val { font-size: 13px; font-weight: 500; }
+
+  .tag { display: inline-block; font-size: 11px; padding: 3px 9px; border-radius: 20px; margin: 2px; font-weight: 500; }
+  .tag-req { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-border); }
+  .tag-nice { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); }
+  .tags-wrap { display: flex; flex-wrap: wrap; gap: 2px; }
+  .section-head { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text3); margin: 1rem 0 6px; }
+  ul.resp-list { padding-left: 1.1rem; font-size: 13px; color: var(--text2); line-height: 1.8; }
+
+  .match-bar { background: var(--surface2); border-radius: var(--radius); padding: 12px 14px; display: flex; align-items: center; gap: 12px; margin-top: 1rem; }
+  .match-track { flex: 1; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+  .match-fill { height: 100%; border-radius: 3px; background: var(--blue); transition: width 0.8s ease; }
+  .match-label { font-size: 12px; color: var(--text2); white-space: nowrap; }
+  .match-pct { font-weight: 600; color: var(--blue); }
+
+  .offer-md { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 1rem; font-family: var(--mono); font-size: 12px; line-height: 1.75; color: var(--text2); white-space: pre-wrap; max-height: 300px; overflow-y: auto; margin-top: 0.5rem; }
+  .cv-out { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 1rem; font-family: var(--mono); font-size: 12px; line-height: 1.75; color: var(--text); white-space: pre-wrap; max-height: 520px; overflow-y: auto; }
+
+  .loading-wrap { display: flex; align-items: center; gap: 10px; margin: 1rem 0; }
+  .spinner { width: 16px; height: 16px; border: 2px solid var(--border); border-top-color: var(--blue); border-radius: 50%; animation: spin 0.8s linear infinite; flex-shrink: 0; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-text { font-size: 13px; color: var(--text2); }
+
+  .alert { border-radius: var(--radius-sm); padding: 10px 14px; font-size: 13px; margin-top: 8px; }
+  .alert-err { background: var(--red-bg); color: var(--red); border: 1px solid #fca5a5; }
+  .alert-info { background: var(--blue-bg); color: var(--blue); border: 1px solid var(--blue-border); }
+
+  .file-path { font-family: var(--mono); font-size: 12px; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 8px 12px; color: var(--text2); margin: 6px 0 1rem; }
+
+  .hint { font-size: 12px; color: var(--text3); margin-top: 5px; }
+  .divider { border: none; border-top: 1px solid var(--border); margin: 1.25rem 0; }
+
+  .apikey-wrap { display: flex; gap: 8px; }
+  .apikey-wrap input { flex: 1; font-family: var(--mono); }
+  .provider-tabs { display: flex; gap: 0; margin-bottom: 1rem; border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; }
+  .provider-tab { flex: 1; padding: 8px; font-size: 13px; font-weight: 500; border: none; background: transparent; cursor: pointer; color: var(--text2); transition: background 0.15s; }
+  .provider-tab.active { background: var(--blue-bg); color: var(--blue); }
+  .provider-section { display: none; }
+  .provider-section.active { display: block; }
+  select { width: 100%; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 9px 12px; font-size: 13px; font-family: var(--sans); background: var(--surface2); color: var(--text); outline: none; cursor: pointer; }
+  select:focus { border-color: var(--blue); }
+  .model-row { display: flex; gap: 8px; align-items: center; }
+  .model-row select { flex: 1; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-brand">
+    jobHunter <span>/ workflow tool</span>
+  </div>
+  <div class="api-pill">
+    <div class="api-dot" id="api-dot"></div>
+    <span id="api-status" style="font-size:12px;color:var(--text3)">Not configured</span>
+  </div>
+</div>
+
+<div class="layout">
+  <nav class="sidebar">
+    <div class="sidebar-label">Setup</div>
+    <button class="nav-item active" data-page="setup" onclick="goPage('setup')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+      Settings
+    </button>
+
+    <div class="sidebar-label">Workflow</div>
+    <button class="nav-item" data-page="input" onclick="goPage('input')">
+      <div class="step-num" id="sn-1">1</div>
+      Find offer
+    </button>
+    <button class="nav-item" data-page="parse" onclick="goPage('parse')">
+      <div class="step-num" id="sn-2">2</div>
+      Parse &amp; standardise
+    </button>
+    <button class="nav-item" data-page="cv" onclick="goPage('cv')">
+      <div class="step-num" id="sn-3">3</div>
+      Generate CV
+    </button>
+
+    <div class="sidebar-label" style="margin-top:auto">Repo paths</div>
+    <div style="font-size:11px;color:var(--text3);padding:0 8px;line-height:1.8">
+      Research → <code>phase1/job-offers/by-country/</code><br>
+      Live offers → <code>phase2/offers/by-country/</code><br>
+      CVs → <code>phase2/documents/generated/</code><br>
+      Profile → <code>phase2/profile/master-profile.md</code>
+    </div>
+  </nav>
+
+  <main class="main">
+
+    <!-- SETUP -->
+    <div class="page active" id="page-setup">
+      <h1>Settings</h1>
+      <p class="subtitle">Configure once — stored only in your browser's localStorage.</p>
+
+      <div class="card">
+        <div class="card-title">LLM provider</div>
+        <div class="provider-tabs">
+          <button class="provider-tab active" id="ptab-ollama" onclick="switchProvider('ollama')">🦙 Ollama (local)</button>
+          <button class="provider-tab" id="ptab-anthropic" onclick="switchProvider('anthropic')">☁️ Anthropic API</button>
+        </div>
+
+        <!-- Ollama settings -->
+        <div class="provider-section active" id="psec-ollama">
+          <div style="margin-bottom:10px">
+            <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:4px">Ollama base URL</label>
+            <div class="apikey-wrap">
+              <input type="text" id="ollama-url" placeholder="http://localhost:11434" value="http://localhost:11434">
+            </div>
+            <p class="hint">Default is <code>http://localhost:11434</code>. Change only if you run Ollama on a custom port.</p>
+          </div>
+          <div style="margin-bottom:10px">
+            <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:4px">Model</label>
+            <div class="model-row">
+              <select id="ollama-model"><option value="">— click Refresh to load models —</option></select>
+              <button class="btn" onclick="fetchOllamaModels()">Refresh</button>
+            </div>
+            <p class="hint">Recommended: <code>mistral</code>, <code>llama3</code>, <code>qwen2.5-coder</code>, <code>deepseek-r1</code>. Run <code>ollama pull &lt;model&gt;</code> to add one.</p>
+          </div>
+          <div id="ollama-status"></div>
+          <div class="btn-actions">
+            <button class="btn btn-primary" onclick="saveOllama()">Save &amp; test connection</button>
+          </div>
+        </div>
+
+        <!-- Anthropic settings -->
+        <div class="provider-section" id="psec-anthropic">
+          <div style="margin-bottom:10px">
+            <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:4px">API key</label>
+            <div class="apikey-wrap">
+              <input type="text" id="api-key-input" placeholder="sk-ant-..." autocomplete="off">
+            </div>
+            <p class="hint">Never leaves your browser. Calls <code>claude-sonnet-4-20250514</code> directly.</p>
+          </div>
+          <div id="key-status"></div>
+          <div class="btn-actions">
+            <button class="btn btn-primary" onclick="saveKey()">Save</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Candidate profile</div>
+        <p style="font-size:13px;color:var(--text2);margin-bottom:8px">This is the master profile used for CV generation. Edit to keep in sync with <code>phase2/profile/master-profile.md</code>.</p>
+        <textarea id="profile-input" rows="14"></textarea>
+        <div class="btn-actions">
+          <button class="btn btn-primary" onclick="saveProfile()">Save profile</button>
+        </div>
+        <p class="hint">Paste the contents of <code>phase2/profile/master-profile.md</code> here.</p>
+      </div>
+    </div>
+
+    <!-- INPUT -->
+    <div class="page" id="page-input">
+      <h1>Find offer</h1>
+      <p class="subtitle">Paste a job listing from any source — LinkedIn, Indeed, company careers page, raw text.</p>
+
+      <div class="card">
+        <div class="card-title">Source</div>
+        <div class="tabs">
+          <button class="tab active" onclick="setTab('paste',this)">Paste listing</button>
+          <button class="tab" onclick="setTab('url',this)">URL</button>
+        </div>
+        <div id="input-paste">
+          <textarea id="raw-paste" rows="10" placeholder="Paste full job listing here — title, company, description, requirements…"></textarea>
+        </div>
+        <div id="input-url" style="display:none">
+          <input type="text" id="raw-url" placeholder="https://linkedin.com/jobs/view/…">
+          <p class="hint" style="margin-top:6px">The page content will be sent to Claude for parsing.</p>
+        </div>
+        <div id="parse-error"></div>
+        <div class="btn-actions">
+          <button class="btn btn-primary" onclick="parseOffer()">Parse offer →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PARSE -->
+    <div class="page" id="page-parse">
+      <h1>Standardised offer</h1>
+      <p class="subtitle">Review the extracted data before generating your CV. This matches the project's <code>_offer-template.md</code> format.</p>
+
+      <div id="parse-loading" style="display:none">
+        <div class="loading-wrap"><div class="spinner"></div><span class="loading-text">Parsing job listing…</span></div>
+      </div>
+
+      <div id="parse-result" style="display:none">
+        <div class="card">
+          <div class="card-title">Job details</div>
+          <div class="meta-grid">
+            <div class="meta-cell"><div class="lbl">Role</div><div class="val" id="r-title">—</div></div>
+            <div class="meta-cell"><div class="lbl">Company</div><div class="val" id="r-company">—</div></div>
+            <div class="meta-cell"><div class="lbl">Location</div><div class="val" id="r-location">—</div></div>
+            <div class="meta-cell"><div class="lbl">Type</div><div class="val" id="r-type">—</div></div>
+          </div>
+          <div id="r-salary-wrap" style="display:none;margin-bottom:8px">
+            <div class="meta-cell"><div class="lbl">Salary</div><div class="val" id="r-salary"></div></div>
+          </div>
+
+          <div class="section-head">Required skills</div>
+          <div class="tags-wrap" id="r-required"></div>
+
+          <div class="section-head">Nice to have</div>
+          <div class="tags-wrap" id="r-nice"></div>
+
+          <div class="section-head">Key responsibilities</div>
+          <ul class="resp-list" id="r-resp"></ul>
+
+          <div class="match-bar">
+            <span class="match-label">Profile match</span>
+            <div class="match-track"><div class="match-fill" id="match-fill" style="width:0%"></div></div>
+            <span class="match-label"><span class="match-pct" id="match-pct">—</span>%</span>
+          </div>
+
+          <hr class="divider">
+          <div class="card-title">Markdown output — save to <code>phase1/job-offers/by-country/&lt;CC&gt;/</code></div>
+          <div class="offer-md" id="offer-md-out"></div>
+          <div class="btn-actions" style="margin-top:0.75rem">
+            <button class="btn" onclick="copyText('offer-md-out', this)">Copy Markdown</button>
+          </div>
+        </div>
+
+        <div id="cv-gen-error"></div>
+        <div class="btn-actions">
+          <button class="btn" onclick="goPage('input')">← Back</button>
+          <button class="btn btn-primary" onclick="generateCV()">Generate tailored CV →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CV -->
+    <div class="page" id="page-cv">
+      <h1>Tailored CV</h1>
+      <p class="subtitle">Review before saving. Copy into <code>phase2/documents/generated/CV_&lt;Company&gt;_&lt;Role&gt;_&lt;Date&gt;.md</code>.</p>
+
+      <div id="cv-loading" style="display:none">
+        <div class="loading-wrap"><div class="spinner"></div><span class="loading-text">Generating tailored CV…</span></div>
+      </div>
+
+      <div id="cv-result" style="display:none">
+        <div class="card">
+          <div class="card-title">Suggested filename</div>
+          <div class="file-path" id="cv-filename">CV_Company_Role_YYYY-MM-DD.md</div>
+          <div class="cv-out" id="cv-out"></div>
+          <div class="btn-actions" style="margin-top:0.75rem">
+            <button class="btn" onclick="copyText('cv-out', this)">Copy CV Markdown</button>
+            <button class="btn" onclick="downloadCV()">Download .md file</button>
+            <button class="btn" onclick="startOver()">New search</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+const DEFAULT_PROFILE = `# Emad Poursina — Master Profile
+
+## Summary
+Full-Stack JavaScript Engineer with 7+ years of web development experience, specialising in scalable SaaS platforms using Next.js, Node.js, and TypeScript. Strong background in REST API design, authentication systems, and Docker-based deployments. Experienced in remote team collaboration. Currently seeking relocation opportunities in Germany.
+
+## Contact
+- Email: emad.puursina@gmail.com
+- GitHub: github.com/emadpoursina
+- LinkedIn: linkedin.com/in/emadpoursina
+- WhatsApp: wa.me/989036326844
+- Telegram: t.me/emad_poursina
+
+## Experience
+
+### Technical Lead — Hamed Mosaddeghian (Remote, 2019–2023)
+- Led development and maintenance of web platforms
+- Managed technical architecture and deployment processes
+- Coordinated marketing-related technical integrations
+- Oversaw reporting systems and performance optimisation
+
+### Freelance WordPress Developer (Remote, 2020–Present)
+- Designed and developed personal, company, and eCommerce websites from templates and Figma
+- Custom plugin, theme, and script development
+- Performance optimisation and security hardening
+
+### Freelance Full-Stack JavaScript Engineer (Remote, 2023–Present)
+- Built SaaS projects in React, Next.js, and React Native
+
+## Skills
+- Languages: HTML, CSS, JavaScript, TypeScript
+- Backend: Node.js, Express, REST API design
+- Frontend: React, Next.js
+- Mobile: React Native
+- Database: MongoDB, PostgreSQL
+- DevOps: Docker, Nginx, Linux
+
+## Projects
+
+### Rousta TV — roustatv.com
+MERN Stack Social Platform
+- Designed and developed full-stack social platform with React, Node.js, MongoDB
+- Implemented RESTful APIs and role-based access control
+- Developed ad management and content moderation features
+- Structured backend architecture for scalability
+
+### Task Manager
+Technologies: MongoDB, React, Node.js
+Application for assigning and following up on tasks.
+
+### Quiz Manager — azmoon.sujiland.com
+Technologies: MongoDB, React, Node.js
+Platform for creating quizzes that users complete online.
+
+### CRM
+Technologies: MongoDB, React, Node.js
+Sales campaign web app with lead capture forms, auto-assignment to sellers, and rating system.
+
+## Education
+Associate Degree, Computer Engineering — Yazd University, Iran (2019–2023)
+
+## Languages
+- Farsi: Native
+- English: Fluent
+- German: A1 (currently learning)
+
+## Visa / Relocation
+Iranian passport. Seeking employer visa sponsorship for relocation to Germany (primary) or other EU countries.`;
+
+let state = {
+  tab: 'paste',
+  jobOffer: null,
+  offerMarkdown: '',
+  cv: '',
+  provider: 'ollama',
+};
+
+function getSetting(k, def) { return localStorage.getItem(k) || def; }
+function getProfile() { return localStorage.getItem('jh_profile') || DEFAULT_PROFILE; }
+
+function updateApiStatus() {
+  const dot = document.getElementById('api-dot');
+  const st = document.getElementById('api-status');
+  const p = getSetting('jh_provider', 'ollama');
+  state.provider = p;
+  if (p === 'ollama') {
+    const url = getSetting('jh_ollama_url', 'http://localhost:11434');
+    const model = getSetting('jh_ollama_model', '');
+    if (model) {
+      dot.className = 'api-dot ok';
+      st.textContent = `Ollama · ${model}`;
+    } else {
+      dot.className = 'api-dot err';
+      st.textContent = 'Ollama · no model selected';
+    }
+  } else {
+    const key = getSetting('jh_api_key', '');
+    if (key && key.startsWith('sk-ant-')) {
+      dot.className = 'api-dot ok';
+      st.textContent = 'Anthropic API';
+    } else {
+      dot.className = 'api-dot err';
+      st.textContent = 'Anthropic · no key';
+    }
+  }
+}
+
+function switchProvider(p) {
+  state.provider = p;
+  document.querySelectorAll('.provider-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.provider-section').forEach(s => s.classList.remove('active'));
+  document.getElementById('ptab-' + p).classList.add('active');
+  document.getElementById('psec-' + p).classList.add('active');
+}
+
+async function fetchOllamaModels() {
+  const url = document.getElementById('ollama-url').value.trim() || 'http://localhost:11434';
+  const statusEl = document.getElementById('ollama-status');
+  statusEl.innerHTML = '<div class="alert alert-info">Connecting to Ollama…</div>';
+  try {
+    const res = await fetch(`${url}/api/tags`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    const models = (data.models || []).map(m => m.name);
+    const sel = document.getElementById('ollama-model');
+    const saved = getSetting('jh_ollama_model', '');
+    sel.innerHTML = models.length
+      ? models.map(m => `<option value="${m}" ${m===saved?'selected':''}>${m}</option>`).join('')
+      : '<option value="">No models found — run: ollama pull mistral</option>';
+    statusEl.innerHTML = models.length
+      ? `<div class="alert alert-info">Found ${models.length} model${models.length>1?'s':''}.</div>`
+      : '<div class="alert alert-err">Ollama is running but no models are installed.</div>';
+  } catch(e) {
+    statusEl.innerHTML = `<div class="alert alert-err">Cannot reach Ollama at <code>${url}</code>. Is it running? Try: <code>ollama serve</code></div>`;
+  }
+  setTimeout(() => { statusEl.innerHTML = ''; }, 4000);
+}
+
+function saveOllama() {
+  const url = document.getElementById('ollama-url').value.trim() || 'http://localhost:11434';
+  const model = document.getElementById('ollama-model').value;
+  localStorage.setItem('jh_provider', 'ollama');
+  localStorage.setItem('jh_ollama_url', url);
+  localStorage.setItem('jh_ollama_model', model);
+  updateApiStatus();
+  document.getElementById('ollama-status').innerHTML = '<div class="alert alert-info">Saved.</div>';
+  setTimeout(() => { document.getElementById('ollama-status').innerHTML = ''; }, 2000);
+}
+
+function saveKey() {
+  const val = document.getElementById('api-key-input').value.trim();
+  localStorage.setItem('jh_api_key', val);
+  localStorage.setItem('jh_provider', 'anthropic');
+  updateApiStatus();
+  document.getElementById('key-status').innerHTML = '<div class="alert alert-info">Saved.</div>';
+  setTimeout(() => { document.getElementById('key-status').innerHTML = ''; }, 2000);
+}
+
+function saveProfile() {
+  const val = document.getElementById('profile-input').value;
+  localStorage.setItem('jh_profile', val);
+  alert('Profile saved.');
+}
+
+// Unified LLM call — routes to Ollama or Anthropic based on saved provider
+async function callLLM(system, user) {
+  const provider = getSetting('jh_provider', 'ollama');
+  if (provider === 'ollama') {
+    return callOllama(system, user);
+  } else {
+    return callAnthropic(system, user);
+  }
+}
+
+async function callOllama(system, user) {
+  const url = getSetting('jh_ollama_url', 'http://localhost:11434');
+  const model = getSetting('jh_ollama_model', '');
+  if (!model) throw new Error('No Ollama model selected. Go to Settings → choose a model.');
+  const res = await fetch(`${url}/api/chat`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model,
+      stream: false,
+      messages: [
+        { role: 'system', content: system },
+        { role: 'user', content: user }
+      ]
+    })
+  });
+  if (!res.ok) {
+    const txt = await res.text().catch(() => '');
+    throw new Error(`Ollama error ${res.status}: ${txt.slice(0, 120)}`);
+  }
+  const data = await res.json();
+  return data.message?.content || '';
+}
+
+function goPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.querySelector(`[data-page="${id}"]`).classList.add('active');
+}
+
+function setTab(tab, el) {
+  state.tab = tab;
+  document.querySelectorAll('.tabs .tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('input-paste').style.display = tab === 'paste' ? '' : 'none';
+  document.getElementById('input-url').style.display = tab === 'url' ? '' : 'none';
+}
+
+async function callAnthropic(system, user) {
+  const key = getSetting('jh_api_key', '');
+  if (!key) throw new Error('No Anthropic API key. Go to Settings first.');
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': key,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1000,
+      system,
+      messages: [{ role: 'user', content: user }]
+    })
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error?.message || `Anthropic API error ${res.status}`);
+  }
+  const data = await res.json();
+  return data.content.map(b => b.text || '').join('');
+}
+
+async function parseOffer() {
+  const raw = state.tab === 'paste'
+    ? document.getElementById('raw-paste').value.trim()
+    : document.getElementById('raw-url').value.trim();
+
+  if (!raw) { showError('parse-error', 'Please paste a job listing or enter a URL first.'); return; }
+  clearError('parse-error');
+
+  goPage('parse');
+  document.getElementById('parse-loading').style.display = '';
+  document.getElementById('parse-result').style.display = 'none';
+
+  const profile = getProfile();
+  const sys = `You are a job offer parser for a job-hunting workflow system. Extract structured data from any job listing format. Return ONLY valid JSON with exactly these keys — no markdown fences, no preamble:
+{
+  "title": "Job title",
+  "company": "Company name",
+  "location": "City, Country",
+  "employment_type": "Full-time | Part-time | Contract | Remote",
+  "salary": "Range or null",
+  "visa_sponsorship": "Yes | No | Not mentioned",
+  "required_skills": ["skill1", "skill2"],
+  "nice_to_have": ["skill1"],
+  "responsibilities": ["resp1", "resp2", "resp3"],
+  "match_score": <integer 0-100 against this candidate: ${profile.slice(0, 400)}>
+}`;
+
+  try {
+    const text = await callLLM(sys, state.tab === 'paste' ? raw : `Fetch and parse this job listing URL: ${raw}`);
+    const clean = text.replace(/```json|```/g, '').trim();
+    state.jobOffer = JSON.parse(clean);
+    renderParseResult();
+  } catch(e) {
+    document.getElementById('parse-loading').style.display = 'none';
+    showError('parse-error', e.message);
+    goPage('input');
+  }
+}
+
+function renderParseResult() {
+  const j = state.jobOffer;
+  document.getElementById('parse-loading').style.display = 'none';
+  document.getElementById('parse-result').style.display = '';
+
+  document.getElementById('r-title').textContent = j.title || '—';
+  document.getElementById('r-company').textContent = j.company || '—';
+  document.getElementById('r-location').textContent = j.location || '—';
+  document.getElementById('r-type').textContent = [j.employment_type, j.visa_sponsorship !== 'Not mentioned' ? `Visa: ${j.visa_sponsorship}` : null].filter(Boolean).join(' · ');
+
+  if (j.salary) {
+    document.getElementById('r-salary').textContent = j.salary;
+    document.getElementById('r-salary-wrap').style.display = '';
+  }
+
+  const reqEl = document.getElementById('r-required');
+  reqEl.innerHTML = (j.required_skills || []).map(s => `<span class="tag tag-req">${s}</span>`).join('') || '<span style="font-size:12px;color:var(--text3)">None listed</span>';
+
+  const niceEl = document.getElementById('r-nice');
+  niceEl.innerHTML = (j.nice_to_have || []).map(s => `<span class="tag tag-nice">${s}</span>`).join('') || '<span style="font-size:12px;color:var(--text3)">None listed</span>';
+
+  const respEl = document.getElementById('r-resp');
+  respEl.innerHTML = (j.responsibilities || []).map(r => `<li>${r}</li>`).join('');
+
+  const score = j.match_score || 0;
+  document.getElementById('match-fill').style.width = score + '%';
+  document.getElementById('match-pct').textContent = score;
+
+  // Build offer markdown following _offer-template.md convention
+  const today = new Date().toISOString().slice(0, 10);
+  const md = `---
+date_collected: ${today}
+source: manual
+status: new
+---
+
+# ${j.title} — ${j.company}
+
+## Meta
+| Field | Value |
+|-------|-------|
+| Company | ${j.company} |
+| Role | ${j.title} |
+| Location | ${j.location} |
+| Type | ${j.employment_type} |
+| Salary | ${j.salary || 'Not listed'} |
+| Visa sponsorship | ${j.visa_sponsorship} |
+| Match score | ${j.match_score}% |
+
+## Required skills
+${(j.required_skills || []).map(s => `- ${s}`).join('\n')}
+
+## Nice to have
+${(j.nice_to_have || []).map(s => `- ${s}`).join('\n')}
+
+## Key responsibilities
+${(j.responsibilities || []).map(r => `- ${r}`).join('\n')}
+`;
+
+  state.offerMarkdown = md;
+  document.getElementById('offer-md-out').textContent = md;
+}
+
+async function generateCV() {
+  clearError('cv-gen-error');
+  goPage('cv');
+  document.getElementById('cv-loading').style.display = '';
+  document.getElementById('cv-result').style.display = 'none';
+
+  const j = state.jobOffer;
+  const profile = getProfile();
+
+  const sys = `You are an expert CV writer for software engineers. Generate a tailored, professional CV in Markdown format. The CV must:
+- Start with a focused summary that directly addresses the role's requirements
+- List only the most relevant skills for this specific job
+- Reframe project and experience bullet points to highlight what matters to this employer
+- Keep it to 1–1.5 pages (roughly 400–600 words of content)
+- Use clean Markdown formatting (##, ###, -, |)
+- Output Markdown only — no preamble, no explanation, no code fences
+
+CANDIDATE PROFILE:
+${profile}`;
+
+  const user = `TARGET JOB:
+Title: ${j.title}
+Company: ${j.company}
+Location: ${j.location}
+Type: ${j.employment_type}
+Visa sponsorship: ${j.visa_sponsorship}
+Required skills: ${(j.required_skills || []).join(', ')}
+Nice to have: ${(j.nice_to_have || []).join(', ')}
+Key responsibilities: ${(j.responsibilities || []).join('; ')}
+
+Generate the tailored CV now.`;
+
+  try {
+    state.cv = await callLLM(sys, user);
+    const today = new Date().toISOString().slice(0, 10);
+    const slug = (j.company || 'Company').replace(/\s+/g, '') + '_' + (j.title || 'Role').replace(/\s+/g, '');
+    const fname = `CV_${slug}_${today}.md`;
+    document.getElementById('cv-filename').textContent = `phase2/documents/generated/${fname}`;
+    document.getElementById('cv-out').textContent = state.cv;
+    document.getElementById('cv-loading').style.display = 'none';
+    document.getElementById('cv-result').style.display = '';
+
+    // Mark steps done in sidebar
+    document.getElementById('sn-1').innerHTML = '✓';
+    document.querySelector('[data-page="input"]').classList.add('done');
+    document.getElementById('sn-2').innerHTML = '✓';
+    document.querySelector('[data-page="parse"]').classList.add('done');
+  } catch(e) {
+    document.getElementById('cv-loading').style.display = 'none';
+    showError('cv-gen-error', e.message);
+    goPage('parse');
+  }
+}
+
+function copyText(id, btn) {
+  const txt = document.getElementById(id).textContent;
+  navigator.clipboard.writeText(txt).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = 'Copied!';
+    setTimeout(() => { btn.textContent = orig; }, 1800);
+  });
+}
+
+function downloadCV() {
+  const fname = document.getElementById('cv-filename').textContent.split('/').pop();
+  const blob = new Blob([state.cv], { type: 'text/markdown' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = fname;
+  a.click();
+}
+
+function startOver() {
+  state = { tab: 'paste', jobOffer: null, offerMarkdown: '', cv: '' };
+  document.getElementById('raw-paste').value = '';
+  document.getElementById('raw-url').value = '';
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('done'));
+  goPage('input');
+}
+
+function showError(id, msg) {
+  const el = document.getElementById(id);
+  if (el) el.innerHTML = `<div class="alert alert-err">${msg}</div>`;
+}
+function clearError(id) {
+  const el = document.getElementById(id);
+  if (el) el.innerHTML = '';
+}
+
+// Init
+const savedProvider = getSetting('jh_provider', 'ollama');
+switchProvider(savedProvider);
+const savedOllamaUrl = getSetting('jh_ollama_url', 'http://localhost:11434');
+document.getElementById('ollama-url').value = savedOllamaUrl;
+const savedModel = getSetting('jh_ollama_model', '');
+if (savedModel) {
+  const sel = document.getElementById('ollama-model');
+  sel.innerHTML = `<option value="${savedModel}">${savedModel}</option>`;
+}
+const savedKey = getSetting('jh_api_key', '');
+if (savedKey) document.getElementById('api-key-input').value = savedKey;
+document.getElementById('profile-input').value = getProfile();
+updateApiStatus();
+</script>
+</body>
+</html>

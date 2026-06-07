@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Research and collect **10–15 real job offers** for a given country, tailored to the candidate in [`profile/master-profile.md`](../../profile/master-profile.md). Output is a structured research file ready for [`skills/requirements-summary.md`](../../skills/requirements-summary.md) and [`skills/gap-report.md`](../../skills/gap-report.md).
+Research and collect **10–15 real job offers** for a given country, tailored to the candidate in [`profile/master-profile.md`](../../phase2/profile/master-profile.md). Output is a structured research file ready for [`requirements-summary.md`](../../phase1/skills/requirements-summary.md) and [`gap-report.md`](../../phase1/skills/gap-report.md).
 
 **Rules:** Do not invent job offers. Only use real, verifiable postings. Skip expired listings.
 
@@ -26,7 +26,7 @@ country_code: de
 
 ## Step 1 — Read candidate profile
 
-Load [`profile/master-profile.md`](../../profile/master-profile.md) and use:
+Load [`profile/master-profile.md`](../../phase2/profile/master-profile.md) and use:
 
 - Target role and seniority
 - Core skills
@@ -39,7 +39,7 @@ Load [`profile/master-profile.md`](../../profile/master-profile.md) and use:
 
 Look up the top boards for the given country. Always include **LinkedIn**. Add 2–3 local boards.
 
-Example for Germany: LinkedIn, StepStone.de, Indeed.de, Xing.de
+Example for Germany: LinkedIn (advanced search filters), Relocate.me, VanHack, Techme Abroad, BerlinStartupJobs (or regional tech hubs), StepStone.de, Indeed.de, Xing.de
 
 Prefer: company careers pages, LinkedIn, reputable national boards. Avoid aggregator spam.
 
@@ -97,10 +97,10 @@ For each offer, extract:
 Save to:
 
 ```
-job-offers/by-country/<country_code>/research.md
+phase1/job-offers/by-country/<country_code>/research.md
 ```
 
-Example: `job-offers/by-country/de/research.md`
+Example: `phase1/job-offers/by-country/de/research.md`
 
 Use this structure:
 
@@ -110,7 +110,7 @@ Use this structure:
 - **Country code:** {country_code}
 - **Research date:** {YYYY-MM-DD}
 - **Offers collected:** {N}
-- **Profile:** profile/master-profile.md
+- **Profile:** phase2/profile/master-profile.md
 
 ## Job offers
 
@@ -139,7 +139,7 @@ Short paragraph:
 Boards used, boards failed, or why fewer than 10 offers were found.
 ```
 
-After saving, the human (or a follow-up step) may copy high-value offers into individual files using [`job-offers/_offer-template.md`](../../job-offers/_offer-template.md) under the same `by-country/<country_code>/` folder.
+After saving, the human (or a follow-up step) may copy high-value offers into individual files using [`offers/_offer-template.md`](../../phase2/offers/_offer-template.md) under `phase2/offers/by-country/<country_code>/`.
 
 ---
 
@@ -157,8 +157,8 @@ After saving, the human (or a follow-up step) may copy high-value offers into in
 
 ## Downstream
 
-1. Merge skills into [`skills/requirements-summary.md`](../../skills/requirements-summary.md)
-2. Compare against master profile → update [`skills/gap-report.md`](../../skills/gap-report.md)
-3. For applications, create an offer file from [`job-offers/_offer-template.md`](../../job-offers/_offer-template.md), then run [`docs/agents/cv-generator.md`](../../docs/agents/cv-generator.md)
+1. Merge skills into [`requirements-summary.md`](../../phase1/skills/requirements-summary.md)
+2. Compare against master profile → update [`gap-report.md`](../../phase1/skills/gap-report.md)
+3. For applications, create an offer file from [`offers/_offer-template.md`](../../phase2/offers/_offer-template.md), then run [`docs/agents/cv-generator.md`](../../docs/agents/cv-generator.md)
 
 Run this agent **once per priority country**, independently.

@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Run **inside a project repository** (or with full project context). Inspect the codebase, README, deploy config, and git history, then produce a structured **Project Profile Block** that matches Section 5 of [`profile/master-profile.md`](../../profile/master-profile.md).
+Run **inside a project repository** (or with full project context). Inspect the codebase, README, deploy config, and git history, then produce a structured **Project Profile Block** that matches Section 5 of [`profile/master-profile.md`](../../phase2/profile/master-profile.md).
 
 A second step in jobHunter merges that block into the master profile and updates related sections (skills, portfolio) when appropriate.
 
@@ -21,7 +21,7 @@ your_role: <optional, e.g. Sole developer, Contributor>
 Always load the target schema from:
 
 ```
-profile/master-profile.md   # Section 5 — Projects (jobHunter repo)
+phase2/profile/master-profile.md   # Section 5 — Projects (jobHunter repo)
 ```
 
 ---
@@ -154,7 +154,7 @@ Only suggest level changes when implementation clearly exceeds what master profi
 If running inside jobHunter repo:
 
 ```
-documents/generated/ProjectProfile_<ProjectSlug>_<YYYY-MM-DD>.md
+phase2/documents/generated/ProjectProfile_<ProjectSlug>_<YYYY-MM-DD>.md
 ```
 
 Otherwise output in chat for the user to paste into jobHunter.
@@ -163,9 +163,9 @@ Otherwise output in chat for the user to paste into jobHunter.
 
 ## Merge into master profile (jobHunter step)
 
-Run [`documents/prompts/project-to-profile.md`](../../documents/prompts/project-to-profile.md) **merge invocation** with:
+Run [`documents/prompts/project-to-profile.md`](../../phase2/documents/prompts/project-to-profile.md) **merge invocation** with:
 
-1. `profile/master-profile.md`
+1. `phase2/profile/master-profile.md`
 2. The Project Profile Block from this agent
 
 The merge agent must:

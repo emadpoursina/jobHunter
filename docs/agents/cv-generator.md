@@ -22,13 +22,13 @@ offer_file: <path to job offer markdown>
 Example:
 
 ```
-offer_file: job-offers/by-country/de/offer-<company>-<role-slug>.md
+offer_file: phase2/offers/by-country/de/offer-<company>-<role-slug>.md
 ```
 
 Always load the master profile from:
 
 ```
-profile/master-profile.md
+phase2/profile/master-profile.md
 ```
 
 Optional overrides:
@@ -42,9 +42,9 @@ review_only: false        # if true, do not write file — output in chat only
 
 ## Step 1 — Read inputs
 
-Load [`profile/master-profile.md`](../../profile/master-profile.md) in full. Use only facts present there.
+Load [`profile/master-profile.md`](../../phase2/profile/master-profile.md) in full. Use only facts present there.
 
-Load the job offer file (create from [`job-offers/_offer-template.md`](../../job-offers/_offer-template.md) if missing). Extract:
+Load the job offer file (create from [`offers/_offer-template.md`](../../phase2/offers/_offer-template.md) if missing). Extract:
 
 - Top 5 **required** skills
 - Top 3 **nice-to-have** skills
@@ -153,7 +153,7 @@ Include:
    | ie | Critical Skills Employment Permit |
    | pt | Tech Visa / D3 Highly Qualified Activity Visa |
 
-6. **Human review required** — mark output stage as `draft` until reviewed (see [`documents/README.md`](../../documents/README.md)).
+6. **Human review required** — mark output stage as `draft` until reviewed (see [`documents/README.md`](../../phase2/documents/README.md)).
 
 ---
 
@@ -162,7 +162,7 @@ Include:
 Save to:
 
 ```
-documents/generated/CV_<CompanySlug>_<JobTitleSlug>_<YYYY-MM-DD>.md
+phase2/documents/generated/CV_<CompanySlug>_<JobTitleSlug>_<YYYY-MM-DD>.md
 ```
 
 **Naming rules:**
@@ -174,8 +174,8 @@ documents/generated/CV_<CompanySlug>_<JobTitleSlug>_<YYYY-MM-DD>.md
 Examples:
 
 ```
-documents/generated/CV_Check24_AgileFullStackNodeReact_2026-06-06.md
-documents/generated/CV_LemonOne_FullStackNodeReactServerless_2026-06-06.md
+phase2/documents/generated/CV_Check24_AgileFullStackNodeReact_2026-06-06.md
+phase2/documents/generated/CV_LemonOne_FullStackNodeReactServerless_2026-06-06.md
 ```
 
 The file must contain **both** the CV and the Tailoring Report (separated by `---`).
@@ -186,9 +186,9 @@ The file must contain **both** the CV and the Tailoring Report (separated by `--
 
 After saving the CV:
 
-1. Add or update a row in [`applications/pipeline.md`](../../applications/pipeline.md) with stage `draft`
+1. Add or update a row in [`applications/pipeline.md`](../../phase2/applications/pipeline.md) with stage `draft`
 2. Set **Generated CV** path in the job offer file under `## Application`
-3. For high-value roles, copy [`applications/_application-template.md`](../../applications/_application-template.md) and link pipeline ID
+3. For high-value roles, copy [`applications/_application-template.md`](../../phase2/applications/_application-template.md) and link pipeline ID
 
 Do **not** set stage to `sent` — human review first.
 
@@ -278,7 +278,7 @@ Append after the CV:
 **Job:** [Job Title] at [Company]
 **Date:** [YYYY-MM-DD]
 **Offer file:** [path]
-**Profile:** profile/master-profile.md
+**Profile:** phase2/profile/master-profile.md
 
 ### Skills Matched
 
@@ -335,7 +335,7 @@ Append after the CV:
 ## Downstream
 
 1. Human reviews CV + Tailoring Report → rename or note `reviewed` in pipeline
-2. After send → update [`applications/pipeline.md`](../../applications/pipeline.md) stage to `sent`
-3. Log rejection/interview feedback → [`skills/gap-report.md`](../../skills/gap-report.md) § From Phase 2 feedback
+2. After send → update [`applications/pipeline.md`](../../phase2/applications/pipeline.md) stage to `sent`
+3. Log rejection/interview feedback → [`gap-report.md`](../../phase1/skills/gap-report.md) § From Phase 2 feedback
 
-**Manual prompt (copy-paste):** [`documents/prompts/cv-from-offer.md`](../../documents/prompts/cv-from-offer.md)
+**Manual prompt (copy-paste):** [`documents/prompts/cv-from-offer.md`](../../phase2/documents/prompts/cv-from-offer.md)

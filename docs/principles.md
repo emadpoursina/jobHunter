@@ -8,7 +8,7 @@ Decision log for jobHunter. Update when rules change.
 - **Target roles:** Backend / Node.js (NestJS); full-stack (React, Next.js, TypeScript).
 - **Migration path:** Employer visa sponsorship required (Iranian passport).
 - **Seniority:** Mid–senior; consistent across countries and search queries.
-- **Upskilling vehicle:** One flagship project per [`../skills/skill-map.md`](../skills/skill-map.md).
+- **Upskilling vehicle:** One flagship project per [`../phase3/skill-map.md`](../phase3/skill-map.md).
 
 ## Sampling (Phase 1)
 
@@ -17,7 +17,7 @@ Decision log for jobHunter. Update when rules change.
 - **Recency:** Prefer postings from the last ~90 days.
 - **Sources:** Company careers pages, LinkedIn, reputable national boards.
 - **Exclude:** Unrelated titles, intern/junior mismatch, duplicate reposts, unclear visa/sponsorship where that matters.
-- **Agent:** Run [`agents/job-offer-research.md`](agents/job-offer-research.md) per country; output → `job-offers/by-country/<code>/research.md`.
+- **Agent:** Run [`agents/job-offer-research.md`](agents/job-offer-research.md) per country; output → `phase1/job-offers/by-country/<code>/research.md`.
 
 ## Immigration (Phase 1)
 
@@ -30,15 +30,15 @@ For each priority country document:
 
 ## Applications (Phase 2)
 
-- **Master profile first** — [`../profile/master-profile.md`](../profile/master-profile.md); never invent beyond it in CVs.
+- **Master profile first** — [`../phase2/profile/master-profile.md`](../phase2/profile/master-profile.md); never invent beyond it in CVs.
 - **AI drafts, human approves** — 100% review before send; verify facts, tone, and role alignment. Agent: [`agents/cv-generator.md`](agents/cv-generator.md).
 - **Phase 2 ∥ Phase 3** — apply while upskilling; do not block applications on gap closure.
-- **Feedback loop** — rejection reasons and interview notes update `skills/gap-report.md` and `learning/backlog.md`.
+- **Feedback loop** — rejection reasons and interview notes update `phase1/skills/gap-report.md` and `phase3/backlog.md`.
 
 ## Networking (Phase 0)
 
 - Run in parallel with Phase 2 from day one.
-- Log every outreach and link referrals to `applications/pipeline.md`.
+- Log every outreach and link referrals to `phase2/applications/pipeline.md`.
 
 ## Metrics
 
