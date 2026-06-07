@@ -4,6 +4,7 @@ import { close as closeDb } from './db.js';
 import settingsRouter from './routes/settings.js';
 import ollamaRouter from './routes/ollama.js';
 import pipelineRouter from './routes/pipeline.js';
+import collectRouter from './routes/collect.js';
 import jobsRouter from './routes/jobs.js';
 
 const app = express();
@@ -18,6 +19,7 @@ app.get('/api/health', (_req, res) => {
 app.use('/api/settings', settingsRouter);
 app.use('/api/ollama', ollamaRouter);
 app.use('/api', pipelineRouter);
+app.use('/api', collectRouter);
 app.use('/api/jobs', jobsRouter);
 
 app.use((_req, res) => {

@@ -214,6 +214,12 @@ export function updateRun(id, fields) {
   return getRunById(id);
 }
 
+// Return one collection run by id, or null when missing
+export function getRunById(id) {
+  const row = sqlite.prepare('SELECT * FROM runs WHERE id = ?').get(id);
+  return row ? parseRunRow(row) : null;
+}
+
 // Return the most recent collection runs
 export function getRecentRuns(limit = 20) {
   const rows = sqlite
@@ -275,6 +281,7 @@ export const db = {
   jobExistsByUrl,
   insertRun,
   updateRun,
+  getRunById,
   getRecentRuns,
   getSetting,
   setSetting,
@@ -328,11 +335,6 @@ function parseRunRow(row) {
   }
 
   return run;
-}
-
-function getRunById(id) {
-  const row = sqlite.prepare('SELECT * FROM runs WHERE id = ?').get(id);
-  return row ? parseRunRow(row) : null;
 }
 
 function normalizeJobInput(jobData) {
