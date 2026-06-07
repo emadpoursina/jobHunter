@@ -1,6 +1,8 @@
 import 'dotenv/config';
 import express from 'express';
 import { close as closeDb } from './db.js';
+import settingsRouter from './routes/settings.js';
+import ollamaRouter from './routes/ollama.js';
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3001;
@@ -10,6 +12,9 @@ app.use(express.json());
 app.get('/api/health', (_req, res) => {
   res.json({ ok: true });
 });
+
+app.use('/api/settings', settingsRouter);
+app.use('/api/ollama', ollamaRouter);
 
 app.use((_req, res) => {
   res.status(404).json({ error: 'Not found', code: 'NOT_FOUND' });
