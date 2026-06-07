@@ -12,58 +12,34 @@ async function request(method, path, body) {
   return data;
 }
 
-// Reject stubbed endpoints until their backend routes exist
-function notImplemented(name) {
-  return () =>
-    Promise.reject(
-      Object.assign(new Error(`${name} is not implemented yet`), {
-        code: 'NOT_IMPLEMENTED',
-      }),
-    );
+// Build query string for job list filters
+function jobsQuery(filters = {}) {
+  const params = new URLSearchParams();
+  if (filters.status) params.set('status', filters.status);
+  if (filters.source) params.set('source', filters.source);
+  if (filters.country_code) params.set('country_code', filters.country_code);
+  const qs = params.toString();
+  return qs ? `?${qs}` : '';
 }
-
-// Static collector metadata until GET /api/collectors is wired (Batch 10)
-const STUB_COLLECTORS = {
-  collectors: [
-    {
-      name: 'linkedin',
-      label: 'LinkedIn',
-      configSchema: {
-        queries: { type: 'array', description: 'Search strings, one per line' },
-        location: { type: 'string', description: 'Location filter, e.g. Germany' },
-        maxResults: { type: 'number', default: 10, description: 'Max listings per query' },
-      },
-    },
-    {
-      name: 'indeed',
-      label: 'Indeed',
-      configSchema: {
-        queries: { type: 'array', description: 'Search strings, one per line' },
-        location: { type: 'string', description: 'Location filter, e.g. Germany' },
-        maxResults: { type: 'number', default: 10, description: 'Max listings per query' },
-      },
-    },
-  ],
-};
 
 export const api = {
   // Jobs
-  getJobs: notImplemented('getJobs'),
-  getJob: notImplemented('getJob'),
-  updateJob: notImplemented('updateJob'),
-  deleteJob: notImplemented('deleteJob'),
+  getJobs: (filters) => request('GET', `/jobs${jobsQuery(filters)}`),
+  getJob: (id) => request('GET', `/jobs/${id}`),
+  updateJob: (id, fields) => request('PATCH', `/jobs/${id}`, fields),
+  deleteJob: (id) => request('DELETE', `/jobs/${id}`),
 
   // Collection
-  getCollectors: () => Promise.resolve(STUB_COLLECTORS),
-  collect: notImplemented('collect'),
-  getRuns: notImplemented('getRuns'),
-  getRun: notImplemented('getRun'),
+  getCollectors: () => request('GET', '/collectors'),
+  collect: (source, config) => request('POST', '/collect', { source, config }),
+  getRuns: (limit = 20) => request('GET', `/runs?limit=${limit}`),
+  getRun: (id) => request('GET', `/runs/${id}`),
 
   // Pipeline
-  parseOffer: notImplemented('parseOffer'),
-  saveJob: notImplemented('saveJob'),
-  generateCv: notImplemented('generateCv'),
-  getCvMarkdown: notImplemented('getCvMarkdown'),
+  parseOffer: (text) => request('POST', '/parse', { text }),
+  saveJob: (id, payload) => request('POST', `/jobs/${id}/save`, payload),
+  generateCv: (id) => request('POST', `/jobs/${id}/cv`),
+  getCvMarkdown: (id) => request('GET', `/jobs/${id}/cv`),
 
   // Settings
   getSettings: () => request('GET', '/settings'),
