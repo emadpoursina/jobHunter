@@ -147,6 +147,8 @@ tools/job-collector/
 
 Offer files are append-only (same slug is not overwritten). CV files follow the same rule.
 
+Generated offer and CV markdown under `REPO_ROOT` are gitignored at the repo root (see root `.gitignore`); only templates and README files in those folders are tracked.
+
 ---
 
 ## Troubleshooting
