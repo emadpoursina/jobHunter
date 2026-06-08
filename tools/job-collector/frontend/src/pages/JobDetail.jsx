@@ -118,7 +118,9 @@ export default function JobDetail() {
     }
   }
 
-  // Update job status (applied or rejected)
+  const isDecisionStatus = job?.status === 'applied' || job?.status === 'rejected';
+
+  // Update job status (applied, rejected, or neutral)
   async function handleStatusChange(status) {
     setUpdatingStatus(true);
     setAlert(null);
@@ -126,7 +128,8 @@ export default function JobDetail() {
     try {
       const { job: updated } = await api.updateJob(id, { status });
       setJob(updated);
-      showAlert(`Marked as ${status}.`, 'info');
+      const message = status === 'neutral' ? 'Reset to neutral.' : `Marked as ${status}.`;
+      showAlert(message, 'info');
     } catch (err) {
       showAlert(err.message);
     } finally {
@@ -346,6 +349,14 @@ export default function JobDetail() {
       <section className="card job-detail-section">
         <div className="card-title">Status</div>
         <div className="btn-actions">
+          <button
+            type="button"
+            className="btn"
+            onClick={() => handleStatusChange('neutral')}
+            disabled={updatingStatus || !isDecisionStatus}
+          >
+            Mark neutral
+          </button>
           <button
             type="button"
             className="btn"

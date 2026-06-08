@@ -3,6 +3,13 @@ import { deleteJob, getJobById, getJobs, updateJob } from '../db.js';
 
 const router = Router();
 
+// Resolve pipeline status when clearing applied/rejected decision
+function inferPipelineStatus(job) {
+  if (job.cvMdPath ?? job.cv_md_path) return 'cv_generated';
+  if (job.title) return 'parsed';
+  return 'raw';
+}
+
 // Parse and validate a numeric job id from route params
 function parseJobId(rawId) {
   const id = Number(rawId);
@@ -69,7 +76,12 @@ router.patch('/:id', (req, res) => {
     });
   }
 
-  const job = updateJob(id, body);
+  const updates = { ...body };
+  if (updates.status === 'neutral') {
+    updates.status = inferPipelineStatus(existing);
+  }
+
+  const job = updateJob(id, updates);
   res.json({ job });
 });
 

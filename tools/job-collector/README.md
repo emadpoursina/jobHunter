@@ -99,7 +99,7 @@ If Ollama is offline, API errors return code `OLLAMA_UNAVAILABLE` or `LLM_ERROR`
 - **Browser extraction** — run a console script in your own browser (LinkedIn, Indeed, or any site), paste JSON, import — bypasses headless 403/CAPTCHA blocks
 - **LinkedIn / Indeed scrapers** — Playwright-based collectors with run controls on the Dashboard
 - **Jobs list** — filter by status, source, country
-- **Job detail** — view parsed fields, generate CV, update status
+- **Job detail** — view parsed fields, generate CV, mark applied / rejected / neutral
 - **CV viewer** — rendered markdown with copy / download
 - **Deduplication** — jobs with the same `source_url` are skipped on insert (DB unique index + application check)
 
