@@ -327,6 +327,86 @@ select:focus {
   margin-bottom: 0.75rem;
 }
 
+.browser-collector {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  margin-bottom: 0.5rem;
+  overflow: hidden;
+}
+
+.browser-collector-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background: var(--surface2);
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  text-align: left;
+}
+
+.browser-collector-toggle:hover {
+  background: var(--border);
+}
+
+.browser-collector-chevron {
+  color: var(--text3);
+  font-size: 12px;
+}
+
+.browser-collector-body {
+  padding: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.browser-collector-steps {
+  margin: 0 0 0.75rem 1.25rem;
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.6;
+}
+
+.browser-script-wrap {
+  margin: 1rem 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.browser-script-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem;
+  background: var(--surface2);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text2);
+}
+
+.browser-script {
+  margin: 0;
+  padding: 0.75rem;
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1.45;
+  max-height: 200px;
+  overflow: auto;
+  background: #1e1e1e;
+  color: #d4d4d4;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.btn-sm {
+  padding: 4px 10px;
+  font-size: 12px;
+}
+
 .loading-wrap {
   display: flex;
   align-items: center;

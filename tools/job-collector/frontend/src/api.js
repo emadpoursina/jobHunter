@@ -37,6 +37,8 @@ export const api = {
   // Collection
   getCollectors: () => request('GET', '/collectors'),
   collect: (source, config) => request('POST', '/collect', { source, config }),
+  importCollect: (source, offers) => request('POST', '/collect/import', { source, offers }),
+  getBrowserScripts: () => request('GET', '/browser-scripts'),
   getRuns: (limit = 20) => request('GET', `/runs?limit=${limit}`),
   getRun: (id) => request('GET', `/runs/${id}`),
 

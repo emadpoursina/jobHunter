@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../api.js';
 import { matchScoreClass } from '../components/JobCard.jsx';
+import BrowserCollector from '../components/BrowserCollector.jsx';
 import RunButton from '../components/RunButton.jsx';
 import StatusBadge from '../components/StatusBadge.jsx';
 
@@ -94,6 +95,7 @@ export default function Dashboard() {
   const [pollingRuns, setPollingRuns] = useState(false);
   const [scrapers, setScrapers] = useState([]);
   const [collectorConfigs, setCollectorConfigs] = useState({});
+  const [browserScripts, setBrowserScripts] = useState([]);
 
   // Show a dismissible alert for 5 seconds
   const showAlert = useCallback((message, type = 'err') => {
@@ -143,6 +145,13 @@ export default function Dashboard() {
   useEffect(() => {
     refreshDashboard();
   }, [refreshDashboard]);
+
+  // Load browser-console extraction scripts for manual import
+  useEffect(() => {
+    api.getBrowserScripts()
+      .then(({ scripts }) => setBrowserScripts(scripts ?? []))
+      .catch(() => setBrowserScripts([]));
+  }, []);
 
   // Poll runs while any collection run is still active
   useEffect(() => {
@@ -200,6 +209,26 @@ export default function Dashboard() {
       const newCount = run.jobsNew ?? 0;
       showAlert(
         `${collector.label} finished: ${found} job${found === 1 ? '' : 's'} found, ${newCount} new.`,
+        'info',
+      );
+      await refreshDashboard();
+    } catch (err) {
+      showAlert(err.message);
+      await refreshDashboard();
+    }
+  }
+
+  // Import offers extracted via browser-console script
+  async function handleBrowserImport({ runId, offerCount, source }) {
+    setPollingRuns(true);
+    try {
+      const run = await waitForRun(runId);
+      if (run.status === 'error') {
+        throw new Error(run.error || 'Import failed');
+      }
+      const newCount = run.jobsNew ?? 0;
+      showAlert(
+        `Imported ${offerCount} offer${offerCount === 1 ? '' : 's'} from ${source}: ${newCount} new job${newCount === 1 ? '' : 's'}.`,
         'info',
       );
       await refreshDashboard();
@@ -370,6 +399,32 @@ export default function Dashboard() {
               </p>
             )}
           </>
+        )}
+      </div>
+
+      <div className="card">
+        <div className="card-title">Browser extraction</div>
+        <p className="hint" style={{ marginBottom: '1rem' }}>
+          When automated scraping is blocked (403, CAPTCHA), run a script in your own browser
+          while logged in, then paste the JSON here to import.
+        </p>
+
+        {browserScripts.length === 0 ? (
+          <p className="hint">Loading browser scripts…</p>
+        ) : (
+          browserScripts.map((entry) => (
+            <BrowserCollector
+              key={entry.name}
+              name={entry.name}
+              label={entry.label}
+              script={entry.script}
+              instructions={entry.instructions}
+              searchHint={entry.searchHint}
+              detailHint={entry.detailHint}
+              onImported={handleBrowserImport}
+              onError={showAlert}
+            />
+          ))
         )}
       </div>
 

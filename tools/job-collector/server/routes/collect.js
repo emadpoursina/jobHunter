@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { getAllBrowserScripts, getBrowserScript, normalizeImportedOffers } from '../../collectors/browserScripts.js';
 import { getCollector, registry } from '../../collectors/registry.js';
 import { parseOffer } from '../../pipeline/parser.js';
 import { writeOfferMd } from '../../pipeline/repoFiles.js';
@@ -53,61 +54,66 @@ function listCollectors() {
   return collectors;
 }
 
-// Run collect → parse → dedup → insert → write offer files for one run
+// Parse, dedup, insert, and write offer files for a list of raw offers
+async function processRawOffers(runId, source, rawOffers) {
+  const jobsFound = rawOffers.length;
+  let jobsNew = 0;
+
+  for (const rawOffer of rawOffers) {
+    if (rawOffer.sourceUrl && jobExistsByUrl(rawOffer.sourceUrl)) {
+      continue;
+    }
+
+    try {
+      const offer = await parseOffer(rawOffer);
+      const jobId = insertJob({
+        source: rawOffer.source ?? source,
+        sourceUrl: rawOffer.sourceUrl ?? null,
+        rawText: rawOffer.rawText,
+        title: offer.title,
+        company: offer.company,
+        location: offer.location,
+        countryCode: offer.countryCode,
+        employmentType: offer.employmentType,
+        salary: offer.salary,
+        visaSponsorship: offer.visaSponsorship,
+        requiredSkills: offer.requiredSkills,
+        niceToHave: offer.niceToHave,
+        responsibilities: offer.responsibilities,
+        matchScore: offer.matchScore,
+        status: 'parsed',
+      });
+
+      if (!jobId) continue;
+
+      const job = getJobById(jobId);
+      const offerMdPath = await writeOfferMd(job);
+      updateJob(jobId, { offerMdPath });
+      jobsNew += 1;
+    } catch (err) {
+      const label = rawOffer.sourceUrl ?? rawOffer.company ?? 'unknown listing';
+      console.warn(`[WARN] [collect] Skipping listing (${label}): ${err.message}`);
+    }
+  }
+
+  updateRun(runId, {
+    status: 'done',
+    jobsFound,
+    jobsNew,
+    finishedAt: new Date().toISOString(),
+  });
+
+  console.log(
+    `[INFO] [collect] Run ${runId} finished: found=${jobsFound}, new=${jobsNew}`,
+  );
+}
+
+// Run automated collector → parse → dedup → insert → write offer files
 async function executeCollectRun(runId, source, config) {
   try {
     const collector = getCollector(source);
     const rawOffers = await collector.run(config);
-    const jobsFound = rawOffers.length;
-    let jobsNew = 0;
-
-    for (const rawOffer of rawOffers) {
-      if (rawOffer.sourceUrl && jobExistsByUrl(rawOffer.sourceUrl)) {
-        continue;
-      }
-
-      try {
-        const offer = await parseOffer(rawOffer);
-        const jobId = insertJob({
-          source: rawOffer.source ?? source,
-          sourceUrl: rawOffer.sourceUrl ?? null,
-          rawText: rawOffer.rawText,
-          title: offer.title,
-          company: offer.company,
-          location: offer.location,
-          countryCode: offer.countryCode,
-          employmentType: offer.employmentType,
-          salary: offer.salary,
-          visaSponsorship: offer.visaSponsorship,
-          requiredSkills: offer.requiredSkills,
-          niceToHave: offer.niceToHave,
-          responsibilities: offer.responsibilities,
-          matchScore: offer.matchScore,
-          status: 'parsed',
-        });
-
-        if (!jobId) continue;
-
-        const job = getJobById(jobId);
-        const offerMdPath = await writeOfferMd(job);
-        updateJob(jobId, { offerMdPath });
-        jobsNew += 1;
-      } catch (err) {
-        const label = rawOffer.sourceUrl ?? rawOffer.company ?? 'unknown listing';
-        console.warn(`[WARN] [collect] Skipping listing (${label}): ${err.message}`);
-      }
-    }
-
-    updateRun(runId, {
-      status: 'done',
-      jobsFound,
-      jobsNew,
-      finishedAt: new Date().toISOString(),
-    });
-
-    console.log(
-      `[INFO] [collect] Run ${runId} finished: found=${jobsFound}, new=${jobsNew}`,
-    );
+    await processRawOffers(runId, source, rawOffers);
   } catch (err) {
     updateRun(runId, {
       status: 'error',
@@ -118,9 +124,46 @@ async function executeCollectRun(runId, source, config) {
   }
 }
 
+// Import browser-extracted offers through the same parse → save pipeline
+async function executeImportRun(runId, source, rawOffers) {
+  try {
+    await processRawOffers(runId, source, rawOffers);
+  } catch (err) {
+    updateRun(runId, {
+      status: 'error',
+      error: err.message,
+      finishedAt: new Date().toISOString(),
+    });
+    console.error(`[ERROR] [collect] Import run ${runId} failed:`, err.message);
+  }
+}
+
 // Return all registered collectors with enabled state from settings
 router.get('/collectors', (_req, res) => {
   res.json({ collectors: listCollectors() });
+});
+
+// Return browser-console script and instructions for a collector
+router.get('/collectors/:name/browser-script', (req, res) => {
+  const { name } = req.params;
+  const script = getBrowserScript(name);
+
+  if (!script) {
+    return res.status(404).json({
+      error: `No browser script for collector: ${name}`,
+      code: 'NOT_FOUND',
+    });
+  }
+
+  res.json({ name, ...script });
+});
+
+// Return all browser-console scripts (linkedin, indeed, manual)
+router.get('/browser-scripts', (_req, res) => {
+  const scripts = getAllBrowserScripts();
+  res.json({
+    scripts: Object.entries(scripts).map(([name, data]) => ({ name, ...data })),
+  });
 });
 
 // Enqueue a full collect+parse+save pipeline and return the run id immediately
@@ -154,6 +197,62 @@ router.post('/collect', (req, res) => {
   enqueueJob(() => executeCollectRun(runId, source, config));
 
   res.status(202).json({ runId });
+});
+
+// Import offers extracted via browser-console scripts
+router.post('/collect/import', (req, res) => {
+  const body = req.body;
+
+  let source = body?.source;
+  let rawOffers = body?.offers;
+
+  // Accept pasted JSON string
+  if (typeof body === 'string' || (typeof body?.json === 'string')) {
+    try {
+      const parsed = JSON.parse(typeof body === 'string' ? body : body.json);
+      source = parsed.source ?? source;
+      rawOffers = parsed.offers ?? rawOffers;
+    } catch {
+      return res.status(400).json({
+        error: 'Invalid JSON in import body',
+        code: 'VALIDATION_ERROR',
+      });
+    }
+  }
+
+  if (!source || typeof source !== 'string') {
+    return res.status(400).json({
+      error: 'Request body must include source',
+      code: 'VALIDATION_ERROR',
+    });
+  }
+
+  if (!registry.has(source)) {
+    return res.status(400).json({
+      error: `Unknown collector source: ${source}`,
+      code: 'VALIDATION_ERROR',
+    });
+  }
+
+  let offers;
+  try {
+    offers = normalizeImportedOffers(source, rawOffers);
+  } catch (err) {
+    return res.status(400).json({
+      error: err.message,
+      code: err.code ?? 'VALIDATION_ERROR',
+    });
+  }
+
+  const runId = insertRun({
+    source,
+    config: { import: true, offerCount: offers.length },
+    status: 'running',
+  });
+
+  enqueueJob(() => executeImportRun(runId, source, offers));
+
+  res.status(202).json({ runId, offerCount: offers.length });
 });
 
 // Return recent collection runs

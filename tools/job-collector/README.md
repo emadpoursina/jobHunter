@@ -96,11 +96,37 @@ If Ollama is offline, API errors return code `OLLAMA_UNAVAILABLE` or `LLM_ERROR`
 ## Features
 
 - **Manual input** — paste job text or a URL on the Dashboard; parse, review, save
+- **Browser extraction** — run a console script in your own browser (LinkedIn, Indeed, or any site), paste JSON, import — bypasses headless 403/CAPTCHA blocks
 - **LinkedIn / Indeed scrapers** — Playwright-based collectors with run controls on the Dashboard
 - **Jobs list** — filter by status, source, country
 - **Job detail** — view parsed fields, generate CV, update status
 - **CV viewer** — rendered markdown with copy / download
 - **Deduplication** — jobs with the same `source_url` are skipped on insert (DB unique index + application check)
+
+---
+
+## Browser extraction (manual scrape)
+
+When automated Playwright scraping is blocked (Indeed 403, LinkedIn CAPTCHA), use the **Browser extraction** section on the Dashboard:
+
+1. Open the target site in your normal browser (logged in if needed).
+2. Go to a **search results** page or a **single job posting**.
+3. Expand the collector panel (LinkedIn, Indeed, or Any site).
+4. Click **Copy script**, open DevTools (F12) → **Console**, paste, press Enter.
+5. The script copies JSON to your clipboard: `{ "source": "...", "offers": [...] }`.
+6. Paste the JSON into the panel and click **Import offers**.
+
+Imported offers go through the same pipeline as automated runs: LLM parse → dedup → SQLite → offer `.md` file.
+
+API equivalent:
+
+```bash
+curl -s -X POST http://localhost:3001/api/collect/import \
+  -H "Content-Type: application/json" \
+  -d '{"source":"indeed","offers":[{"sourceUrl":"https://...","rawText":"Title: ...\n..."}]}'
+```
+
+Scripts live in `collectors/browserScripts.js`. Fetch metadata via `GET /api/browser-scripts`.
 
 ---
 
@@ -160,6 +186,7 @@ Generated offer and CV markdown under `REPO_ROOT` are gitignored at the repo roo
 | Collect run saves some jobs but logs parse warnings | One listing failed LLM JSON extraction; others still saved. Parser strips markdown fences and preamble; try a different model if warnings persist |
 | Scraper run fails immediately | Run `bunx playwright install chromium` |
 | Duplicate jobs from scrapers | Expected — same URL is deduplicated; `runs.jobs_new` stays 0 |
+| Indeed 403 / LinkedIn CAPTCHA | Use **Browser extraction** on the Dashboard instead of Run buttons |
 | Port already in use | Change `PORT` in `.env` |
 
 ---
