@@ -66,31 +66,36 @@ async function executeCollectRun(runId, source, config) {
         continue;
       }
 
-      const offer = await parseOffer(rawOffer);
-      const jobId = insertJob({
-        source: rawOffer.source ?? source,
-        sourceUrl: rawOffer.sourceUrl ?? null,
-        rawText: rawOffer.rawText,
-        title: offer.title,
-        company: offer.company,
-        location: offer.location,
-        countryCode: offer.countryCode,
-        employmentType: offer.employmentType,
-        salary: offer.salary,
-        visaSponsorship: offer.visaSponsorship,
-        requiredSkills: offer.requiredSkills,
-        niceToHave: offer.niceToHave,
-        responsibilities: offer.responsibilities,
-        matchScore: offer.matchScore,
-        status: 'parsed',
-      });
+      try {
+        const offer = await parseOffer(rawOffer);
+        const jobId = insertJob({
+          source: rawOffer.source ?? source,
+          sourceUrl: rawOffer.sourceUrl ?? null,
+          rawText: rawOffer.rawText,
+          title: offer.title,
+          company: offer.company,
+          location: offer.location,
+          countryCode: offer.countryCode,
+          employmentType: offer.employmentType,
+          salary: offer.salary,
+          visaSponsorship: offer.visaSponsorship,
+          requiredSkills: offer.requiredSkills,
+          niceToHave: offer.niceToHave,
+          responsibilities: offer.responsibilities,
+          matchScore: offer.matchScore,
+          status: 'parsed',
+        });
 
-      if (!jobId) continue;
+        if (!jobId) continue;
 
-      const job = getJobById(jobId);
-      const offerMdPath = await writeOfferMd(job);
-      updateJob(jobId, { offerMdPath });
-      jobsNew += 1;
+        const job = getJobById(jobId);
+        const offerMdPath = await writeOfferMd(job);
+        updateJob(jobId, { offerMdPath });
+        jobsNew += 1;
+      } catch (err) {
+        const label = rawOffer.sourceUrl ?? rawOffer.company ?? 'unknown listing';
+        console.warn(`[WARN] [collect] Skipping listing (${label}): ${err.message}`);
+      }
     }
 
     updateRun(runId, {

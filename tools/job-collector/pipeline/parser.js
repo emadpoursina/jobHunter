@@ -54,12 +54,27 @@ async function buildSystemPrompt() {
   return `${basePrompt.trim()}${EXTRACTION_TASK}${candidateSummary}`;
 }
 
-// Strip markdown fences and parse the LLM JSON response
+// Extract a JSON object string from LLM output (fences, preamble, or bare object)
+function extractJsonString(responseText) {
+  const text = responseText.trim();
+  const fenced = text.match(/```(?:json)?\s*([\s\S]*?)```/i);
+  const candidate = (fenced ? fenced[1] : text).trim();
+
+  const start = candidate.indexOf('{');
+  const end = candidate.lastIndexOf('}');
+  if (start !== -1 && end > start) {
+    return candidate.slice(start, end + 1);
+  }
+
+  return candidate;
+}
+
+// Parse the LLM JSON response, tolerating markdown fences and preamble text
 function parseLlmJson(responseText) {
-  const clean = responseText.replace(/```json|```/g, '').trim();
+  const jsonStr = extractJsonString(responseText);
 
   try {
-    return JSON.parse(clean);
+    return JSON.parse(jsonStr);
   } catch {
     const preview = responseText.slice(0, 200);
     const err = new Error(`Failed to parse LLM response as JSON. Preview: ${preview}`);

@@ -157,6 +157,7 @@ Generated offer and CV markdown under `REPO_ROOT` are gitignored at the repo roo
 |---------|-----|
 | Settings model dropdown empty | Start Ollama: `ollama serve` |
 | Parse / CV fails with LLM error | Check Settings provider and model; confirm Ollama model is pulled |
+| Collect run saves some jobs but logs parse warnings | One listing failed LLM JSON extraction; others still saved. Parser strips markdown fences and preamble; try a different model if warnings persist |
 | Scraper run fails immediately | Run `bunx playwright install chromium` |
 | Duplicate jobs from scrapers | Expected — same URL is deduplicated; `runs.jobs_new` stays 0 |
 | Port already in use | Change `PORT` in `.env` |
