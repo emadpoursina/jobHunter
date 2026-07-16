@@ -25,7 +25,12 @@ Languages:         Farsi (Native), English (Fluent), German (A1 — learning)
 
 ## 2. Professional Summary
 
-Full-Stack JavaScript Engineer with 7+ years of experience building scalable SaaS platforms using Node.js, TypeScript, React, and Next.js. Strong background in REST API design, JWT authentication, role-based access control, and Docker-based deployments. Four years as Technical Lead (2019–2023) owning architecture and delivery. Currently backend & DevOps lead on VoiceDash — a live AI dictation SaaS (Electron, Socket.IO, Docker Compose, Stripe, BullMQ/Redis) — and mobile developer on Villion — a live luxury concierge platform (React Native/Expo member app within a team monorepo spanning Azure Functions, MongoDB, Next.js admin, Stripe, SignalR chat, and a LiveKit AI concierge agent). Also building a flagship portfolio project to add AWS, NestJS, GraphQL, Jest testing, and PostgreSQL advanced patterns. Seeking senior backend or full-stack roles in Europe or Canada with visa sponsorship; Germany is the primary relocation target.
+Backend Engineer with 7+ years building production Node.js systems.
+Currently backend & DevOps lead on VoiceDash — a live AI dictation SaaS —
+owning the full deployment stack (Docker Compose, staging/production environments,
+release management, and code review). Four years as Technical Lead (2019–2023)
+owning architecture and delivery across full-stack JavaScript projects.
+Seeking senior backend roles in Germany and Europe; available immediately with EU Blue Card eligibility.
 
 ---
 
