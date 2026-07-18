@@ -1,0 +1,19 @@
+project:
+  name: "jobHunter"
+  description: "Personal workflow for finding, qualifying, and applying to backend/full-stack JavaScript roles with employer visa sponsorship"
+  created: "2026-07-18T11:15:18Z"
+  fire_version: "0.1.8"
+
+workspace:
+  type: brownfield
+  structure: monolith
+  autonomy_bias: balanced
+  run_scope_preference: single
+  run_scope_history: []
+  scanned_at: "2026-07-18T11:15:18Z"
+
+intents: []
+
+runs:
+  active: []
+  completed: []
