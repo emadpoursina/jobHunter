@@ -40,3 +40,5 @@ raw/*_draft*.md
 tools/*/node_modules/
 tools/*/data/
 tools/*/.env
+
+scratch/
