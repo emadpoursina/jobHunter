@@ -153,7 +153,7 @@ jobHunter/
 │   └── agents/
 │       ├── README.md
 │       ├── job-offer-research.md      # Phase 1 — find offers per country
-│       ├── cv-generator.md            # Phase 2 — tailored CV + tailoring report
+│       ├── cv-generator.md            # Phase 2 — tailored CV + Gaps Disclosure
 │       └── project-profile-extractor.md
 │
 ├── networking/                        # Phase 0

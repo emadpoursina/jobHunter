@@ -30,8 +30,8 @@ For each priority country document:
 
 ## Applications (Phase 2)
 
-- **Master profile first** — [`../phase2/profile/master-profile.md`](../phase2/profile/master-profile.md); never invent beyond it in CVs.
-- **AI drafts, human approves** — 100% review before send; verify facts, tone, and role alignment. Agent: [`agents/cv-generator.md`](agents/cv-generator.md).
+- **Master profile first** — [`../phase2/profile/master-profile.md`](../phase2/profile/master-profile.md); scoped adjacency fills only, every fill logged in Gaps Disclosure.
+- **AI drafts, human approves** — 100% review of CV + Gaps Disclosure before send. Agent: [`agents/cv-generator.md`](agents/cv-generator.md).
 - **Phase 2 ∥ Phase 3** — apply while upskilling; do not block applications on gap closure.
 - **Feedback loop** — rejection reasons and interview notes update `phase1/skills/gap-report.md` and `phase3/backlog.md`.
 
