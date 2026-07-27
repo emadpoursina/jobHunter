@@ -33,26 +33,39 @@ async function withRetry(fn, retries = 1) {
   }
 }
 
-// Route a prompt to the configured LLM provider
-export async function callLlm({ system, user, maxTokens = 1000 }) {
-  const provider = getSetting('llm_provider') ?? 'ollama';
+// Route a prompt to the configured LLM provider (optional per-call overrides)
+export async function callLlm({ system, user, maxTokens = 1000, provider, model } = {}) {
+  const resolvedProvider = provider || getSetting('llm_provider') || 'ollama';
   const inputLen = (system?.length ?? 0) + (user?.length ?? 0);
-  console.log(`[INFO] [llm] Calling ${provider}, input ~${inputLen} chars`);
+  console.log(`[INFO] [llm] Calling ${resolvedProvider}, input ~${inputLen} chars`);
 
-  if (provider === 'ollama') {
-    return callOllama({ system, user, maxTokens });
+  if (resolvedProvider === 'ollama') {
+    return callOllama({ system, user, maxTokens, model });
   }
-  if (provider === 'anthropic') {
-    return callAnthropic({ system, user, maxTokens });
+  if (resolvedProvider === 'anthropic') {
+    return callAnthropic({ system, user, maxTokens, model });
+  }
+  if (resolvedProvider === 'openai') {
+    return callOpenAI({ system, user, maxTokens, model });
   }
 
-  throw llmError(`Unknown LLM provider: ${provider}`);
+  throw llmError(`Unknown LLM provider: ${resolvedProvider}`);
+}
+
+// Resolve llm_tasks.<task> overrides; empty fields fall back to global settings
+export function resolveTaskLlm(task) {
+  const tasks = getSetting('llm_tasks') ?? {};
+  const cfg = tasks[task] && typeof tasks[task] === 'object' ? tasks[task] : {};
+  return {
+    provider: cfg.provider || undefined,
+    model: cfg.model || undefined,
+  };
 }
 
 // Send a chat request to the local Ollama server
-async function callOllama({ system, user, maxTokens }) {
+async function callOllama({ system, user, maxTokens, model: modelOverride }) {
   const baseUrl = (getSetting('ollama_base_url') ?? 'http://localhost:11434').replace(/\/$/, '');
-  const model = getSetting('ollama_model') ?? '';
+  const model = modelOverride || getSetting('ollama_model') || '';
 
   if (!model) {
     throw llmError('No Ollama model configured. Go to Settings to select a model.');
@@ -96,14 +109,15 @@ async function callOllama({ system, user, maxTokens }) {
 }
 
 // Send a messages request to the Anthropic API
-async function callAnthropic({ system, user, maxTokens }) {
+async function callAnthropic({ system, user, maxTokens, model: modelOverride }) {
   const apiKey = getSetting('anthropic_api_key') ?? '';
+  const model = modelOverride || ANTHROPIC_MODEL;
 
   if (!apiKey) {
     throw llmError('No Anthropic API key configured.');
   }
 
-  console.log(`[INFO] [llm] Anthropic model=${ANTHROPIC_MODEL}`);
+  console.log(`[INFO] [llm] Anthropic model=${model}`);
 
   const doFetch = async () => {
     const res = await fetch('https://api.anthropic.com/v1/messages', {
@@ -114,7 +128,7 @@ async function callAnthropic({ system, user, maxTokens }) {
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: ANTHROPIC_MODEL,
+        model,
         max_tokens: maxTokens,
         system,
         messages: [{ role: 'user', content: user }],
@@ -136,6 +150,58 @@ async function callAnthropic({ system, user, maxTokens }) {
   } catch (err) {
     if (err.code === 'LLM_ERROR') throw err;
     throw llmError(`Cannot reach Anthropic API: ${err.message}`);
+  }
+}
+
+// Send a chat completions request to an OpenAI-compatible API
+async function callOpenAI({ system, user, maxTokens, model: modelOverride }) {
+  const apiKey = getSetting('openai_api_key') ?? '';
+  const baseUrl = (getSetting('openai_base_url') ?? 'https://api.openai.com/v1').replace(/\/$/, '');
+  const model = modelOverride || getSetting('openai_model') || '';
+
+  if (!apiKey) {
+    throw llmError('No OpenAI API key configured.');
+  }
+  if (!model) {
+    throw llmError('No OpenAI model configured. Go to Settings to set a model.');
+  }
+
+  console.log(`[INFO] [llm] OpenAI model=${model} base=${baseUrl}`);
+
+  const doFetch = async () => {
+    const headers = {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${apiKey}`,
+    };
+
+    const res = await fetch(`${baseUrl}/chat/completions`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        model,
+        max_tokens: maxTokens,
+        messages: [
+          { role: 'system', content: system },
+          { role: 'user', content: user },
+        ],
+      }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      console.error(`[ERROR] [llm] OpenAI returned ${res.status}:`, data);
+      throw llmError(data?.error?.message ?? `OpenAI returned ${res.status}`);
+    }
+
+    return data.choices?.[0]?.message?.content ?? '';
+  };
+
+  try {
+    return await withRetry(doFetch);
+  } catch (err) {
+    if (err.code === 'LLM_ERROR') throw err;
+    throw llmError(`Cannot reach OpenAI API at ${baseUrl}: ${err.message}`);
   }
 }
 

@@ -50,10 +50,13 @@ Copy `.env.example` to `.env` and adjust as needed.
 |----------|---------|-------------|
 | `PORT` | `3001` | Express API port |
 | `REPO_ROOT` | `../..` | Path to jobHunter repo root (relative to `tools/job-collector/`) |
-| `LLM_PROVIDER` | `ollama` | `ollama` or `anthropic` (also configurable in Settings UI) |
+| `LLM_PROVIDER` | `ollama` | `ollama`, `anthropic`, or `openai` (also configurable in Settings UI) |
 | `OLLAMA_BASE_URL` | `http://localhost:11434` | Ollama API base URL |
 | `OLLAMA_MODEL` | — | Default Ollama model name |
 | `ANTHROPIC_API_KEY` | — | Required when using Anthropic |
+| `OPENAI_API_KEY` | — | Required when using OpenAI-compatible API |
+| `OPENAI_BASE_URL` | `https://api.openai.com/v1` | OpenAI-compatible chat completions base URL |
+| `OPENAI_MODEL` | — | Model name for OpenAI-compatible API |
 | `PROFILE_PATH` | `phase2/profile/master-profile.md` | Candidate profile (relative to `REPO_ROOT`) |
 | `AGENTS_DIR` | `docs/agents` | Agent prompt files directory |
 | `OFFERS_DIR` | `phase2/offers/by-country` | Where parsed offer `.md` files are written |
@@ -78,6 +81,16 @@ If Ollama is offline, API errors return code `OLLAMA_UNAVAILABLE` or `LLM_ERROR`
 
 1. Set `ANTHROPIC_API_KEY` in `.env` or paste the key in Settings
 2. Set provider to **Anthropic** and save
+
+### OpenAI (compatible)
+
+1. Set `OPENAI_API_KEY` in `.env` or paste the key in Settings
+2. Set **API base URL** (default `https://api.openai.com/v1`; any OpenAI-compatible endpoint works)
+3. Set the **model** name and save
+
+### Per-task models
+
+In **Settings → Task models**, override provider/model for **Parse offer** and **Generate CV**. Leave as Default to use the global provider. Credentials and base URLs remain shared.
 
 ---
 

@@ -1,5 +1,5 @@
 import { inferCountryCode } from '../collectors/base.js';
-import { callLlm } from '../server/llm.js';
+import { callLlm, resolveTaskLlm } from '../server/llm.js';
 import { readRepoFile } from './repoFiles.js';
 
 const MAX_RAW_TEXT = 3000;
@@ -127,7 +127,13 @@ export async function parseOffer(rawOffer) {
   }
 
   const system = await buildSystemPrompt();
-  const responseText = await callLlm({ system, user: rawText, maxTokens: PARSE_MAX_TOKENS });
+  const taskLlm = resolveTaskLlm('parse');
+  const responseText = await callLlm({
+    system,
+    user: rawText,
+    maxTokens: PARSE_MAX_TOKENS,
+    ...taskLlm,
+  });
   const parsed = parseLlmJson(responseText);
 
   return normalizeOffer(parsed);

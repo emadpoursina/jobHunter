@@ -8,6 +8,13 @@ const DEFAULT_COLLECTOR_CONFIG = {
   maxResults: 10,
 };
 
+const DEFAULT_LLM_TASK = { provider: '', model: '' };
+
+const LLM_TASK_DEFS = [
+  { key: 'parse', label: 'Parse offer' },
+  { key: 'cv', label: 'Generate CV' },
+];
+
 // Merge stored collector config with defaults for the settings form
 function normalizeCollectorConfig(stored) {
   return {
@@ -18,14 +25,46 @@ function normalizeCollectorConfig(stored) {
   };
 }
 
+// Normalize per-task LLM overrides from API/settings
+function normalizeLlmTasks(stored) {
+  const tasks = {};
+  for (const { key } of LLM_TASK_DEFS) {
+    const entry = stored?.[key] && typeof stored[key] === 'object' ? stored[key] : {};
+    tasks[key] = {
+      provider: entry.provider ?? '',
+      model: entry.model ?? '',
+    };
+  }
+  return tasks;
+}
+
 // Build the full settings payload sent to PUT /api/settings
-function buildSettingsPayload(form, anthropicApiKey) {
+function buildSettingsPayload(form, anthropicApiKey, openaiApiKey) {
   return {
     llm_provider: form.llmProvider,
     ollama_base_url: form.ollamaBaseUrl,
     ollama_model: form.ollamaModel,
     anthropic_api_key: anthropicApiKey,
+    openai_api_key: openaiApiKey,
+    openai_base_url: form.openaiBaseUrl,
+    openai_model: form.openaiModel,
+    llm_tasks: form.llmTasks,
     collectors: form.collectors,
+  };
+}
+
+// Map API settings response onto form state fields
+function formFromSettings(settings, collectors) {
+  return {
+    llmProvider: settings.llm_provider ?? 'ollama',
+    ollamaBaseUrl: settings.ollama_base_url ?? 'http://localhost:11434',
+    ollamaModel: settings.ollama_model ?? '',
+    anthropicApiKeySet: Boolean(settings.anthropic_api_key_set),
+    openaiApiKeySet: Boolean(settings.openai_api_key_set),
+    openaiBaseUrl: settings.openai_base_url ?? 'https://api.openai.com/v1',
+    openaiModel: settings.openai_model ?? '',
+    llmTasks: normalizeLlmTasks(settings.llm_tasks),
+    collectors: collectors ?? settings.collectors ?? {},
   };
 }
 
@@ -33,6 +72,8 @@ export default function Settings() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [testingOllama, setTestingOllama] = useState(false);
+  const [testingProvider, setTestingProvider] = useState(false);
+  const [testResult, setTestResult] = useState(null);
   const [refreshingModels, setRefreshingModels] = useState(false);
   const [collectorDefs, setCollectorDefs] = useState([]);
   const [ollamaModels, setOllamaModels] = useState([]);
@@ -43,9 +84,14 @@ export default function Settings() {
     ollamaBaseUrl: 'http://localhost:11434',
     ollamaModel: '',
     anthropicApiKeySet: false,
+    openaiApiKeySet: false,
+    openaiBaseUrl: 'https://api.openai.com/v1',
+    openaiModel: '',
+    llmTasks: normalizeLlmTasks(null),
     collectors: {},
   });
   const [anthropicApiKey, setAnthropicApiKey] = useState('');
+  const [openaiApiKey, setOpenaiApiKey] = useState('');
 
   // Show a dismissible alert for 5 seconds
   const showAlert = useCallback((message, type = 'err') => {
@@ -75,13 +121,7 @@ export default function Settings() {
         }
 
         setCollectorDefs(collectors);
-        setForm({
-          llmProvider: settings.llm_provider ?? 'ollama',
-          ollamaBaseUrl: settings.ollama_base_url ?? 'http://localhost:11434',
-          ollamaModel: settings.ollama_model ?? '',
-          anthropicApiKeySet: Boolean(settings.anthropic_api_key_set),
-          collectors: mergedCollectors,
-        });
+        setForm(formFromSettings(settings, mergedCollectors));
 
         if ((settings.llm_provider ?? 'ollama') === 'ollama') {
           await loadOllamaModels();
@@ -125,23 +165,23 @@ export default function Settings() {
     }
   }
 
+  // Apply saved settings response and clear key inputs
+  function applySavedSettings(settings, keepCollectors = true) {
+    setForm((prev) =>
+      formFromSettings(settings, keepCollectors ? (settings.collectors ?? prev.collectors) : prev.collectors),
+    );
+    setAnthropicApiKey('');
+    setOpenaiApiKey('');
+  }
+
   // Save current settings to the API
   async function handleSave() {
     setSaving(true);
     setAlert(null);
     try {
-      const payload = buildSettingsPayload(form, anthropicApiKey);
+      const payload = buildSettingsPayload(form, anthropicApiKey, openaiApiKey);
       const { settings } = await api.saveSettings(payload);
-
-      setForm((prev) => ({
-        ...prev,
-        llmProvider: settings.llm_provider,
-        ollamaBaseUrl: settings.ollama_base_url,
-        ollamaModel: settings.ollama_model,
-        anthropicApiKeySet: Boolean(settings.anthropic_api_key_set),
-        collectors: settings.collectors ?? prev.collectors,
-      }));
-      setAnthropicApiKey('');
+      applySavedSettings(settings);
       showAlert('Settings saved.', 'info');
     } catch (err) {
       showAlert(err.message);
@@ -155,17 +195,9 @@ export default function Settings() {
     setTestingOllama(true);
     setAlert(null);
     try {
-      const payload = buildSettingsPayload(form, anthropicApiKey);
+      const payload = buildSettingsPayload(form, anthropicApiKey, openaiApiKey);
       const { settings } = await api.saveSettings(payload);
-
-      setForm((prev) => ({
-        ...prev,
-        llmProvider: settings.llm_provider,
-        ollamaBaseUrl: settings.ollama_base_url,
-        ollamaModel: settings.ollama_model,
-        anthropicApiKeySet: Boolean(settings.anthropic_api_key_set),
-      }));
-      setAnthropicApiKey('');
+      applySavedSettings(settings, false);
 
       const models = await loadOllamaModels();
       showAlert(`Connected to Ollama — ${models.length} model(s) available.`, 'info');
@@ -173,6 +205,27 @@ export default function Settings() {
       showAlert(err.message);
     } finally {
       setTestingOllama(false);
+    }
+  }
+
+  // Save current form, then ping the active LLM provider
+  async function handleTestProvider() {
+    setTestingProvider(true);
+    setTestResult(null);
+    setAlert(null);
+    try {
+      const payload = buildSettingsPayload(form, anthropicApiKey, openaiApiKey);
+      const { settings } = await api.saveSettings(payload);
+      applySavedSettings(settings);
+
+      const result = await api.testLlm();
+      setTestResult(result);
+      showAlert(`Provider OK (${result.provider}).`, 'info');
+    } catch (err) {
+      setTestResult({ ok: false, error: err.message });
+      showAlert(err.message);
+    } finally {
+      setTestingProvider(false);
     }
   }
 
@@ -188,6 +241,30 @@ export default function Settings() {
         },
       },
     }));
+  }
+
+  // Update one per-task LLM override field
+  function updateLlmTask(task, field, value) {
+    setForm((prev) => ({
+      ...prev,
+      llmTasks: {
+        ...prev.llmTasks,
+        [task]: {
+          ...DEFAULT_LLM_TASK,
+          ...prev.llmTasks[task],
+          [field]: value,
+        },
+      },
+    }));
+  }
+
+  // Placeholder for task model input when using Default provider
+  function defaultModelHint(taskProvider) {
+    const provider = taskProvider || form.llmProvider;
+    if (provider === 'ollama') return form.ollamaModel || 'global Ollama model';
+    if (provider === 'openai') return form.openaiModel || 'global OpenAI model';
+    if (provider === 'anthropic') return 'claude-sonnet-4-20250514';
+    return 'global model';
   }
 
   if (loading) {
@@ -225,9 +302,16 @@ export default function Settings() {
           >
             Anthropic API
           </button>
+          <button
+            type="button"
+            className={`tab${form.llmProvider === 'openai' ? ' active' : ''}`}
+            onClick={() => setForm((prev) => ({ ...prev, llmProvider: 'openai' }))}
+          >
+            OpenAI API
+          </button>
         </div>
 
-        {form.llmProvider === 'ollama' ? (
+        {form.llmProvider === 'ollama' && (
           <>
             <div className="field">
               <label htmlFor="ollama-url">Ollama base URL</label>
@@ -286,7 +370,9 @@ export default function Settings() {
               </button>
             </div>
           </>
-        ) : (
+        )}
+
+        {form.llmProvider === 'anthropic' && (
           <>
             <div className="field">
               <label htmlFor="anthropic-key">Anthropic API key</label>
@@ -315,6 +401,145 @@ export default function Settings() {
               </button>
             </div>
           </>
+        )}
+
+        {form.llmProvider === 'openai' && (
+          <>
+            <div className="field">
+              <label htmlFor="openai-url">API base URL</label>
+              <input
+                id="openai-url"
+                type="text"
+                placeholder="https://api.openai.com/v1"
+                value={form.openaiBaseUrl}
+                onChange={(e) =>
+                  setForm((prev) => ({ ...prev, openaiBaseUrl: e.target.value }))
+                }
+              />
+              <p className="hint">
+                OpenAI-compatible endpoint (OpenAI, Azure, OpenRouter, local proxies, etc.).
+              </p>
+            </div>
+
+            <div className="field">
+              <label htmlFor="openai-key">API key</label>
+              <input
+                id="openai-key"
+                type="password"
+                placeholder={
+                  form.openaiApiKeySet ? 'Key is set — enter new key to replace' : 'sk-…'
+                }
+                value={openaiApiKey}
+                onChange={(e) => setOpenaiApiKey(e.target.value)}
+              />
+              {form.openaiApiKeySet && (
+                <p className="hint">Leave blank to keep the existing key.</p>
+              )}
+            </div>
+
+            <div className="field">
+              <label htmlFor="openai-model">Model</label>
+              <input
+                id="openai-model"
+                type="text"
+                placeholder="e.g. gpt-4o-mini"
+                value={form.openaiModel}
+                onChange={(e) =>
+                  setForm((prev) => ({ ...prev, openaiModel: e.target.value }))
+                }
+              />
+            </div>
+
+            <div className="btn-actions">
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={handleSave}
+                disabled={saving}
+              >
+                {saving ? 'Saving…' : 'Save'}
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+
+      <div className="card">
+        <div className="card-title">Task models</div>
+        <p className="hint">
+          Override provider/model per task. Leave as Default to use the global LLM settings above.
+          Credentials and base URLs stay shared.
+        </p>
+
+        {LLM_TASK_DEFS.map(({ key, label }) => {
+          const task = form.llmTasks[key] ?? DEFAULT_LLM_TASK;
+          return (
+            <div key={key} className="collector-card">
+              <h3>{label}</h3>
+              <div className="field">
+                <label htmlFor={`task-${key}-provider`}>Provider</label>
+                <select
+                  id={`task-${key}-provider`}
+                  value={task.provider}
+                  onChange={(e) => updateLlmTask(key, 'provider', e.target.value)}
+                >
+                  <option value="">Default ({form.llmProvider})</option>
+                  <option value="ollama">Ollama</option>
+                  <option value="anthropic">Anthropic</option>
+                  <option value="openai">OpenAI</option>
+                </select>
+              </div>
+              <div className="field">
+                <label htmlFor={`task-${key}-model`}>Model</label>
+                <input
+                  id={`task-${key}-model`}
+                  type="text"
+                  placeholder={defaultModelHint(task.provider)}
+                  value={task.model}
+                  onChange={(e) => updateLlmTask(key, 'model', e.target.value)}
+                />
+                <p className="hint">Leave blank to use that provider&apos;s global model.</p>
+              </div>
+            </div>
+          );
+        })}
+
+        <div className="btn-actions">
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={handleSave}
+            disabled={saving}
+          >
+            {saving ? 'Saving…' : 'Save'}
+          </button>
+        </div>
+      </div>
+
+      <div className="card">
+        <div className="card-title">Test provider</div>
+        <p className="hint">
+          Saves the form above, then sends a tiny ping to the selected LLM.
+        </p>
+        <div className="btn-actions">
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={handleTestProvider}
+            disabled={testingProvider || saving}
+          >
+            {testingProvider ? 'Testing…' : 'Save & test'}
+          </button>
+        </div>
+        {testResult?.ok && (
+          <p className="hint" style={{ marginTop: 12 }}>
+            Reply from <code>{testResult.provider}</code>: {testResult.reply || '(empty)'}
+          </p>
+        )}
+        {testResult && !testResult.ok && (
+          <p className="hint" style={{ marginTop: 12 }}>
+            Failed: {testResult.error}
+          </p>
         )}
       </div>
 

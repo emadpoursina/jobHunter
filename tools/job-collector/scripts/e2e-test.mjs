@@ -83,6 +83,13 @@ async function test1_settings() {
       ollama_base_url: 'http://localhost:11434',
       ollama_model: 'qwen2.5-coder:14b',
       anthropic_api_key: 'sk-test-secret-key-12345',
+      openai_api_key: 'sk-openai-secret-key-67890',
+      openai_base_url: 'https://api.openai.com/v1',
+      openai_model: 'gpt-4o-mini',
+      llm_tasks: {
+        parse: { provider: 'openai', model: 'gpt-4o-mini' },
+        cv: { provider: '', model: '' },
+      },
       collectors: { manual: { enabled: true } },
     },
   });
@@ -91,20 +98,36 @@ async function test1_settings() {
   record(
     put.status === 200
       && put.data?.settings?.anthropic_api_key_set === true
-      && !putJson.includes('sk-test-secret'),
-    'PUT redacts API key',
+      && put.data?.settings?.openai_api_key_set === true
+      && !putJson.includes('sk-test-secret')
+      && !putJson.includes('sk-openai-secret'),
+    'PUT redacts API keys',
     put.status !== 200 ? `HTTP ${put.status}` : '',
   );
 
   const get = await api('GET', '/settings');
   const getJson = JSON.stringify(get.data);
   record(
-    get.data?.settings?.anthropic_api_key_set === true && !getJson.includes('sk-test-secret'),
-    'GET redacts API key',
+    get.data?.settings?.anthropic_api_key_set === true
+      && get.data?.settings?.openai_api_key_set === true
+      && !getJson.includes('sk-test-secret')
+      && !getJson.includes('sk-openai-secret'),
+    'GET redacts API keys',
   );
   record(
     get.data?.settings?.ollama_model === 'qwen2.5-coder:14b',
     'Settings persist ollama_model',
+  );
+  record(
+    get.data?.settings?.openai_base_url === 'https://api.openai.com/v1'
+      && get.data?.settings?.openai_model === 'gpt-4o-mini',
+    'Settings persist openai url/model',
+  );
+  record(
+    get.data?.settings?.llm_tasks?.parse?.provider === 'openai'
+      && get.data?.settings?.llm_tasks?.parse?.model === 'gpt-4o-mini'
+      && get.data?.settings?.llm_tasks?.cv?.provider === '',
+    'Settings persist llm_tasks',
   );
 }
 
@@ -253,9 +276,9 @@ async function test8_dedup() {
 }
 
 async function test9_scrapers() {
-  console.log('\n=== Test 9: LinkedIn/Indeed run without crash ===');
+  console.log('\n=== Test 9: LinkedIn/Indeed/GermanTechJobs run without crash ===');
 
-  for (const source of ['linkedin', 'indeed']) {
+  for (const source of ['linkedin', 'indeed', 'germantechjobs']) {
     const start = await api('POST', '/collect', {
       source,
       config: { query: 'software engineer', location: 'Berlin', maxResults: 1 },

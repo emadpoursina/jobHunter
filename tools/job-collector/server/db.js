@@ -21,11 +21,25 @@ const JOB_SUMMARY_COLUMNS = [
   'created_at',
 ];
 
+const DEFAULT_LLM_TASK = { provider: '', model: '' };
+
+export const DEFAULT_LLM_TASKS = {
+  parse: { ...DEFAULT_LLM_TASK },
+  cv: { ...DEFAULT_LLM_TASK },
+};
+
 const DEFAULT_SETTINGS = {
   llm_provider: 'ollama',
   ollama_base_url: 'http://localhost:11434',
   ollama_model: '',
   anthropic_api_key: '',
+  openai_api_key: '',
+  openai_base_url: 'https://api.openai.com/v1',
+  openai_model: '',
+  llm_tasks: {
+    parse: { provider: '', model: '' },
+    cv: { provider: '', model: '' },
+  },
   collectors: {},
 };
 

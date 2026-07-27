@@ -1,4 +1,4 @@
-import { callLlm } from '../server/llm.js';
+import { callLlm, resolveTaskLlm } from '../server/llm.js';
 import { readRepoFile } from './repoFiles.js';
 
 const CV_MAX_TOKENS = 2000;
@@ -79,7 +79,13 @@ Generate the tailored CV now.`;
 export async function generateCv(job) {
   const system = await buildSystemPrompt();
   const user = await buildUserMessage(job);
-  const cvMarkdown = await callLlm({ system, user, maxTokens: CV_MAX_TOKENS });
+  const taskLlm = resolveTaskLlm('cv');
+  const cvMarkdown = await callLlm({
+    system,
+    user,
+    maxTokens: CV_MAX_TOKENS,
+    ...taskLlm,
+  });
 
   return cvMarkdown.trim();
 }
