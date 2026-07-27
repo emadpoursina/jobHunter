@@ -263,6 +263,27 @@ export function getRecentRuns(limit = 20) {
   return rows.map(parseRunRow);
 }
 
+// Mark runs left in 'running' after a crash/restart so the UI unsticks
+export function failOrphanedRuns() {
+  const result = sqlite
+    .prepare(
+      `UPDATE runs
+       SET status = 'error',
+           error = 'Interrupted by server restart',
+           finished_at = datetime('now')
+       WHERE status = 'running'`,
+    )
+    .run();
+
+  if (result.changes > 0) {
+    console.warn(
+      `[WARN] [db] Marked ${result.changes} orphaned run(s) as error`,
+    );
+  }
+
+  return result.changes;
+}
+
 // Read one setting value, parsed from JSON
 export function getSetting(key) {
   const row = sqlite.prepare('SELECT value FROM settings WHERE key = ?').get(key);
@@ -317,6 +338,7 @@ export const db = {
   updateRun,
   getRunById,
   getRecentRuns,
+  failOrphanedRuns,
   getSetting,
   setSetting,
   getAllSettings,

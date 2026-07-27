@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import express from 'express';
 import { closeBrowser } from '../collectors/linkedin.js';
-import { close as closeDb } from './db.js';
+import { close as closeDb, failOrphanedRuns } from './db.js';
 import { statusForError } from './errors.js';
 import settingsRouter from './routes/settings.js';
 import ollamaRouter from './routes/ollama.js';
@@ -11,6 +11,9 @@ import jobsRouter from './routes/jobs.js';
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3001;
+
+// In-memory queue dies with the process; clear stuck DB rows on boot
+failOrphanedRuns();
 
 app.use(express.json());
 
