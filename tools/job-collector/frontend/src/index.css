@@ -623,6 +623,12 @@ select:focus {
   border-color: #fca5a5;
 }
 
+.status-unmatched {
+  background: var(--surface2);
+  color: var(--text3);
+  border-color: var(--border2);
+}
+
 .status-running {
   background: var(--amber-bg);
   color: var(--amber);
@@ -725,6 +731,10 @@ select:focus {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 1rem 1.25rem;
+}
+
+.job-card-unmatched {
+  opacity: 0.55;
 }
 
 .job-card-main {

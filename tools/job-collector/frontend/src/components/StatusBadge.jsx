@@ -1,6 +1,7 @@
 const JOB_STATUS_CONFIG = {
   raw: { label: 'Raw', className: 'status-raw' },
   parsed: { label: 'Parsed', className: 'status-parsed' },
+  unmatched: { label: 'Not a match', className: 'status-unmatched' },
   cv_generated: { label: 'CV ready', className: 'status-cv' },
   applied: { label: 'Applied', className: 'status-applied' },
   rejected: { label: 'Rejected', className: 'status-rejected' },

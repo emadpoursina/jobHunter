@@ -6,6 +6,7 @@ const STATUS_OPTIONS = [
   { value: '', label: 'All statuses' },
   { value: 'raw', label: 'Raw' },
   { value: 'parsed', label: 'Parsed' },
+  { value: 'unmatched', label: 'Not a match' },
   { value: 'cv_generated', label: 'CV ready' },
   { value: 'applied', label: 'Applied' },
   { value: 'rejected', label: 'Rejected' },
@@ -16,6 +17,7 @@ const SOURCE_OPTIONS = [
   { value: 'manual', label: 'Manual' },
   { value: 'linkedin', label: 'LinkedIn' },
   { value: 'indeed', label: 'Indeed' },
+  { value: 'germantechjobs', label: 'GermanTechJobs' },
 ];
 
 const SORT_OPTIONS = [

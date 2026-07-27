@@ -54,6 +54,22 @@ function listCollectors() {
   return collectors;
 }
 
+// Insert a job from RSS/collector fields without calling the LLM
+function insertWithoutParse(rawOffer, source, status) {
+  return insertJob({
+    source: rawOffer.source ?? source,
+    sourceUrl: rawOffer.sourceUrl ?? null,
+    rawText: rawOffer.rawText,
+    title: rawOffer.title ?? null,
+    company: rawOffer.company ?? null,
+    location: rawOffer.location ?? null,
+    countryCode: rawOffer.countryCode ?? null,
+    salary: rawOffer.salary ?? null,
+    matchScore: null,
+    status,
+  });
+}
+
 // Parse, dedup, insert, and write offer files for a list of raw offers
 async function processRawOffers(runId, source, rawOffers) {
   const jobsFound = rawOffers.length;
@@ -65,6 +81,19 @@ async function processRawOffers(runId, source, rawOffers) {
     }
 
     try {
+      // Off-query hits (and matched overflow) are stored without an LLM pass
+      if (rawOffer.queryMatched === false) {
+        const jobId = insertWithoutParse(rawOffer, source, 'unmatched');
+        if (jobId) jobsNew += 1;
+        continue;
+      }
+
+      if (rawOffer.skipParse) {
+        const jobId = insertWithoutParse(rawOffer, source, 'raw');
+        if (jobId) jobsNew += 1;
+        continue;
+      }
+
       const offer = await parseOffer(rawOffer);
       const jobId = insertJob({
         source: rawOffer.source ?? source,

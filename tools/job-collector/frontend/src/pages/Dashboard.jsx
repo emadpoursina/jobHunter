@@ -7,7 +7,7 @@ import RunButton from '../components/RunButton.jsx';
 import StatusBadge from '../components/StatusBadge.jsx';
 
 const RUN_POLL_MS = 3000;
-const SCRAPER_SOURCES = new Set(['linkedin', 'indeed']);
+const SCRAPER_SOURCES = new Set(['linkedin', 'indeed', 'germantechjobs']);
 
 // Merge stored collector config with defaults for run requests
 function normalizeCollectorConfig(stored = {}) {
@@ -175,7 +175,7 @@ export default function Dashboard() {
     [runs],
   );
 
-  // Start an automated LinkedIn or Indeed collection run
+  // Start an automated LinkedIn, Indeed, or GermanTechJobs collection run
   async function handleRunCollector(source) {
     const collector = scrapers.find((entry) => entry.name === source);
     const config = collectorConfigs[source];

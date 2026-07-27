@@ -24,9 +24,10 @@ function VisaBadge({ visa }) {
 // Compact job summary row for the Jobs list
 export default function JobCard({ job }) {
   const scoreClass = matchScoreClass(job.matchScore);
+  const offQuery = job.status === 'unmatched';
 
   return (
-    <article className="job-card">
+    <article className={`job-card${offQuery ? ' job-card-unmatched' : ''}`}>
       <div className="job-card-main">
         <div className="job-card-header">
           <h2 className="job-card-title">{job.title || 'Untitled role'}</h2>
