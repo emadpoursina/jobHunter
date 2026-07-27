@@ -25,6 +25,17 @@ const SORT_OPTIONS = [
   { value: 'date', label: 'Date collected' },
 ];
 
+const BULK_ACTIONS = [
+  { id: 'remove', label: 'Remove', danger: true },
+  { id: 'rejected', label: 'Mark rejected' },
+  { id: 'applied', label: 'Mark applied' },
+  { id: 'neutral', label: 'Mark neutral' },
+  { id: 'cv', label: 'Generate CV' },
+];
+
+const PAGE_SIZE_OPTIONS = [20, 50, 100];
+const DEFAULT_PAGE_SIZE = 20;
+
 // Sort jobs client-side by match score or collection date
 function sortJobs(jobs, sortBy) {
   const copy = [...jobs];
@@ -46,19 +57,30 @@ function sortJobs(jobs, sortBy) {
   return copy;
 }
 
+// Run one bulk action against a single job id via existing APIs
+async function applyBulkAction(id, action) {
+  if (action === 'remove') return api.deleteJob(id);
+  if (action === 'cv') return api.generateCv(id);
+  return api.updateJob(id, { status: action });
+}
+
 export default function Jobs() {
   const [loading, setLoading] = useState(true);
   const [jobs, setJobs] = useState([]);
   const [alert, setAlert] = useState(null);
+  const [selected, setSelected] = useState(() => new Set());
+  const [bulkBusy, setBulkBusy] = useState(false);
 
   const [statusFilter, setStatusFilter] = useState('');
   const [sourceFilter, setSourceFilter] = useState('');
   const [countryFilter, setCountryFilter] = useState('');
   const [sortBy, setSortBy] = useState('score');
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
 
   // Show a dismissible alert for 5 seconds
-  const showAlert = useCallback((message) => {
-    setAlert({ message });
+  const showAlert = useCallback((message, type = 'err') => {
+    setAlert({ message, type });
     const timer = setTimeout(() => setAlert(null), 5000);
     return () => clearTimeout(timer);
   }, []);
@@ -84,6 +106,16 @@ export default function Jobs() {
     setLoading(true);
     loadJobs();
   }, [loadJobs]);
+
+  // Drop selection when the visible list changes (filters / reload)
+  useEffect(() => {
+    setSelected(new Set());
+  }, [jobs]);
+
+  // Reset to first page when filters or sort change
+  useEffect(() => {
+    setPage(1);
+  }, [statusFilter, sourceFilter, countryFilter, sortBy, pageSize]);
 
   const [countryOptions, setCountryOptions] = useState([{ value: '', label: 'All countries' }]);
 
@@ -113,6 +145,84 @@ export default function Jobs() {
   }, []);
 
   const sortedJobs = useMemo(() => sortJobs(jobs, sortBy), [jobs, sortBy]);
+  const totalPages = Math.max(1, Math.ceil(sortedJobs.length / pageSize));
+  const currentPage = Math.min(page, totalPages);
+  const pageJobs = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return sortedJobs.slice(start, start + pageSize);
+  }, [sortedJobs, currentPage, pageSize]);
+
+  const pageSelectedCount = pageJobs.filter((job) => selected.has(job.id)).length;
+  const allPageSelected = pageJobs.length > 0 && pageSelectedCount === pageJobs.length;
+  const someSelected = selected.size > 0;
+
+  function toggleSelect(id) {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  function toggleSelectAll() {
+    if (allPageSelected) {
+      setSelected((prev) => {
+        const next = new Set(prev);
+        for (const job of pageJobs) next.delete(job.id);
+        return next;
+      });
+      return;
+    }
+    setSelected((prev) => {
+      const next = new Set(prev);
+      for (const job of pageJobs) next.add(job.id);
+      return next;
+    });
+  }
+
+  async function handleBulk(action) {
+    const ids = [...selected];
+    if (ids.length === 0 || bulkBusy) return;
+
+    if (
+      action === 'remove' &&
+      !window.confirm(`Delete ${ids.length} job(s)? This cannot be undone.`)
+    ) {
+      return;
+    }
+
+    setBulkBusy(true);
+    setAlert(null);
+
+    let ok = 0;
+    let fail = 0;
+
+    for (const id of ids) {
+      try {
+        await applyBulkAction(id, action);
+        ok += 1;
+      } catch {
+        fail += 1;
+      }
+    }
+
+    await loadJobs();
+    setBulkBusy(false);
+
+    if (fail === 0) {
+      const labels = {
+        remove: `Removed ${ok} job(s).`,
+        rejected: `Marked ${ok} job(s) as rejected.`,
+        applied: `Marked ${ok} job(s) as applied.`,
+        neutral: `Reset ${ok} job(s) to neutral.`,
+        cv: `CV generation started for ${ok} job(s).`,
+      };
+      showAlert(labels[action] ?? `Updated ${ok} job(s).`, 'info');
+    } else {
+      showAlert(`${ok} succeeded, ${fail} failed.`);
+    }
+  }
 
   return (
     <div>
@@ -192,18 +302,96 @@ export default function Jobs() {
           <p className="hint">Paste a listing on the Dashboard to get started.</p>
         </div>
       ) : (
-        <div className="job-list">
-          {sortedJobs.map((job) => (
-            <JobCard key={job.id} job={job} />
-          ))}
+        <>
+          <div className="bulk-bar">
+            <label className="bulk-select-all">
+              <input
+                type="checkbox"
+                checked={allPageSelected}
+                onChange={toggleSelectAll}
+                disabled={bulkBusy}
+              />
+              <span>
+                {someSelected
+                  ? `${selected.size} selected`
+                  : `Select page (${pageJobs.length})`}
+              </span>
+            </label>
+
+            {someSelected && (
+              <div className="bulk-actions">
+                {BULK_ACTIONS.map(({ id, label, danger }) => (
+                  <button
+                    key={id}
+                    type="button"
+                    className={`btn${danger ? ' btn-danger' : ''}`}
+                    onClick={() => handleBulk(id)}
+                    disabled={bulkBusy}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="job-list">
+            {pageJobs.map((job) => (
+              <JobCard
+                key={job.id}
+                job={job}
+                selected={selected.has(job.id)}
+                onToggleSelect={toggleSelect}
+                selectDisabled={bulkBusy}
+              />
+            ))}
+          </div>
+
+          <div className="pagination">
+            <p className="list-count">
+              {sortedJobs.length} job(s) · page {currentPage} of {totalPages}
+            </p>
+            <div className="pagination-controls">
+              <label className="pagination-size">
+                Per page
+                <select
+                  value={pageSize}
+                  onChange={(e) => setPageSize(Number(e.target.value))}
+                  disabled={bulkBusy}
+                >
+                  {PAGE_SIZE_OPTIONS.map((size) => (
+                    <option key={size} value={size}>
+                      {size}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <button
+                type="button"
+                className="btn"
+                onClick={() => setPage(currentPage - 1)}
+                disabled={bulkBusy || currentPage <= 1}
+              >
+                Previous
+              </button>
+              <button
+                type="button"
+                className="btn"
+                onClick={() => setPage(currentPage + 1)}
+                disabled={bulkBusy || currentPage >= totalPages}
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        </>
+      )}
+
+      {alert && (
+        <div className={`alert alert-${alert.type === 'info' ? 'info' : 'err'}`}>
+          {alert.message}
         </div>
       )}
-
-      {!loading && sortedJobs.length > 0 && (
-        <p className="list-count">{sortedJobs.length} job(s)</p>
-      )}
-
-      {alert && <div className="alert alert-err">{alert.message}</div>}
     </div>
   );
 }

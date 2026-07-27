@@ -22,12 +22,26 @@ function VisaBadge({ visa }) {
 }
 
 // Compact job summary row for the Jobs list
-export default function JobCard({ job }) {
+export default function JobCard({ job, selected = false, onToggleSelect, selectDisabled = false }) {
   const scoreClass = matchScoreClass(job.matchScore);
   const offQuery = job.status === 'unmatched';
 
   return (
-    <article className={`job-card${offQuery ? ' job-card-unmatched' : ''}`}>
+    <article
+      className={`job-card${offQuery ? ' job-card-unmatched' : ''}${selected ? ' job-card-selected' : ''}`}
+    >
+      {onToggleSelect && (
+        <label className="job-card-select" onClick={(e) => e.stopPropagation()}>
+          <input
+            type="checkbox"
+            checked={selected}
+            disabled={selectDisabled}
+            onChange={() => onToggleSelect(job.id)}
+            aria-label={`Select ${job.title || 'job'}`}
+          />
+        </label>
+      )}
+
       <div className="job-card-main">
         <div className="job-card-header">
           <h2 className="job-card-title">{job.title || 'Untitled role'}</h2>
