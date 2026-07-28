@@ -3,6 +3,8 @@ import { Link, useParams } from 'react-router-dom';
 import { api } from '../api.js';
 import CvPreview from '../components/CvPreview.jsx';
 
+const CV_POLL_MS = 2000;
+
 // Trigger a browser download of markdown content as a .md file
 function downloadMarkdown(markdown, filename) {
   const blob = new Blob([markdown], { type: 'text/markdown;charset=utf-8' });
@@ -24,12 +26,18 @@ function cvFilename(job) {
   return `${slug || `job-${job.id}`}-cv.md`;
 }
 
+function jobUpdatedAt(job) {
+  return job?.updatedAt ?? job?.updated_at ?? '';
+}
+
 export default function CvViewer() {
   const { id } = useParams();
 
   const [loading, setLoading] = useState(true);
   const [job, setJob] = useState(null);
   const [markdown, setMarkdown] = useState(null);
+  const [rewriting, setRewriting] = useState(false);
+  const [rewriteBaseline, setRewriteBaseline] = useState(null);
   const [alert, setAlert] = useState(null);
   const [copied, setCopied] = useState(false);
 
@@ -40,21 +48,24 @@ export default function CvViewer() {
     return () => clearTimeout(timer);
   }, []);
 
+  const loadCv = useCallback(async () => {
+    const [{ job: jobData }, cvResponse] = await Promise.all([
+      api.getJob(id),
+      api.getCvMarkdown(id).catch(() => null),
+    ]);
+    const nextMarkdown = cvResponse?.markdown ?? null;
+    setJob(jobData);
+    setMarkdown(nextMarkdown);
+    return { job: jobData, markdown: nextMarkdown };
+  }, [id]);
+
   useEffect(() => {
     let cancelled = false;
 
     async function load() {
       setLoading(true);
       try {
-        const [{ job: jobData }, cvResponse] = await Promise.all([
-          api.getJob(id),
-          api.getCvMarkdown(id).catch(() => null),
-        ]);
-
-        if (cancelled) return;
-
-        setJob(jobData);
-        setMarkdown(cvResponse?.markdown ?? null);
+        await loadCv();
       } catch (err) {
         if (!cancelled) showAlert(err.message);
       } finally {
@@ -66,7 +77,50 @@ export default function CvViewer() {
     return () => {
       cancelled = true;
     };
-  }, [id, showAlert]);
+  }, [loadCv, showAlert]);
+
+  // Poll until rewrite writes a new CV (markdown change and/or updated_at)
+  useEffect(() => {
+    if (!rewriting || !rewriteBaseline) return;
+
+    const interval = setInterval(async () => {
+      try {
+        const { job: data, markdown: nextMarkdown } = await loadCv();
+        const updated = jobUpdatedAt(data) > rewriteBaseline.updatedAt;
+        const changed =
+          nextMarkdown != null && nextMarkdown !== rewriteBaseline.markdown;
+        if (updated || changed) {
+          setRewriting(false);
+          setRewriteBaseline(null);
+          showAlert('CV rewritten successfully.', 'info');
+        }
+      } catch (err) {
+        setRewriting(false);
+        setRewriteBaseline(null);
+        showAlert(err.message);
+      }
+    }, CV_POLL_MS);
+
+    return () => clearInterval(interval);
+  }, [rewriting, rewriteBaseline, loadCv, showAlert]);
+
+  // Enqueue a fresh CV rewrite via the existing generate endpoint
+  async function handleRewrite() {
+    setAlert(null);
+    setRewriting(true);
+    setRewriteBaseline({
+      updatedAt: jobUpdatedAt(job),
+      markdown,
+    });
+
+    try {
+      await api.generateCv(id);
+    } catch (err) {
+      setRewriting(false);
+      setRewriteBaseline(null);
+      showAlert(err.message);
+    }
+  }
 
   // Copy the full CV markdown to the clipboard
   async function handleCopy() {
@@ -113,7 +167,7 @@ export default function CvViewer() {
     );
   }
 
-  if (!markdown) {
+  if (!markdown && !rewriting) {
     return (
       <div className="cv-viewer-page">
         <div className="page-nav">
@@ -151,18 +205,38 @@ export default function CvViewer() {
           </p>
         </div>
         <div className="btn-actions cv-viewer-actions">
-          <button type="button" className="btn" onClick={handleCopy}>
+          <button
+            type="button"
+            className="btn"
+            onClick={handleRewrite}
+            disabled={rewriting}
+          >
+            {rewriting ? 'Rewriting…' : 'Rewrite CV'}
+          </button>
+          <button type="button" className="btn" onClick={handleCopy} disabled={rewriting || !markdown}>
             {copied ? 'Copied!' : 'Copy Markdown'}
           </button>
-          <button type="button" className="btn btn-primary" onClick={handleDownload}>
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={handleDownload}
+            disabled={rewriting || !markdown}
+          >
             Download .md
           </button>
         </div>
       </div>
 
-      <div className="card cv-viewer-card">
-        <CvPreview markdown={markdown} />
-      </div>
+      {rewriting ? (
+        <div className="loading-wrap">
+          <div className="spinner" />
+          <span className="loading-text">Rewriting CV…</span>
+        </div>
+      ) : (
+        <div className="card cv-viewer-card">
+          <CvPreview markdown={markdown} />
+        </div>
+      )}
 
       {alert && (
         <div className={`alert alert-${alert.type === 'info' ? 'info' : 'err'}`}>
