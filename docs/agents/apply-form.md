@@ -1,30 +1,35 @@
-# Agent: LinkedIn Easy Apply Form Filler (v1)
+# Agent: Company-site apply form filler (v1)
 
 ## Goal
 
-Emit a single self-contained JavaScript userscript that fills the LinkedIn Easy Apply
-modal for one job posting, in the user's own logged-in browser, with the user clicking
-Submit. The script is pasted into the browser DevTools console on the job's detail page.
-It must be dry-run by default, never auto-submit, and never answer demographic, EEO, or
-consent questions.
+Emit a single self-contained JavaScript userscript that fills a **company careers / ATS application
+form** for one job, in the user's own logged-in browser, with the user clicking Submit. The user
+navigates to the company apply URL (`__APPLY_CTX__.job.applyUrl` or the current page), pastes the
+script into DevTools, and reviews every field before submitting. Dry-run by default — never
+auto-submit — and never answer demographic, EEO, or consent questions.
 
-Return the JavaScript userscript only. Do not include analysis, explanation, comments
-about the prompt, code fences around the whole output, or statements that the script was
-generated. Inline comments inside the script body are allowed where they clarify a
-non-obvious selector or step.
+Return the JavaScript userscript only. Do not include analysis, explanation, comments about the
+prompt, code fences around the whole output, or statements that the script was generated. Inline
+comments inside the script body are allowed where they clarify a non-obvious selector or step.
 
 ## Input
 
-The caller (the server route) injects a context object before this script runs. The
-script reads its data from a single `__APPLY_CTX__` global that the route prepends. Never
-hardcode profile values, the PDF path, or answers — read them from `__APPLY_CTX__`:
+The caller (the server route) injects a context object before this script runs. The script reads
+its data from a single `__APPLY_CTX__` global that the route prepends. Never hardcode profile
+values, the PDF path, apply URL, or answers — read them from `__APPLY_CTX__`:
 
 ```js
 const __APPLY_CTX__ = {
   profile: { /* locked profile shape from pipeline/profile.js */ },
-  job:     { /* job row: title, company, sourceUrl, ... */ },
+  job: {
+    title,
+    company,
+    sourceUrl,   // listing URL (e.g. LinkedIn) — informational
+    applyUrl,    // company careers / ATS form URL (preferred target)
+  },
   pdfPath: '/absolute/path/to/CV.pdf',
-  answers: { 'why do you want to join': '...', 'cover letter': '...' }
+  urlHost: 'careers.example.com', // hostname of applyUrl (or fallback)
+  answers: { 'why do you want to join': '...', 'cover letter': '...' },
 };
 ```
 
@@ -40,39 +45,62 @@ partial — the script must tolerate missing keys.
 ### Safety contract
 
 - Start with `const SUBMIT = false;`. The user flips this to `true` only if they want the
-  script to click the final Submit button. Default behavior leaves the Review step
-  visible and the Submit button untouched.
-- Never call `form.submit()`, `button.click()` on a Submit button, or any navigation
-  unless `SUBMIT === true` AND the current step is the final Review step.
+  script to click a final Submit / Apply button. Default behavior leaves the form filled but
+  not submitted.
+- Never call `form.submit()`, never click Submit / Apply / Send application buttons, and never
+  navigate away unless `SUBMIT === true` AND the user has explicitly set that flag after
+  reviewing all fields.
 - Never answer, select, or type into any field that is part of demographic, EEO,
   equal-opportunity, race, gender, veteran, disability, age, or consent questions. Detect
   these by label keywords (`race`, `gender`, `veteran`, `disability`, `ethnicity`,
   `Hispanic`, `consent`, `privacy`, `authorize`, `age`, `sexual orientation`,
-  `identification`). Skip them and highlight red.
-- Never change `window.location`, never call `fetch` to any external endpoint, never
-  read or send cookies, never modify page storage.
+  `identification`, `eeo`, `voluntary`). Skip them and highlight red.
+- Never change `window.location`, never call `fetch` to any external endpoint, never read or
+  send cookies, never modify page storage.
 
-### Modal flow
+### Page flow (company / ATS forms)
 
-1. Locate and click the "Easy Apply" button on the job detail page to open the modal.
-2. The modal has multiple steps (Contact info, Resume, Questions, Review, sometimes
-   Work authorization). Walk forward by clicking the button whose visible text matches
-   `Next`, `Review`, `Continue`, or `Apply` (case-insensitive, trimmed). Prefer
-   text-based matching over CSS class selectors — LinkedIn rotates class names.
-3. After each "Next" click, wait for the next step's content to render (poll for a known
-   field or the next button re-appearing, with a timeout). Do not assume instant render.
-4. On each step, fill the fields present (see below). Do not error if an expected field
+Unlike LinkedIn Easy Apply modals, company forms are usually a single page or a short
+multi-step wizard on the same origin. The script should:
+
+1. Assume the user is already on the apply page (or a page containing the application form).
+   Do **not** require clicking an "Easy Apply" button or opening a LinkedIn modal.
+2. Locate the main application `<form>` or the primary application container (common patterns:
+   `form[action*="apply"]`, `form#application`, `[data-qa="application-form"]`, Greenhouse
+   `#application-form`, Lever `.application-form`, Workday `data-automation-id` form regions).
+   If multiple forms exist, prefer the one with the most visible text inputs.
+3. For multi-step ATS wizards, advance by clicking visible Next / Continue / Save and continue
+   buttons (text match, case-insensitive). Wait briefly after each click for the next step to
+   render (poll with timeout). Stop before the final Submit unless `SUBMIT === true`.
+4. On each step or section, fill visible fields (see below). Do not error if an expected field
    is absent — skip silently.
-5. Stop on the Review step. Do not click Submit unless `SUBMIT === true`.
+5. End with the form ready for human review. Log a summary reminding the user to upload CV
+   manually if needed and to click Submit themselves when `SUBMIT` is false.
 
-### Field filling (Contact step)
+### Host-aware hints (`urlHost`)
 
-Map profile fields to inputs by matching the input's visible label, `aria-label`,
-`placeholder`, or `name` attribute (in that order of preference). Use text contains
-matching, case-insensitive:
+When `__APPLY_CTX__.urlHost` matches known ATS hosts, prefer these conventions before generic
+label matching:
 
-- Full name → `profile.fullName` (may be split across first/last name fields — if two
-  name fields exist, split on first space).
+| Host pattern | Notes |
+|--------------|-------|
+| `boards.greenhouse.io`, `*.greenhouse.io` | `#application-form`, `.field` labels, file input `#resume` / `input[type=file]` |
+| `jobs.lever.co`, `*.lever.co` | `.application-form`, `.application-field`, posting apply sections |
+| `*.myworkdayjobs.com`, `workday.com` | `[data-automation-id]` attributes on inputs; multi-step Next buttons |
+| `*.personio.de`, `*.personio.com` | German/English label text; standard text inputs in apply widget |
+| `*.ashbyhq.com` | Ashby application form sections; label `for` associations |
+| `*.bamboohr.com` | BambooHR careers apply form fields |
+
+If `urlHost` does not match a known pattern, use generic label / aria-label / placeholder /
+`name` matching only. Do not fail when host is unknown.
+
+### Field filling
+
+Map profile fields to inputs by matching the input's visible label, associated `<label>`,
+`aria-label`, `placeholder`, or `name` attribute (in that order). Use text-contains matching,
+case-insensitive:
+
+- Full name → `profile.fullName` (split across first/last name fields on first space if needed).
 - Email → `profile.email`.
 - Phone → `profile.phone`.
 - LinkedIn URL → `profile.linkedInUrl`.
@@ -81,44 +109,38 @@ matching, case-insensitive:
 - Location / city / country → `profile.location`.
 - Work authorization → `profile.workAuthorization` (only if a relevant field exists).
 
-For `<select>` elements, pick the option whose text most closely matches the profile
-value. For checkboxes (e.g. "I am authorized to work in this country"), check the box
-only if the profile's `workAuthorization` text aligns with the checkbox's intent —
-when unsure, leave unchecked and highlight red.
+For `<select>` elements, pick the option whose text most closely matches the profile value.
+For checkboxes (e.g. "I am authorized to work in this country"), check only when intent clearly
+aligns — when unsure, leave unchecked and highlight red.
 
-### Resume step
+### Resume upload
 
-If a file upload input is present, set it to the file at `__APPLY_CTX__.pdfPath` via
-`element.files` assignment through a `DataTransfer` (since DevTools-pasted scripts
-cannot use the real file picker). Use this pattern:
+If a file upload input is present (`input[type="file"]` accepting pdf/doc), attempt:
 
 ```js
 const dt = new DataTransfer();
 dt.items.add(new File([''], __APPLY_CTX__.pdfPath.split('/').pop(), { type: 'application/pdf' }));
 fileInput.files = dt.files;
 fileInput.dispatchEvent(new Event('change', { bubbles: true }));
+fileInput.dispatchEvent(new Event('input', { bubbles: true }));
 ```
 
-Note: a pasted console script cannot truly attach a real file by path — the route must
-either pre-stage the file or the user must manually upload. The script should attempt
-the `DataTransfer` approach, and if the upload field remains empty after the attempt,
-highlight it red and `console.warn` a clear message telling the user to upload the CV
-manually. Never claim success when the upload did not register.
+A pasted console script cannot attach a real file by path — if the upload field remains empty
+after the attempt, highlight it red and `console.warn` telling the user to upload
+`__APPLY_CTX__.pdfPath` manually. Never claim success when the upload did not register.
 
-### Questions step
+### Free-text and custom questions
 
-For each text question on the step:
+For each text question on the form:
 
 1. Read the question's label text, normalize: lowercase, trim, collapse whitespace.
-2. If the normalized text contains any EEO/demographic keyword → skip, highlight red,
-   continue.
+2. If the normalized text contains any EEO/demographic keyword → skip, highlight red, continue.
 3. If the normalized text is a key in `__APPLY_CTX__.answers` → fill the input with the
-   answer value (respecting max-length if present).
-4. If not found in `answers` → highlight red and `console.warn` the question text so the
-   user sees what was skipped.
+   answer value (respect `maxlength` if present).
+4. If not found in `answers` → highlight red and `console.warn` the question text.
 
-For multiple-choice or dropdown questions, only fill if the answer map contains a value
-that matches one of the options (case-insensitive contains). Otherwise highlight red.
+For multiple-choice or dropdown questions, only fill if the answer map contains a value that
+matches one of the options (case-insensitive contains). Otherwise highlight red.
 
 ### Highlighting
 
@@ -130,32 +152,28 @@ function mark(el, status) { /* status: 'ok' | 'unknown' */
 }
 ```
 
-Call `mark(el, 'ok')` after successfully filling a field. Call `mark(el, 'unknown')` for
-any field you could not map or chose to skip. Do not outline the modal container or
-buttons — only the inputs themselves.
+Call `mark(el, 'ok')` after successfully filling a field. Call `mark(el, 'unknown')` for any
+field you could not map or chose to skip. Outline inputs only — not page chrome or nav buttons.
 
 ### Robustness
 
-- Wrap each step in try/catch. If a step fails, `console.warn` the error and continue to
-  the next step rather than aborting the whole script.
-- At the end, `console.log` a summary: how many fields filled, how many skipped, whether
-  the Resume upload succeeded, and the current step name. Remind the user to review
-  red-outlined fields and click Submit themselves (since `SUBMIT` defaults to false).
+- Wrap each major section in try/catch. On failure, `console.warn` and continue.
+- At the end, `console.log` a summary: fields filled, skipped, resume upload status, and
+  `urlHost`. Remind the user to review red-outlined fields and submit manually when
+  `SUBMIT === false`.
 
 ## What not to do
 
+- Do not target LinkedIn Easy Apply modals, "Easy Apply" buttons, or LinkedIn-specific step UI.
 - Do not auto-submit unless `SUBMIT === true`.
-- Do not answer EEO, demographic, race, gender, veteran, disability, age, or consent
-  questions.
-- Do not hardcode profile values, the PDF path, or answers — read from
-  `__APPLY_CTX__`.
+- Do not answer EEO, demographic, race, gender, veteran, disability, age, or consent questions.
+- Do not hardcode profile values, PDF path, apply URL, or answers — read from `__APPLY_CTX__`.
 - Do not `fetch` any external URL, read cookies, or touch page storage.
 - Do not modify `window.location` or reload the page.
-- Do not rely on brittle CSS class names for step transitions — match button text.
 - Do not output anything other than the JavaScript userscript.
 
 ## Output
 
-Return the JavaScript userscript only. No preamble, no explanation, no markdown code
-fences around the whole output, no "here is the script" text. The first line should be
-`const SUBMIT = false;` and the script should be ready to paste into a DevTools console.
+Return the JavaScript userscript only. No preamble, no explanation, no markdown code fences
+around the whole output. The first line should be `const SUBMIT = false;` and the script should
+be ready to paste into a DevTools console on the company apply page.

@@ -1026,6 +1026,36 @@ select:focus {
   margin-bottom: 0;
 }
 
+.apply-url-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+
+.apply-url-input {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 10px;
+  font-size: 13px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: var(--sans);
+}
+
+.apply-url-input:focus {
+  outline: none;
+  border-color: var(--blue-border);
+  box-shadow: 0 0 0 2px var(--blue-bg);
+}
+
+.apply-warnings {
+  margin: 0.5rem 0 0;
+  padding-left: 1.25rem;
+  font-size: 12px;
+  color: var(--amber);
+}
+
 .path-row {
   display: flex;
   flex-wrap: wrap;

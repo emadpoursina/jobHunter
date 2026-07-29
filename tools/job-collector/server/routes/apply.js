@@ -11,11 +11,13 @@ const router = Router();
 const AGENT_PATH = 'docs/agents/apply-form.md';
 const ANSWER_MAX_TOKENS = 600;
 
-// Common LinkedIn Easy Apply free-text questions to pre-answer (best-effort)
+// Common application free-text questions to pre-answer (best-effort)
 const COMMON_QUESTIONS = [
   'why do you want to join',
   'why are you interested in this role',
+  'why do you want to work here',
   'cover letter',
+  'tell us about yourself',
 ];
 
 // Parse and validate a numeric job id from the request body
@@ -25,7 +27,7 @@ function parseJobId(rawId) {
   return id;
 }
 
-// Best-effort: generate short answers for common Easy Apply questions.
+// Best-effort: generate short answers for common application questions.
 // Returns {} on any failure — the script highlights unknown questions red.
 async function generateAnswers(job, profile) {
   const system = `You write concise, truthful, first-person answers to job application questions.
@@ -63,7 +65,7 @@ Return JSON like: {"why do you want to join": "...", ...}`;
   }
 }
 
-// Generate a LinkedIn Easy Apply userscript for a saved job
+// Generate a company-site apply fill-assist userscript for a saved job
 router.post('/script', asyncHandler(async (req, res) => {
   const jobId = parseJobId(req.body?.jobId);
   if (jobId === null) {
@@ -78,6 +80,14 @@ router.post('/script', asyncHandler(async (req, res) => {
     return res.status(404).json({
       error: 'Job not found',
       code: 'NOT_FOUND',
+    });
+  }
+
+  const applyUrl = job.applyUrl ?? job.apply_url ?? null;
+  if (!applyUrl || !String(applyUrl).trim()) {
+    return res.status(409).json({
+      error: 'Set the company apply URL on this job before generating an apply script.',
+      code: 'APPLY_URL_MISSING',
     });
   }
 
@@ -117,13 +127,14 @@ router.post('/script', asyncHandler(async (req, res) => {
     });
   }
 
-  let urlHost = 'linkedin.com';
-  if (job.sourceUrl) {
-    try {
-      urlHost = new URL(job.sourceUrl).hostname;
-    } catch {
-      // keep default
-    }
+  let urlHost = 'unknown';
+  try {
+    urlHost = new URL(applyUrl).hostname;
+  } catch {
+    return res.status(400).json({
+      error: 'Job applyUrl is not a valid URL',
+      code: 'VALIDATION_ERROR',
+    });
   }
 
   const answers = await generateAnswers(job, profile);
@@ -134,13 +145,14 @@ router.post('/script', asyncHandler(async (req, res) => {
       title: job.title,
       company: job.company,
       sourceUrl: job.sourceUrl,
+      applyUrl,
     },
     pdfPath,
     urlHost,
     answers,
   };
 
-  const userMsg = `Produce the LinkedIn Easy Apply userscript for this context. Read all values from __APPLY_CTX__.
+  const userMsg = `Produce the company-site apply form fill-assist userscript for this context. The user is on the company careers/ATS page. Read all values from __APPLY_CTX__.
 
 const __APPLY_CTX__ = ${JSON.stringify(ctx, null, 2)};
 
@@ -168,10 +180,9 @@ Emit the script only.`;
   }
 
   const script = `const __APPLY_CTX__ = ${JSON.stringify(ctx)};\n${scriptBody.trim()}`;
-  const warnings = [];
 
   console.log(`[INFO] [apply] Generated apply script for job ${jobId} (${script.length} chars)`);
-  res.json({ script, warnings, pdfPath });
+  res.json({ script, warnings: [], pdfPath });
 }));
 
 export default router;

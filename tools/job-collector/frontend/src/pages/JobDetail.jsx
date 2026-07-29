@@ -38,9 +38,12 @@ export default function JobDetail() {
   const [markingApplied, setMarkingApplied] = useState(false);
   const [applyScript, setApplyScript] = useState(null);
   const [applyPdfPath, setApplyPdfPath] = useState(null);
+  const [applyWarnings, setApplyWarnings] = useState([]);
   const [copiedScript, setCopiedScript] = useState(false);
   const [alert, setAlert] = useState(null);
   const [copiedPath, setCopiedPath] = useState(false);
+  const [applyUrlInput, setApplyUrlInput] = useState('');
+  const [savingApplyUrl, setSavingApplyUrl] = useState(false);
 
   // Show a dismissible alert for 5 seconds
   const showAlert = useCallback((message, type = 'err') => {
@@ -89,6 +92,11 @@ export default function JobDetail() {
     };
   }, [loadJob, showAlert]);
 
+  useEffect(() => {
+    const url = job?.applyUrl ?? job?.apply_url ?? '';
+    setApplyUrlInput(url || '');
+  }, [job?.applyUrl, job?.apply_url]);
+
   // Poll job until CV path appears after generation starts
   useEffect(() => {
     if (!generatingCv) return;
@@ -123,20 +131,21 @@ export default function JobDetail() {
     }
   }
 
-  // Generate the LinkedIn Easy Apply userscript and show it on the page
+  // Generate the company apply fill-assist userscript and show it on the page
   async function handleGenerateApplyScript() {
     setGeneratingApplyScript(true);
     setAlert(null);
     setApplyScript(null);
     setApplyPdfPath(null);
+    setApplyWarnings([]);
 
     try {
       const data = await api.generateApplyScript(id);
       setApplyScript(data.script);
       setApplyPdfPath(data.pdfPath ?? null);
-      const warnNote = data.warnings?.length ? `${data.warnings.length} warning(s).` : '';
+      setApplyWarnings(Array.isArray(data.warnings) ? data.warnings : []);
       showAlert(
-        `Apply script ready. PDF: ${data.pdfPath}. ${warnNote} Copy it and paste into the LinkedIn job page DevTools console.`,
+        'Apply script ready. Open the company apply page, paste into DevTools, review fields, then submit yourself.',
         'info',
       );
     } catch (err) {
@@ -159,15 +168,17 @@ export default function JobDetail() {
     }
   }
 
-  // Mark the job as applied via the Easy Apply endpoint (records applied_at + applied_url)
+  // Record applied_at + applied_url for the company application
   async function handleMarkApplied() {
     setMarkingApplied(true);
     setAlert(null);
 
+    const appliedUrl = job?.applyUrl ?? job?.apply_url ?? job?.sourceUrl ?? null;
+
     try {
-      const { job: updated } = await api.markApplied(id, job?.sourceUrl ?? null);
+      const { job: updated } = await api.markApplied(id, appliedUrl);
       setJob(updated);
-      showAlert('Marked applied (Easy Apply).', 'info');
+      showAlert('Application recorded (applied_at timestamp saved).', 'info');
     } catch (err) {
       showAlert(err.message);
     } finally {
@@ -206,6 +217,21 @@ export default function JobDetail() {
       });
     } catch (err) {
       showAlert(err.message || 'Failed to copy path');
+    }
+  }
+
+  async function handleSaveApplyUrl() {
+    setSavingApplyUrl(true);
+    setAlert(null);
+
+    try {
+      const { job: updated } = await api.updateJob(id, { applyUrl: applyUrlInput });
+      setJob(updated);
+      showAlert('Company apply URL saved.', 'info');
+    } catch (err) {
+      showAlert(err.message);
+    } finally {
+      setSavingApplyUrl(false);
     }
   }
 
@@ -253,6 +279,8 @@ export default function JobDetail() {
   const requiredSkills = job.requiredSkills ?? job.required_skills ?? [];
   const niceToHave = job.niceToHave ?? job.nice_to_have ?? [];
   const responsibilities = job.responsibilities ?? [];
+  const applyUrl = job.applyUrl ?? job.apply_url ?? null;
+  const canGenerateApplyScript = Boolean(cvPath && applyUrl);
 
   return (
     <div className="job-detail">
@@ -292,6 +320,43 @@ export default function JobDetail() {
           )}
         </div>
       </header>
+
+      <section className="card job-detail-section">
+        <div className="card-title">Company apply URL</div>
+        <p className="detail-row">
+          Careers / ATS form link (separate from the listing URL above).
+        </p>
+        {applyUrl && (
+          <p className="detail-row">
+            <a
+              href={applyUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="job-detail-link"
+            >
+              Open company apply page
+            </a>
+          </p>
+        )}
+        <div className="apply-url-row">
+          <input
+            type="url"
+            className="apply-url-input"
+            placeholder="https://careers.example.com/apply/…"
+            value={applyUrlInput}
+            onChange={(e) => setApplyUrlInput(e.target.value)}
+            disabled={savingApplyUrl}
+          />
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={handleSaveApplyUrl}
+            disabled={savingApplyUrl}
+          >
+            {savingApplyUrl ? 'Saving…' : 'Save'}
+          </button>
+        </div>
+      </section>
 
       {(requiredSkills.length > 0 || niceToHave.length > 0) && (
         <section className="card job-detail-section">
@@ -389,11 +454,21 @@ export default function JobDetail() {
                 type="button"
                 className="btn"
                 onClick={handleGenerateApplyScript}
-                disabled={generatingApplyScript}
+                disabled={generatingApplyScript || !canGenerateApplyScript}
+                title={
+                  !applyUrl
+                    ? 'Set the company apply URL above first'
+                    : !cvPath
+                      ? 'Generate a CV first'
+                      : 'Generate fill-assist script for the company apply page'
+                }
               >
                 {generatingApplyScript ? 'Generating…' : 'Generate apply script'}
               </button>
             </div>
+            {!applyUrl && cvPath && (
+              <p className="hint">Set the company apply URL above to generate a fill-assist script.</p>
+            )}
           </>
         )}
 
@@ -429,9 +504,24 @@ export default function JobDetail() {
                   <strong>PDF:</strong> <code className="file-path">{applyPdfPath}</code>
                 </p>
               )}
+              {applyWarnings.length > 0 && (
+                <ul className="apply-warnings">
+                  {applyWarnings.map((w) => (
+                    <li key={w}>{w}</li>
+                  ))}
+                </ul>
+              )}
               <p className="hint">
-                Copy the script below, open the LinkedIn job page, paste it into the DevTools
-                console, then review highlighted fields and click Submit yourself.
+                Copy the script below, open the{' '}
+                {applyUrl ? (
+                  <a href={applyUrl} target="_blank" rel="noopener noreferrer" className="job-detail-link">
+                    company apply page
+                  </a>
+                ) : (
+                  'company apply page'
+                )}
+                , paste into the DevTools console, review highlighted fields, and click Submit
+                yourself.
               </p>
               <div className="browser-script-wrap">
                 <div className="browser-script-header">
@@ -471,9 +561,9 @@ export default function JobDetail() {
             className="btn"
             onClick={handleMarkApplied}
             disabled={markingApplied || Boolean(job.appliedAt)}
-            title="Record applied_at timestamp via the Easy Apply endpoint"
+            title="Record applied_at and company apply URL after you submit the application"
           >
-            {job.appliedAt ? 'Applied (recorded)' : 'Mark applied (Easy Apply)'}
+            {job.appliedAt ? 'Application recorded' : 'Record application'}
           </button>
           <button
             type="button"

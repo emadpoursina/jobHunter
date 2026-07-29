@@ -1,19 +1,136 @@
 project:
-  name: "jobHunter"
-  description: "Personal workflow for finding, qualifying, and applying to backend/full-stack JavaScript roles with employer visa sponsorship"
-  created: "2026-07-18T11:15:18Z"
-  fire_version: "0.1.8"
-
+  name: jobHunter
+  description: Personal workflow for finding, qualifying, and applying to
+    backend/full-stack JavaScript roles with employer visa sponsorship
+  created: 2026-07-18T11:15:18Z
+  fire_version: 0.1.8
 workspace:
   type: brownfield
   structure: monolith
   autonomy_bias: balanced
   run_scope_preference: single
   run_scope_history: []
-  scanned_at: "2026-07-18T11:15:18Z"
-
-intents: []
-
+  scanned_at: 2026-07-18T11:15:18Z
+intents:
+  - id: linkedin-easy-apply-filler
+    title: LinkedIn Easy Apply form filler
+    status: completed
+    created: 2026-07-28T07:35:00Z
+    brief: .specs-fire/intents/linkedin-easy-apply-filler/brief.md
+    completed_at: 2026-07-29T12:09:55.435Z
+    notes: Superseded for apply UX by company-site-apply-filler; reusable infra kept.
+    work_items:
+      - id: profile-parser
+        title: Profile parser + cache
+        complexity: medium
+        mode: confirm
+        status: completed
+        depends_on: []
+        run_id: run-jobhunter-001
+        completed_at: 2026-07-29T12:09:55.435Z
+      - id: cv-md-to-pdf
+        title: CV md→PDF conversion
+        complexity: medium
+        mode: confirm
+        status: completed
+        depends_on: []
+        run_id: run-jobhunter-001
+        completed_at: 2026-07-29T12:09:55.435Z
+      - id: application-status-tracking
+        title: Application status tracking
+        complexity: medium
+        mode: confirm
+        status: completed
+        depends_on: []
+        run_id: run-jobhunter-001
+        completed_at: 2026-07-29T12:09:55.435Z
+      - id: apply-form-agent-prompt
+        title: Apply-form agent prompt
+        complexity: medium
+        mode: confirm
+        status: completed
+        depends_on:
+          - profile-parser
+        run_id: run-jobhunter-001
+        completed_at: 2026-07-29T12:09:55.435Z
+      - id: apply-script-route-and-ui
+        title: Apply script API route + UI button
+        complexity: medium
+        mode: confirm
+        status: completed
+        depends_on:
+          - profile-parser
+          - cv-md-to-pdf
+          - application-status-tracking
+          - apply-form-agent-prompt
+        run_id: run-jobhunter-001
+        completed_at: 2026-07-29T12:09:55.435Z
+  - id: company-site-apply-filler
+    title: Company-site apply form filler
+    status: in_progress
+    created: 2026-07-29T21:13:00Z
+    brief: .specs-fire/intents/company-site-apply-filler/brief.md
+    work_items:
+      - id: apply-url-on-job
+        title: Apply URL on job record
+        complexity: medium
+        mode: confirm
+        status: completed
+        depends_on: []
+        run_id: run-jobhunter-002
+        completed_at: 2026-07-29T21:31:02.263Z
+      - id: company-site-apply-agent
+        title: Company-site apply agent prompt
+        complexity: medium
+        mode: confirm
+        status: completed
+        depends_on: []
+        run_id: run-jobhunter-002
+        completed_at: 2026-07-29T21:31:02.263Z
+      - id: pivot-apply-route-and-ui
+        title: Pivot apply route and UI to company apply URL
+        complexity: medium
+        mode: confirm
+        status: completed
+        depends_on:
+          - apply-url-on-job
+          - company-site-apply-agent
+        run_id: run-jobhunter-002
+        completed_at: 2026-07-29T21:31:02.263Z
 runs:
   active: []
-  completed: []
+  completed:
+    - id: run-jobhunter-001
+      scope: batch
+      work_items:
+        - id: profile-parser
+          intent: linkedin-easy-apply-filler
+          mode: confirm
+        - id: cv-md-to-pdf
+          intent: linkedin-easy-apply-filler
+          mode: confirm
+        - id: application-status-tracking
+          intent: linkedin-easy-apply-filler
+          mode: confirm
+        - id: apply-form-agent-prompt
+          intent: linkedin-easy-apply-filler
+          mode: confirm
+        - id: apply-script-route-and-ui
+          intent: linkedin-easy-apply-filler
+          mode: confirm
+      started: 2026-07-28T15:28:31.128Z
+      completed: 2026-07-29T12:09:55.435Z
+    - id: run-jobhunter-002
+      scope: batch
+      work_items:
+        - id: apply-url-on-job
+          intent: company-site-apply-filler
+          mode: confirm
+        - id: company-site-apply-agent
+          intent: company-site-apply-filler
+          mode: confirm
+        - id: pivot-apply-route-and-ui
+          intent: company-site-apply-filler
+          mode: confirm
+      started: 2026-07-29T21:24:55.389Z
+      completed: 2026-07-29T21:31:02.263Z

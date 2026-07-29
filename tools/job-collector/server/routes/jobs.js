@@ -17,6 +17,27 @@ function parseJobId(rawId) {
   return id;
 }
 
+// Normalize applyUrl: empty → null; non-empty must be http(s)
+export function normalizeApplyUrl(value) {
+  if (value === null || value === undefined) return undefined;
+  if (typeof value !== 'string') {
+    return { error: 'applyUrl must be a string' };
+  }
+
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+
+  try {
+    const parsed = new URL(trimmed);
+    if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+      return { error: 'applyUrl must use http or https' };
+    }
+    return parsed.href;
+  } catch {
+    return { error: 'applyUrl must be a valid URL' };
+  }
+}
+
 // Return all jobs, optionally filtered by status, source, or country
 router.get('/', (req, res) => {
   const { status, source, country_code: countryCode } = req.query;
@@ -79,6 +100,17 @@ router.patch('/:id', (req, res) => {
   const updates = { ...body };
   if (updates.status === 'neutral') {
     updates.status = inferPipelineStatus(existing);
+  }
+
+  if ('applyUrl' in updates) {
+    const normalized = normalizeApplyUrl(updates.applyUrl);
+    if (normalized && typeof normalized === 'object' && 'error' in normalized) {
+      return res.status(400).json({
+        error: normalized.error,
+        code: 'VALIDATION_ERROR',
+      });
+    }
+    updates.applyUrl = normalized;
   }
 
   const job = updateJob(id, updates);

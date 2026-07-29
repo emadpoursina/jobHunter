@@ -117,6 +117,7 @@ export function migrate() {
 
   addColumnIfMissing('jobs', 'applied_at', 'TEXT');
   addColumnIfMissing('jobs', 'applied_url', 'TEXT');
+  addColumnIfMissing('jobs', 'apply_url', 'TEXT');
 
   seedDefaultSettings();
 }
