@@ -1,0 +1,9 @@
+{
+  "name": "fire-run-execute-scripts",
+  "version": "0.0.0",
+  "private": true,
+  "type": "commonjs",
+  "dependencies": {
+    "yaml": "^2.5.0"
+  }
+}

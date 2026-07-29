@@ -41,4 +41,7 @@ tools/*/node_modules/
 tools/*/data/
 tools/*/.env
 
+# FIRE builder script installs (package.json + lockfile are tracked)
+.specsmd/**/node_modules/
+
 scratch/
