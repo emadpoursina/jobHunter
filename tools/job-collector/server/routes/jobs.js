@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { deleteJob, getJobById, getJobs, updateJob } from '../db.js';
+import { deleteJob, getJobById, getJobs, markApplied, updateJob } from '../db.js';
 
 const router = Router();
 
@@ -82,6 +82,37 @@ router.patch('/:id', (req, res) => {
   }
 
   const job = updateJob(id, updates);
+  res.json({ job });
+});
+
+// Mark a job as applied (first application wins; idempotent)
+router.post('/:id/applied', (req, res) => {
+  const id = parseJobId(req.params.id);
+  if (id === null) {
+    return res.status(400).json({
+      error: 'Invalid job id',
+      code: 'VALIDATION_ERROR',
+    });
+  }
+
+  const body = req.body;
+  if (!body || typeof body !== 'object' || Array.isArray(body)) {
+    return res.status(400).json({
+      error: 'Request body must be a JSON object',
+      code: 'VALIDATION_ERROR',
+    });
+  }
+
+  const appliedUrl = typeof body.appliedUrl === 'string' ? body.appliedUrl : null;
+
+  const job = markApplied(id, { appliedUrl });
+  if (!job) {
+    return res.status(404).json({
+      error: 'Job not found',
+      code: 'NOT_FOUND',
+    });
+  }
+
   res.json({ job });
 });
 

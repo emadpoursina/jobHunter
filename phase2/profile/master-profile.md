@@ -1,7 +1,7 @@
 # Master Profile — Backend Developer
 
 > Emad Poursina  
-> Version: 2.0 — Updated 2026-06-06  
+> Version: 2.1 — Updated 2026-07-28
 > This document is the single source of truth for generating tailored CVs.
 
 ---
@@ -17,7 +17,7 @@ LinkedIn:          https://www.linkedin.com/in/emadpoursina/
 GitHub:            https://github.com/emadpoursina
 Location:          Iran
 Seeking:           Relocation — Germany (primary), Netherlands, Canada, Ireland, Portugal
-Visa Status:       Iranian passport — requires visa sponsorship / EU Blue Card / work permit
+Work Authorization: Requires employer-sponsored work authorization
 Languages:         Farsi (Native), English (Fluent), German (A1 — learning)
 ```
 
@@ -30,7 +30,7 @@ Currently backend & DevOps lead on VoiceDash — a live AI dictation SaaS —
 owning the full deployment stack (Docker Compose, staging/production environments,
 release management, and code review). Four years as Technical Lead (2019–2023)
 owning architecture and delivery across full-stack JavaScript projects.
-Seeking senior backend roles in Germany and Europe; available immediately with EU Blue Card eligibility.
+Seeking senior backend roles in Germany and Europe; available immediately and requires employer-sponsored work authorization.
 
 ---
 
@@ -520,8 +520,18 @@ Minimum salary:
   - Canada:             C$90,000/year
   - Ireland:            €55,000/year
   - Portugal:           €40,000/year
+Expected salary (opening position for applications, senior backend band, gross/year):
+  - Germany:            €68,000 – €75,000
+  - Netherlands:        €75,000 – €85,000
+  - Canada:             C$105,000 – C$120,000
+  - Ireland:            €65,000 – €75,000
+  - Portugal:           €45,000 – €55,000
+  Notes:                 Expected is the opening ask on applications, not the floor.
+                         Floors above are the walk-away minimum. Always quote gross/year
+                         and the currency of the target country. If a form forces a single
+                         number, use ~5% below the top of the range to leave negotiation room.
 Work type:              Remote or hybrid (open to on-site for right opportunity)
-Visa requirement:       Requires sponsorship — EU Blue Card / Highly Skilled Migrant / GTS
+Work authorization:     Requires employer-sponsored work authorization
 Earliest start date:    Immediate
 Relocation priority:    Germany (primary) → Netherlands → Canada → Ireland → Portugal
 Deal breakers:          No unpaid overtime; no 24/7 on-call without compensation;
@@ -555,9 +565,11 @@ When this profile is passed to an AI to generate a tailored CV, use these rules:
 5. **Quantify where possible** — VoiceDash: Docker multi-env, Socket.IO streaming, 15 Mongoose models. Villion (personal scope): 166+ screens, trip feature, booking flows. Villion (platform context only): ~208 functions, 79+ admin pages, 20+ collections — cite only when framing team/platform scale, not as sole ownership.
 6. **Adjust seniority language** — for senior roles use "architected", "led", "designed". For mid roles use "built", "implemented", "developed".
 7. **Never fabricate** — only use information present in this document. If a skill is marked **Learning**, do not present it as proficient. Skills marked "team context" must not be presented as personally built end-to-end.
-8. **Azure → AWS framing** — when applying to AWS-heavy roles, frame Azure Functions experience (Villion platform context) as transferable to Lambda; Azure Blob as S3-equivalent; Azure SignalR as comparable to API Gateway WebSockets.
+8. **No technology substitution** — do not present Azure experience as AWS experience, or one framework as hands-on experience with another. Adjacent knowledge may inform learning, but it is not CV evidence for the requested technology.
 9. **Private projects** — VoiceDash and Villion have private codebases; cite public product URLs only. Never list git repos or source links for either.
-10. **Output format** — Markdown, one page preferred, two pages maximum.
+10. **Contact links** — always include LinkedIn and GitHub as clickable Markdown links whose visible labels are the readable profile URLs.
+11. **Work authorization** — use only "Requires employer-sponsored work authorization." Do not claim EU Blue Card or any named visa eligibility.
+12. **Output format** — Markdown, one page preferred, two pages maximum.
 
 **Prompt template:** [`../docs/agents/cv-generator.md`](../docs/agents/cv-generator.md)  
 **Quick invocation:** [`../documents/prompts/cv-from-offer.md`](../documents/prompts/cv-from-offer.md)  

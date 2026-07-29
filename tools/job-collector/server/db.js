@@ -18,6 +18,7 @@ const JOB_SUMMARY_COLUMNS = [
   'match_score',
   'status',
   'visa_sponsorship',
+  'applied_at',
   'created_at',
 ];
 
@@ -114,7 +115,18 @@ export function migrate() {
     WHERE source_url IS NOT NULL AND source_url != '';
   `);
 
+  addColumnIfMissing('jobs', 'applied_at', 'TEXT');
+  addColumnIfMissing('jobs', 'applied_url', 'TEXT');
+
   seedDefaultSettings();
+}
+
+// Add a column to a table if it does not already exist (SQLite has no ADD COLUMN IF NOT EXISTS)
+function addColumnIfMissing(table, column, type) {
+  const cols = sqlite.prepare(`PRAGMA table_info(${table})`).all();
+  if (!cols.some((c) => c.name === column)) {
+    sqlite.run(`ALTER TABLE ${table} ADD COLUMN ${column} ${type}`);
+  }
 }
 
 // Return jobs matching optional status, source, and country filters
@@ -196,6 +208,21 @@ export function updateJob(id, fields) {
   sqlite
     .prepare(`UPDATE jobs SET ${assignments} WHERE id = ?`)
     .run(...columns.map((col) => row[col]), id);
+
+  return getJobById(id);
+}
+
+// Mark a job as applied; first application wins, subsequent calls are no-ops
+export function markApplied(id, { appliedUrl = null } = {}) {
+  const row = sqlite
+    .prepare('SELECT applied_at FROM jobs WHERE id = ?')
+    .get(id);
+  if (!row) return null;
+  if (row.applied_at) return getJobById(id);
+
+  sqlite
+    .prepare("UPDATE jobs SET applied_at = datetime('now'), applied_url = ? WHERE id = ?")
+    .run(appliedUrl, id);
 
   return getJobById(id);
 }
@@ -334,6 +361,7 @@ export const db = {
   updateJob,
   deleteJob,
   jobExistsByUrl,
+  markApplied,
   insertRun,
   updateRun,
   getRunById,

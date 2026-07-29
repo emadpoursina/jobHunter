@@ -8,6 +8,7 @@ import ollamaRouter from './routes/ollama.js';
 import pipelineRouter from './routes/pipeline.js';
 import collectRouter from './routes/collect.js';
 import jobsRouter from './routes/jobs.js';
+import applyRouter from './routes/apply.js';
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3001;
@@ -26,6 +27,7 @@ app.use('/api/ollama', ollamaRouter);
 app.use('/api', pipelineRouter);
 app.use('/api', collectRouter);
 app.use('/api/jobs', jobsRouter);
+app.use('/api/apply', applyRouter);
 
 app.use((_req, res) => {
   res.status(404).json({ error: 'Not found', code: 'NOT_FOUND' });

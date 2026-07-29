@@ -47,6 +47,21 @@ export const api = {
   saveJob: (id, payload) => request('POST', `/jobs/${id}/save`, payload),
   generateCv: (id) => request('POST', `/jobs/${id}/cv`),
   getCvMarkdown: (id) => request('GET', `/jobs/${id}/cv`),
+  downloadCvPdf: async (id) => {
+    const res = await fetch(`${BASE}/jobs/${id}/cv/pdf`, { method: 'POST' });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw Object.assign(
+        new Error(data.error || res.statusText || 'PDF conversion failed'),
+        { code: data.code || 'INTERNAL_ERROR' },
+      );
+    }
+    return res.blob();
+  },
+
+  // Apply
+  generateApplyScript: (id) => request('POST', '/apply/script', { jobId: id }),
+  markApplied: (id, appliedUrl) => request('POST', `/jobs/${id}/applied`, { appliedUrl }),
 
   // Settings
   getSettings: () => request('GET', '/settings'),

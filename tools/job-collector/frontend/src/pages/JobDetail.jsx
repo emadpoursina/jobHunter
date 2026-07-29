@@ -34,6 +34,11 @@ export default function JobDetail() {
   const [cvMarkdown, setCvMarkdown] = useState(null);
   const [generatingCv, setGeneratingCv] = useState(false);
   const [updatingStatus, setUpdatingStatus] = useState(false);
+  const [generatingApplyScript, setGeneratingApplyScript] = useState(false);
+  const [markingApplied, setMarkingApplied] = useState(false);
+  const [applyScript, setApplyScript] = useState(null);
+  const [applyPdfPath, setApplyPdfPath] = useState(null);
+  const [copiedScript, setCopiedScript] = useState(false);
   const [alert, setAlert] = useState(null);
   const [copiedPath, setCopiedPath] = useState(false);
 
@@ -115,6 +120,58 @@ export default function JobDetail() {
     } catch (err) {
       setGeneratingCv(false);
       showAlert(err.message);
+    }
+  }
+
+  // Generate the LinkedIn Easy Apply userscript and show it on the page
+  async function handleGenerateApplyScript() {
+    setGeneratingApplyScript(true);
+    setAlert(null);
+    setApplyScript(null);
+    setApplyPdfPath(null);
+
+    try {
+      const data = await api.generateApplyScript(id);
+      setApplyScript(data.script);
+      setApplyPdfPath(data.pdfPath ?? null);
+      const warnNote = data.warnings?.length ? `${data.warnings.length} warning(s).` : '';
+      showAlert(
+        `Apply script ready. PDF: ${data.pdfPath}. ${warnNote} Copy it and paste into the LinkedIn job page DevTools console.`,
+        'info',
+      );
+    } catch (err) {
+      showAlert(err.message);
+    } finally {
+      setGeneratingApplyScript(false);
+    }
+  }
+
+  // Copy the generated apply script from the on-page box
+  async function handleCopyApplyScript() {
+    if (!applyScript) return;
+    try {
+      await copyToClipboard(applyScript, () => {
+        setCopiedScript(true);
+        setTimeout(() => setCopiedScript(false), 2000);
+      });
+    } catch (err) {
+      showAlert(err.message || 'Failed to copy script');
+    }
+  }
+
+  // Mark the job as applied via the Easy Apply endpoint (records applied_at + applied_url)
+  async function handleMarkApplied() {
+    setMarkingApplied(true);
+    setAlert(null);
+
+    try {
+      const { job: updated } = await api.markApplied(id, job?.sourceUrl ?? null);
+      setJob(updated);
+      showAlert('Marked applied (Easy Apply).', 'info');
+    } catch (err) {
+      showAlert(err.message);
+    } finally {
+      setMarkingApplied(false);
     }
   }
 
@@ -328,6 +385,14 @@ export default function JobDetail() {
               >
                 Regenerate CV
               </button>
+              <button
+                type="button"
+                className="btn"
+                onClick={handleGenerateApplyScript}
+                disabled={generatingApplyScript}
+              >
+                {generatingApplyScript ? 'Generating…' : 'Generate apply script'}
+              </button>
             </div>
           </>
         )}
@@ -345,6 +410,42 @@ export default function JobDetail() {
           </div>
         )}
       </section>
+
+      {(generatingApplyScript || applyScript) && (
+        <section className="card job-detail-section">
+          <div className="card-title">Apply Script</div>
+
+          {generatingApplyScript && (
+            <div className="loading-wrap">
+              <div className="spinner" />
+              <span className="loading-text">Generating apply script…</span>
+            </div>
+          )}
+
+          {!generatingApplyScript && applyScript && (
+            <>
+              {applyPdfPath && (
+                <p className="detail-row">
+                  <strong>PDF:</strong> <code className="file-path">{applyPdfPath}</code>
+                </p>
+              )}
+              <p className="hint">
+                Copy the script below, open the LinkedIn job page, paste it into the DevTools
+                console, then review highlighted fields and click Submit yourself.
+              </p>
+              <div className="browser-script-wrap">
+                <div className="browser-script-header">
+                  <span>Console script</span>
+                  <button type="button" className="btn" onClick={handleCopyApplyScript}>
+                    {copiedScript ? 'Copied!' : 'Copy script'}
+                  </button>
+                </div>
+                <pre className="browser-script">{applyScript}</pre>
+              </div>
+            </>
+          )}
+        </section>
+      )}
 
       <section className="card job-detail-section">
         <div className="card-title">Status</div>
@@ -364,6 +465,15 @@ export default function JobDetail() {
             disabled={updatingStatus || job.status === 'applied'}
           >
             Mark applied
+          </button>
+          <button
+            type="button"
+            className="btn"
+            onClick={handleMarkApplied}
+            disabled={markingApplied || Boolean(job.appliedAt)}
+            title="Record applied_at timestamp via the Easy Apply endpoint"
+          >
+            {job.appliedAt ? 'Applied (recorded)' : 'Mark applied (Easy Apply)'}
           </button>
           <button
             type="button"

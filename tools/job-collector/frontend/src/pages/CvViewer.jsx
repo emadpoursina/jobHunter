@@ -26,6 +26,20 @@ function cvFilename(job) {
   return `${slug || `job-${job.id}`}-cv.md`;
 }
 
+function cvPdfFilename(job) {
+  return cvFilename(job).replace(/\.md$/, '.pdf');
+}
+
+// Trigger a browser download of a PDF blob
+function downloadPdf(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement('a');
+  anchor.href = url;
+  anchor.download = filename;
+  anchor.click();
+  URL.revokeObjectURL(url);
+}
+
 function jobUpdatedAt(job) {
   return job?.updatedAt ?? job?.updated_at ?? '';
 }
@@ -40,6 +54,7 @@ export default function CvViewer() {
   const [rewriteBaseline, setRewriteBaseline] = useState(null);
   const [alert, setAlert] = useState(null);
   const [copied, setCopied] = useState(false);
+  const [convertingPdf, setConvertingPdf] = useState(false);
 
   // Show a dismissible alert for 5 seconds
   const showAlert = useCallback((message, type = 'err') => {
@@ -141,6 +156,24 @@ export default function CvViewer() {
     downloadMarkdown(markdown, cvFilename(job));
   }
 
+  // Convert the saved CV markdown to PDF and download it
+  async function handleDownloadPdf() {
+    if (!markdown || !job) return;
+
+    setConvertingPdf(true);
+    setAlert(null);
+
+    try {
+      const blob = await api.downloadCvPdf(id);
+      downloadPdf(blob, cvPdfFilename(job));
+      showAlert('PDF downloaded.', 'info');
+    } catch (err) {
+      showAlert(err.message);
+    } finally {
+      setConvertingPdf(false);
+    }
+  }
+
   if (loading) {
     return (
       <div className="cv-viewer-page">
@@ -218,11 +251,19 @@ export default function CvViewer() {
           </button>
           <button
             type="button"
-            className="btn btn-primary"
+            className="btn"
             onClick={handleDownload}
-            disabled={rewriting || !markdown}
+            disabled={rewriting || convertingPdf || !markdown}
           >
             Download .md
+          </button>
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={handleDownloadPdf}
+            disabled={rewriting || convertingPdf || !markdown}
+          >
+            {convertingPdf ? 'Converting…' : 'Download PDF'}
           </button>
         </div>
       </div>

@@ -6,13 +6,16 @@ const CV_MAX_TOKENS = 2000;
 const AGENTS_DIR = process.env.AGENTS_DIR ?? 'docs/agents';
 const PROFILE_PATH = process.env.PROFILE_PATH ?? 'phase2/profile/master-profile.md';
 
-const DEFAULT_CV_PROMPT = `You are an expert CV writer for software engineers. Generate a tailored,
-professional CV in Markdown format. The CV must:
-- Start with a focused summary that directly addresses the role
-- List only the most relevant skills
-- Reframe experience and project bullet points to match the job
-- Keep it to 1–1.5 pages (400–600 words)
-- Output Markdown only — no preamble, no code fences`;
+const DEFAULT_CV_PROMPT = `Write a truthful, natural-sounding, ATS-friendly CV in Markdown.
+- Use only facts and experience explicitly verified by the candidate profile
+- Use one column and standard headings: Professional Summary, Skills, Work Experience,
+  Selected Projects, Education, and Languages
+- Put job keywords in context only when supported; never substitute adjacent technologies
+- Avoid tables, ratings, keyword stuffing, generic promotional language, and invented metrics
+- Include LinkedIn and GitHub as clickable links with their readable URLs as labels
+- State only "Requires employer-sponsored work authorization"; do not name a visa program
+- Keep it to two pages maximum
+- Output the finished CV only, with no preamble, notes, or code fences`;
 
 // Load the CV generator agent file or fall back to the default system prompt
 async function buildSystemPrompt() {

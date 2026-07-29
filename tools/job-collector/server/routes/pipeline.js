@@ -1,5 +1,7 @@
+import { basename } from 'path';
 import { Router } from 'express';
 import { generateCv } from '../../pipeline/cv.js';
+import { cvToPdf } from '../../pipeline/cvPdf.js';
 import { parseOffer } from '../../pipeline/parser.js';
 import { readRepoFile, writeCvMd, writeOfferMd } from '../../pipeline/repoFiles.js';
 import { getJobById, updateJob } from '../db.js';
@@ -170,6 +172,45 @@ router.get('/jobs/:id/cv', asyncHandler(async (req, res) => {
   }
 
   res.json({ markdown });
+}));
+
+// Convert the job's CV markdown to PDF and return it as a download
+router.post('/jobs/:id/cv/pdf', asyncHandler(async (req, res) => {
+  const id = parseJobId(req.params.id);
+  if (id === null) {
+    return res.status(400).json({
+      error: 'Invalid job id',
+      code: 'VALIDATION_ERROR',
+    });
+  }
+
+  const job = getJobById(id);
+  if (!job) {
+    return res.status(404).json({
+      error: 'Job not found',
+      code: 'NOT_FOUND',
+    });
+  }
+
+  const cvMdPath = job.cvMdPath ?? job.cv_md_path;
+  if (!cvMdPath) {
+    return res.status(404).json({
+      error: 'CV not generated for this job',
+      code: 'NOT_FOUND',
+    });
+  }
+
+  let pdfPath;
+  try {
+    pdfPath = await cvToPdf(cvMdPath);
+  } catch (err) {
+    return res.status(503).json({
+      error: err.message,
+      code: err.code || 'CV_PDF_ERROR',
+    });
+  }
+
+  res.download(pdfPath, basename(pdfPath));
 }));
 
 export default router;
