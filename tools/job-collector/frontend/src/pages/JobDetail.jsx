@@ -6,6 +6,7 @@ import { matchScoreClass } from '../components/JobCard.jsx';
 import StatusBadge from '../components/StatusBadge.jsx';
 
 const CV_POLL_MS = 2000;
+const CV_POLL_TIMEOUT_MS = 120000;
 
 // Render visa sponsorship as a small badge when present
 function VisaBadge({ visa }) {
@@ -17,6 +18,10 @@ function VisaBadge({ visa }) {
   if (normalized === 'no' || normalized === 'unlikely') className = 'visa-no';
 
   return <span className={`visa-badge ${className}`}>{visa}</span>;
+}
+
+function jobUpdatedAt(job) {
+  return job?.updatedAt ?? job?.updated_at ?? '';
 }
 
 // Copy text to the clipboard and show a brief confirmation
@@ -33,6 +38,7 @@ export default function JobDetail() {
   const [job, setJob] = useState(null);
   const [cvMarkdown, setCvMarkdown] = useState(null);
   const [generatingCv, setGeneratingCv] = useState(false);
+  const [cvGenBaseline, setCvGenBaseline] = useState(null);
   const [updatingStatus, setUpdatingStatus] = useState(false);
   const [generatingApplyScript, setGeneratingApplyScript] = useState(false);
   const [markingApplied, setMarkingApplied] = useState(false);
@@ -58,18 +64,18 @@ export default function JobDetail() {
     setJob(data);
 
     const cvPath = data.cvMdPath ?? data.cv_md_path;
+    let nextMarkdown = null;
     if (cvPath) {
       try {
         const { markdown } = await api.getCvMarkdown(id);
-        setCvMarkdown(markdown);
+        nextMarkdown = markdown;
       } catch {
-        setCvMarkdown(null);
+        nextMarkdown = null;
       }
-    } else {
-      setCvMarkdown(null);
     }
+    setCvMarkdown(nextMarkdown);
 
-    return data;
+    return { job: data, markdown: nextMarkdown };
   }, [id]);
 
   useEffect(() => {
@@ -97,36 +103,59 @@ export default function JobDetail() {
     setApplyUrlInput(url || '');
   }, [job?.applyUrl, job?.apply_url]);
 
-  // Poll job until CV path appears after generation starts
+  // Poll until CV markdown appears / changes after generation starts
   useEffect(() => {
-    if (!generatingCv) return;
+    if (!generatingCv || !cvGenBaseline) return;
 
     const interval = setInterval(async () => {
       try {
-        const data = await loadJob();
-        const cvPath = data.cvMdPath ?? data.cv_md_path;
-        if (cvPath) {
+        if (Date.now() - cvGenBaseline.startedAt > CV_POLL_TIMEOUT_MS) {
           setGeneratingCv(false);
-          showAlert('CV generated successfully.', 'info');
+          setCvGenBaseline(null);
+          showAlert('CV generation timed out. Check server logs / LLM settings.');
+          return;
+        }
+
+        const { job: data, markdown: nextMarkdown } = await loadJob();
+        const updated = jobUpdatedAt(data) > cvGenBaseline.updatedAt;
+        const changed =
+          nextMarkdown != null &&
+          nextMarkdown.trim() &&
+          nextMarkdown !== cvGenBaseline.markdown;
+        if (updated || changed) {
+          setGeneratingCv(false);
+          setCvGenBaseline(null);
+          if (nextMarkdown?.trim()) {
+            showAlert('CV generated successfully.', 'info');
+          } else {
+            showAlert('CV generation finished but the file is empty. Try another model.');
+          }
         }
       } catch (err) {
         setGeneratingCv(false);
+        setCvGenBaseline(null);
         showAlert(err.message);
       }
     }, CV_POLL_MS);
 
     return () => clearInterval(interval);
-  }, [generatingCv, loadJob, showAlert]);
+  }, [generatingCv, cvGenBaseline, loadJob, showAlert]);
 
   // Enqueue CV generation on the server
   async function handleGenerateCv() {
     setGeneratingCv(true);
     setAlert(null);
+    setCvGenBaseline({
+      updatedAt: jobUpdatedAt(job),
+      markdown: cvMarkdown,
+      startedAt: Date.now(),
+    });
 
     try {
       await api.generateCv(id);
     } catch (err) {
       setGeneratingCv(false);
+      setCvGenBaseline(null);
       showAlert(err.message);
     }
   }
@@ -469,6 +498,24 @@ export default function JobDetail() {
             {!applyUrl && cvPath && (
               <p className="hint">Set the company apply URL above to generate a fill-assist script.</p>
             )}
+          </>
+        )}
+
+        {!generatingCv && cvPath && !cvMarkdown && (
+          <>
+            <p className="hint">
+              CV file is missing or empty (often a free/overloaded model returned nothing). Regenerate with a working model.
+            </p>
+            <div className="btn-actions">
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={handleGenerateCv}
+                disabled={generatingCv}
+              >
+                Regenerate CV
+              </button>
+            </div>
           </>
         )}
 

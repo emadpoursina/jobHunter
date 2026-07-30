@@ -4,6 +4,7 @@ import { api } from '../api.js';
 import CvPreview from '../components/CvPreview.jsx';
 
 const CV_POLL_MS = 2000;
+const CV_POLL_TIMEOUT_MS = 120000;
 
 // Trigger a browser download of markdown content as a .md file
 function downloadMarkdown(markdown, filename) {
@@ -100,14 +101,27 @@ export default function CvViewer() {
 
     const interval = setInterval(async () => {
       try {
+        if (Date.now() - rewriteBaseline.startedAt > CV_POLL_TIMEOUT_MS) {
+          setRewriting(false);
+          setRewriteBaseline(null);
+          showAlert('CV rewrite timed out. Check server logs / LLM settings.');
+          return;
+        }
+
         const { job: data, markdown: nextMarkdown } = await loadCv();
         const updated = jobUpdatedAt(data) > rewriteBaseline.updatedAt;
         const changed =
-          nextMarkdown != null && nextMarkdown !== rewriteBaseline.markdown;
+          nextMarkdown != null &&
+          nextMarkdown.trim() &&
+          nextMarkdown !== rewriteBaseline.markdown;
         if (updated || changed) {
           setRewriting(false);
           setRewriteBaseline(null);
-          showAlert('CV rewritten successfully.', 'info');
+          if (nextMarkdown?.trim()) {
+            showAlert('CV rewritten successfully.', 'info');
+          } else {
+            showAlert('CV rewrite finished but the file is empty. Try another model.');
+          }
         }
       } catch (err) {
         setRewriting(false);
@@ -126,6 +140,7 @@ export default function CvViewer() {
     setRewriteBaseline({
       updatedAt: jobUpdatedAt(job),
       markdown,
+      startedAt: Date.now(),
     });
 
     try {

@@ -90,5 +90,12 @@ export async function generateCv(job) {
     ...taskLlm,
   });
 
-  return cvMarkdown.trim();
+  const trimmed = cvMarkdown.trim();
+  if (!trimmed) {
+    const err = new Error('LLM returned an empty CV');
+    err.code = 'LLM_ERROR';
+    throw err;
+  }
+
+  return trimmed;
 }

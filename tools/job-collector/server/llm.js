@@ -9,6 +9,26 @@ function llmError(message) {
   return err;
 }
 
+// Normalize chat message content (string or OpenAI-style content parts)
+export function normalizeMessageContent(content) {
+  if (typeof content === 'string') return content;
+  if (Array.isArray(content)) {
+    return content
+      .map((part) => (typeof part === 'string' ? part : part?.text ?? ''))
+      .join('');
+  }
+  return '';
+}
+
+// Reject blank model output so callers never persist empty artifacts
+export function requireLlmText(content, label = 'LLM') {
+  const text = normalizeMessageContent(content);
+  if (!text.trim()) {
+    throw llmError(`${label} returned an empty response`);
+  }
+  return text;
+}
+
 // Pause between retry attempts
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -97,7 +117,7 @@ async function callOllama({ system, user, maxTokens, model: modelOverride }) {
     }
 
     const data = await res.json();
-    return data.message.content;
+    return requireLlmText(data.message?.content, 'Ollama');
   };
 
   try {
@@ -142,7 +162,10 @@ async function callAnthropic({ system, user, maxTokens, model: modelOverride }) 
       throw llmError(data?.error?.message ?? `Anthropic returned ${res.status}`);
     }
 
-    return data.content.map((block) => block.text || '').join('');
+    return requireLlmText(
+      data.content.map((block) => block.text || '').join(''),
+      'Anthropic',
+    );
   };
 
   try {
@@ -194,7 +217,18 @@ async function callOpenAI({ system, user, maxTokens, model: modelOverride }) {
       throw llmError(data?.error?.message ?? `OpenAI returned ${res.status}`);
     }
 
-    return data.choices?.[0]?.message?.content ?? '';
+    const choice = data.choices?.[0];
+    const text = normalizeMessageContent(choice?.message?.content);
+    if (!text.trim()) {
+      console.error('[ERROR] [llm] OpenAI empty content:', {
+        finish_reason: choice?.finish_reason,
+        refusal: choice?.message?.refusal,
+        error: data.error,
+      });
+      throw llmError('OpenAI returned an empty response');
+    }
+
+    return text;
   };
 
   try {

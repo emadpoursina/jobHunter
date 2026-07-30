@@ -43,6 +43,12 @@ export async function writeOfferMd(job) {
 
 // Write generated CV markdown and return its relative path (overwrites on collision)
 export async function writeCvMd(job, cvText) {
+  if (!cvText || !String(cvText).trim()) {
+    const err = new Error('Refusing to write empty CV');
+    err.code = 'LLM_ERROR';
+    throw err;
+  }
+
   const company = pick(job, 'company') ?? 'Unknown';
   const title = pick(job, 'title') ?? 'Unknown';
   const generatedAt = formatDate(new Date());
