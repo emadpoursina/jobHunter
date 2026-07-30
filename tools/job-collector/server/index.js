@@ -1,4 +1,7 @@
 import 'dotenv/config';
+import { existsSync } from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import express from 'express';
 import { closeBrowser } from '../collectors/linkedin.js';
 import { close as closeDb, failOrphanedRuns } from './db.js';
@@ -9,6 +12,10 @@ import pipelineRouter from './routes/pipeline.js';
 import collectRouter from './routes/collect.js';
 import jobsRouter from './routes/jobs.js';
 import applyRouter from './routes/apply.js';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const DIST_DIR = path.resolve(__dirname, '../frontend/dist');
+const DIST_INDEX = path.join(DIST_DIR, 'index.html');
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3001;
@@ -29,9 +36,16 @@ app.use('/api', collectRouter);
 app.use('/api/jobs', jobsRouter);
 app.use('/api/apply', applyRouter);
 
-app.use((_req, res) => {
+app.use('/api', (_req, res) => {
   res.status(404).json({ error: 'Not found', code: 'NOT_FOUND' });
 });
+
+if (existsSync(DIST_INDEX)) {
+  app.use(express.static(DIST_DIR));
+  app.get(/^(?!\/api).*/, (_req, res) => {
+    res.sendFile(DIST_INDEX);
+  });
+}
 
 // Global error handler — all routes return { error, code }
 app.use((err, _req, res, _next) => {

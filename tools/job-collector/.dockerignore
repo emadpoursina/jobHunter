@@ -1,0 +1,11 @@
+node_modules
+data
+.env
+scratch
+frontend/dist
+.git
+*.md
+!README.md
+phase2
+scripts
+**/*.self-check.js

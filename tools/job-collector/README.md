@@ -42,6 +42,35 @@ curl http://localhost:3001/api/health
 
 ---
 
+## Docker
+
+Requires Docker and (for LLM) Ollama on the host listening on `11434`.
+
+```bash
+cd tools/job-collector
+cp -n .env.example .env   # optional; compose overrides REPO_ROOT / OLLAMA_BASE_URL
+bun run stack:build       # once (or after Dockerfile/deps change); needs Docker Hub
+bun run stack:up
+```
+
+Then open `http://localhost:3061` (API + UI in one process).
+
+```bash
+curl http://localhost:3061/api/health
+# → {"ok":true}
+```
+
+| Volume | Purpose |
+|--------|---------|
+| `./data` → `/app/data` | SQLite (`jobs.db`) |
+| `../..` → `/repo` | jobHunter repo root (profile, agents, offers, generated CVs) |
+
+Inside the container, `OLLAMA_BASE_URL` is `http://host.docker.internal:11434` so Settings/Ollama calls reach the host. Start Ollama with `ollama serve` before parsing jobs.
+
+Stop: `bun run stack:down`.
+
+---
+
 ## Environment variables
 
 Copy `.env.example` to `.env` and adjust as needed.
@@ -173,6 +202,8 @@ tools/job-collector/
 ├── pipeline/         # parser, CV generator, repo file writer
 ├── server/           # Express API, SQLite, LLM router, queue
 ├── data/             # SQLite database (gitignored)
+├── Dockerfile
+├── docker-compose.yml
 ├── .env.example
 └── package.json
 ```
