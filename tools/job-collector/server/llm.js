@@ -1,6 +1,18 @@
 import { getSetting } from './db.js';
 
 const ANTHROPIC_MODEL = 'claude-sonnet-4-20250514';
+const OPENROUTER_BASE_URL = 'https://openrouter.ai/api/v1';
+
+// Build OpenRouter provider.order from a comma/space-separated slug list
+export function buildOpenRouterProviderPrefs(orderRaw) {
+  const order = String(orderRaw ?? '')
+    .split(/[,;\s]+/)
+    .map((slug) => slug.trim())
+    .filter(Boolean);
+
+  if (!order.length) return undefined;
+  return { order };
+}
 
 // Build an error tagged for pipeline and route handlers
 function llmError(message) {
@@ -67,6 +79,9 @@ export async function callLlm({ system, user, maxTokens = 1000, provider, model 
   }
   if (resolvedProvider === 'openai') {
     return callOpenAI({ system, user, maxTokens, model });
+  }
+  if (resolvedProvider === 'openrouter') {
+    return callOpenRouter({ system, user, maxTokens, model });
   }
 
   throw llmError(`Unknown LLM provider: ${resolvedProvider}`);
@@ -191,15 +206,73 @@ async function callOpenAI({ system, user, maxTokens, model: modelOverride }) {
 
   console.log(`[INFO] [llm] OpenAI model=${model} base=${baseUrl}`);
 
-  const doFetch = async () => {
-    const headers = {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${apiKey}`,
-    };
+  return callChatCompletions({
+    label: 'OpenAI',
+    apiKey,
+    baseUrl,
+    model,
+    system,
+    user,
+    maxTokens,
+  });
+}
 
-    const res = await fetch(`${baseUrl}/chat/completions`, {
+// Send a chat completions request via OpenRouter
+async function callOpenRouter({ system, user, maxTokens, model: modelOverride }) {
+  const apiKey = getSetting('openrouter_api_key') ?? '';
+  const model = modelOverride || getSetting('openrouter_model') || '';
+  const providerOrder = getSetting('openrouter_provider_order') ?? '';
+  const provider = buildOpenRouterProviderPrefs(providerOrder);
+
+  if (!apiKey) {
+    throw llmError('No OpenRouter API key configured.');
+  }
+  if (!model) {
+    throw llmError('No OpenRouter model configured. Go to Settings to set a model.');
+  }
+
+  console.log(
+    `[INFO] [llm] OpenRouter model=${model}${provider ? ` providers=${provider.order.join(',')}` : ''}`,
+  );
+
+  return callChatCompletions({
+    label: 'OpenRouter',
+    apiKey,
+    baseUrl: OPENROUTER_BASE_URL,
+    model,
+    system,
+    user,
+    maxTokens,
+    bodyExtras: provider ? { provider } : {},
+    extraHeaders: {
+      'HTTP-Referer': 'https://github.com/jobHunter',
+      'X-OpenRouter-Title': 'jobHunter job-collector',
+    },
+  });
+}
+
+// Shared OpenAI-compatible chat completions client
+async function callChatCompletions({
+  label,
+  apiKey,
+  baseUrl,
+  model,
+  system,
+  user,
+  maxTokens,
+  bodyExtras = {},
+  extraHeaders = {},
+}) {
+  const normalizedBase = baseUrl.replace(/\/$/, '');
+
+  const doFetch = async () => {
+    const res = await fetch(`${normalizedBase}/chat/completions`, {
       method: 'POST',
-      headers,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
+        ...extraHeaders,
+      },
       body: JSON.stringify({
         model,
         max_tokens: maxTokens,
@@ -207,25 +280,26 @@ async function callOpenAI({ system, user, maxTokens, model: modelOverride }) {
           { role: 'system', content: system },
           { role: 'user', content: user },
         ],
+        ...bodyExtras,
       }),
     });
 
     const data = await res.json();
 
     if (!res.ok) {
-      console.error(`[ERROR] [llm] OpenAI returned ${res.status}:`, data);
-      throw llmError(data?.error?.message ?? `OpenAI returned ${res.status}`);
+      console.error(`[ERROR] [llm] ${label} returned ${res.status}:`, data);
+      throw llmError(data?.error?.message ?? `${label} returned ${res.status}`);
     }
 
     const choice = data.choices?.[0];
     const text = normalizeMessageContent(choice?.message?.content);
     if (!text.trim()) {
-      console.error('[ERROR] [llm] OpenAI empty content:', {
+      console.error(`[ERROR] [llm] ${label} empty content:`, {
         finish_reason: choice?.finish_reason,
         refusal: choice?.message?.refusal,
         error: data.error,
       });
-      throw llmError('OpenAI returned an empty response');
+      throw llmError(`${label} returned an empty response`);
     }
 
     return text;
@@ -235,7 +309,7 @@ async function callOpenAI({ system, user, maxTokens, model: modelOverride }) {
     return await withRetry(doFetch);
   } catch (err) {
     if (err.code === 'LLM_ERROR') throw err;
-    throw llmError(`Cannot reach OpenAI API at ${baseUrl}: ${err.message}`);
+    throw llmError(`Cannot reach ${label} API at ${normalizedBase}: ${err.message}`);
   }
 }
 

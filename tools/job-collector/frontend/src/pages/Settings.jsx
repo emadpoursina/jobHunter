@@ -39,7 +39,7 @@ function normalizeLlmTasks(stored) {
 }
 
 // Build the full settings payload sent to PUT /api/settings
-function buildSettingsPayload(form, anthropicApiKey, openaiApiKey) {
+function buildSettingsPayload(form, anthropicApiKey, openaiApiKey, openrouterApiKey) {
   return {
     llm_provider: form.llmProvider,
     ollama_base_url: form.ollamaBaseUrl,
@@ -48,6 +48,9 @@ function buildSettingsPayload(form, anthropicApiKey, openaiApiKey) {
     openai_api_key: openaiApiKey,
     openai_base_url: form.openaiBaseUrl,
     openai_model: form.openaiModel,
+    openrouter_api_key: openrouterApiKey,
+    openrouter_model: form.openrouterModel,
+    openrouter_provider_order: form.openrouterProviderOrder,
     llm_tasks: form.llmTasks,
     collectors: form.collectors,
   };
@@ -63,6 +66,9 @@ function formFromSettings(settings, collectors) {
     openaiApiKeySet: Boolean(settings.openai_api_key_set),
     openaiBaseUrl: settings.openai_base_url ?? 'https://api.openai.com/v1',
     openaiModel: settings.openai_model ?? '',
+    openrouterApiKeySet: Boolean(settings.openrouter_api_key_set),
+    openrouterModel: settings.openrouter_model ?? '',
+    openrouterProviderOrder: settings.openrouter_provider_order ?? '',
     llmTasks: normalizeLlmTasks(settings.llm_tasks),
     collectors: collectors ?? settings.collectors ?? {},
   };
@@ -87,11 +93,15 @@ export default function Settings() {
     openaiApiKeySet: false,
     openaiBaseUrl: 'https://api.openai.com/v1',
     openaiModel: '',
+    openrouterApiKeySet: false,
+    openrouterModel: '',
+    openrouterProviderOrder: '',
     llmTasks: normalizeLlmTasks(null),
     collectors: {},
   });
   const [anthropicApiKey, setAnthropicApiKey] = useState('');
   const [openaiApiKey, setOpenaiApiKey] = useState('');
+  const [openrouterApiKey, setOpenrouterApiKey] = useState('');
 
   // Show a dismissible alert for 5 seconds
   const showAlert = useCallback((message, type = 'err') => {
@@ -172,6 +182,7 @@ export default function Settings() {
     );
     setAnthropicApiKey('');
     setOpenaiApiKey('');
+    setOpenrouterApiKey('');
   }
 
   // Save current settings to the API
@@ -179,7 +190,7 @@ export default function Settings() {
     setSaving(true);
     setAlert(null);
     try {
-      const payload = buildSettingsPayload(form, anthropicApiKey, openaiApiKey);
+      const payload = buildSettingsPayload(form, anthropicApiKey, openaiApiKey, openrouterApiKey);
       const { settings } = await api.saveSettings(payload);
       applySavedSettings(settings);
       showAlert('Settings saved.', 'info');
@@ -195,7 +206,7 @@ export default function Settings() {
     setTestingOllama(true);
     setAlert(null);
     try {
-      const payload = buildSettingsPayload(form, anthropicApiKey, openaiApiKey);
+      const payload = buildSettingsPayload(form, anthropicApiKey, openaiApiKey, openrouterApiKey);
       const { settings } = await api.saveSettings(payload);
       applySavedSettings(settings, false);
 
@@ -214,7 +225,7 @@ export default function Settings() {
     setTestResult(null);
     setAlert(null);
     try {
-      const payload = buildSettingsPayload(form, anthropicApiKey, openaiApiKey);
+      const payload = buildSettingsPayload(form, anthropicApiKey, openaiApiKey, openrouterApiKey);
       const { settings } = await api.saveSettings(payload);
       applySavedSettings(settings);
 
@@ -263,6 +274,7 @@ export default function Settings() {
     const provider = taskProvider || form.llmProvider;
     if (provider === 'ollama') return form.ollamaModel || 'global Ollama model';
     if (provider === 'openai') return form.openaiModel || 'global OpenAI model';
+    if (provider === 'openrouter') return form.openrouterModel || 'global OpenRouter model';
     if (provider === 'anthropic') return 'claude-sonnet-4-20250514';
     return 'global model';
   }
@@ -308,6 +320,13 @@ export default function Settings() {
             onClick={() => setForm((prev) => ({ ...prev, llmProvider: 'openai' }))}
           >
             OpenAI API
+          </button>
+          <button
+            type="button"
+            className={`tab${form.llmProvider === 'openrouter' ? ' active' : ''}`}
+            onClick={() => setForm((prev) => ({ ...prev, llmProvider: 'openrouter' }))}
+          >
+            OpenRouter
           </button>
         </div>
 
@@ -462,6 +481,73 @@ export default function Settings() {
             </div>
           </>
         )}
+
+        {form.llmProvider === 'openrouter' && (
+          <>
+            <div className="field">
+              <label htmlFor="openrouter-key">OpenRouter API key</label>
+              <input
+                id="openrouter-key"
+                type="password"
+                placeholder={
+                  form.openrouterApiKeySet ? 'Key is set — enter new key to replace' : 'sk-or-…'
+                }
+                value={openrouterApiKey}
+                onChange={(e) => setOpenrouterApiKey(e.target.value)}
+              />
+              {form.openrouterApiKeySet && (
+                <p className="hint">Leave blank to keep the existing key.</p>
+              )}
+            </div>
+
+            <div className="field">
+              <label htmlFor="openrouter-model">Model</label>
+              <input
+                id="openrouter-model"
+                type="text"
+                placeholder="e.g. anthropic/claude-sonnet-4"
+                value={form.openrouterModel}
+                onChange={(e) =>
+                  setForm((prev) => ({ ...prev, openrouterModel: e.target.value }))
+                }
+              />
+              <p className="hint">
+                Use OpenRouter model slugs (see{' '}
+                <a href="https://openrouter.ai/models" target="_blank" rel="noreferrer">
+                  openrouter.ai/models
+                </a>
+                ).
+              </p>
+            </div>
+
+            <div className="field">
+              <label htmlFor="openrouter-provider-order">Provider order (optional)</label>
+              <input
+                id="openrouter-provider-order"
+                type="text"
+                placeholder="e.g. anthropic, deepinfra"
+                value={form.openrouterProviderOrder}
+                onChange={(e) =>
+                  setForm((prev) => ({ ...prev, openrouterProviderOrder: e.target.value }))
+                }
+              />
+              <p className="hint">
+                Comma-separated OpenRouter provider slugs. Leave blank for default routing.
+              </p>
+            </div>
+
+            <div className="btn-actions">
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={handleSave}
+                disabled={saving}
+              >
+                {saving ? 'Saving…' : 'Save'}
+              </button>
+            </div>
+          </>
+        )}
       </div>
 
       <div className="card">
@@ -487,6 +573,7 @@ export default function Settings() {
                   <option value="ollama">Ollama</option>
                   <option value="anthropic">Anthropic</option>
                   <option value="openai">OpenAI</option>
+                  <option value="openrouter">OpenRouter</option>
                 </select>
               </div>
               <div className="field">

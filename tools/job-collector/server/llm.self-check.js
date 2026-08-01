@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 // Run: cd tools/job-collector && bun run server/llm.self-check.js
-import { normalizeMessageContent, requireLlmText } from './llm.js';
+import { buildOpenRouterProviderPrefs, normalizeMessageContent, requireLlmText } from './llm.js';
 
 function assert(cond, msg) {
   if (!cond) throw new Error(msg);
@@ -33,5 +33,19 @@ try {
   threw = err.code === 'LLM_ERROR';
 }
 assert(threw, 'empty content parts throw LLM_ERROR');
+
+assert(buildOpenRouterProviderPrefs('') === undefined, 'empty provider order → undefined');
+assert(
+  JSON.stringify(buildOpenRouterProviderPrefs('anthropic, deepinfra')) === JSON.stringify({
+    order: ['anthropic', 'deepinfra'],
+  }),
+  'provider order parsed',
+);
+assert(
+  JSON.stringify(buildOpenRouterProviderPrefs('anthropic deepinfra')) === JSON.stringify({
+    order: ['anthropic', 'deepinfra'],
+  }),
+  'space-separated provider order parsed',
+);
 
 console.log('[self-check] ok');

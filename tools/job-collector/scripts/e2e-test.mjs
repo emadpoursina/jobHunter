@@ -86,6 +86,9 @@ async function test1_settings() {
       openai_api_key: 'sk-openai-secret-key-67890',
       openai_base_url: 'https://api.openai.com/v1',
       openai_model: 'gpt-4o-mini',
+      openrouter_api_key: 'sk-or-test-secret-key-99999',
+      openrouter_model: 'anthropic/claude-sonnet-4',
+      openrouter_provider_order: 'anthropic, deepinfra',
       llm_tasks: {
         parse: { provider: 'openai', model: 'gpt-4o-mini' },
         cv: { provider: '', model: '' },
@@ -99,8 +102,10 @@ async function test1_settings() {
     put.status === 200
       && put.data?.settings?.anthropic_api_key_set === true
       && put.data?.settings?.openai_api_key_set === true
+      && put.data?.settings?.openrouter_api_key_set === true
       && !putJson.includes('sk-test-secret')
-      && !putJson.includes('sk-openai-secret'),
+      && !putJson.includes('sk-openai-secret')
+      && !putJson.includes('sk-or-test-secret'),
     'PUT redacts API keys',
     put.status !== 200 ? `HTTP ${put.status}` : '',
   );
@@ -110,8 +115,10 @@ async function test1_settings() {
   record(
     get.data?.settings?.anthropic_api_key_set === true
       && get.data?.settings?.openai_api_key_set === true
+      && get.data?.settings?.openrouter_api_key_set === true
       && !getJson.includes('sk-test-secret')
-      && !getJson.includes('sk-openai-secret'),
+      && !getJson.includes('sk-openai-secret')
+      && !getJson.includes('sk-or-test-secret'),
     'GET redacts API keys',
   );
   record(
@@ -122,6 +129,11 @@ async function test1_settings() {
     get.data?.settings?.openai_base_url === 'https://api.openai.com/v1'
       && get.data?.settings?.openai_model === 'gpt-4o-mini',
     'Settings persist openai url/model',
+  );
+  record(
+    get.data?.settings?.openrouter_model === 'anthropic/claude-sonnet-4'
+      && get.data?.settings?.openrouter_provider_order === 'anthropic, deepinfra',
+    'Settings persist openrouter model/provider order',
   );
   record(
     get.data?.settings?.llm_tasks?.parse?.provider === 'openai'

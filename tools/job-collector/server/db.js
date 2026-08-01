@@ -38,6 +38,9 @@ const DEFAULT_SETTINGS = {
   openai_api_key: '',
   openai_base_url: 'https://api.openai.com/v1',
   openai_model: '',
+  openrouter_api_key: '',
+  openrouter_model: '',
+  openrouter_provider_order: '',
   llm_tasks: {
     parse: { provider: '', model: '' },
     cv: { provider: '', model: '' },

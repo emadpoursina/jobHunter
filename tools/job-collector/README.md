@@ -49,9 +49,10 @@ Requires Docker and (for LLM) Ollama on the host listening on `11434`.
 ```bash
 cd tools/job-collector
 cp -n .env.example .env   # optional; compose overrides REPO_ROOT / OLLAMA_BASE_URL
-bun run stack:build       # once (or after Dockerfile/deps change); needs Docker Hub
-bun run stack:up
+bun run stack:up          # builds image + starts (rebuilds UI on each up)
 ```
+
+`stack:up` runs `docker compose up --build`, so frontend changes are baked into the image. Use `bun run dev` for live Vite reload during UI work; use Docker when you want the single-port stack on `:3061`.
 
 Then open `http://localhost:3061` (API + UI in one process).
 
@@ -79,13 +80,16 @@ Copy `.env.example` to `.env` and adjust as needed.
 |----------|---------|-------------|
 | `PORT` | `3001` | Express API port |
 | `REPO_ROOT` | `../..` | Path to jobHunter repo root (relative to `tools/job-collector/`) |
-| `LLM_PROVIDER` | `ollama` | `ollama`, `anthropic`, or `openai` (also configurable in Settings UI) |
+| `LLM_PROVIDER` | `ollama` | `ollama`, `anthropic`, `openai`, or `openrouter` (also configurable in Settings UI) |
 | `OLLAMA_BASE_URL` | `http://localhost:11434` | Ollama API base URL |
 | `OLLAMA_MODEL` | — | Default Ollama model name |
 | `ANTHROPIC_API_KEY` | — | Required when using Anthropic |
 | `OPENAI_API_KEY` | — | Required when using OpenAI-compatible API |
 | `OPENAI_BASE_URL` | `https://api.openai.com/v1` | OpenAI-compatible chat completions base URL |
 | `OPENAI_MODEL` | — | Model name for OpenAI-compatible API |
+| `OPENROUTER_API_KEY` | — | Required when using OpenRouter |
+| `OPENROUTER_MODEL` | — | OpenRouter model slug (e.g. `anthropic/claude-sonnet-4`) |
+| `OPENROUTER_PROVIDER_ORDER` | — | Optional comma-separated provider slugs for OpenRouter routing |
 | `PROFILE_PATH` | `phase2/profile/master-profile.md` | Candidate profile (relative to `REPO_ROOT`) |
 | `AGENTS_DIR` | `docs/agents` | Agent prompt files directory |
 | `OFFERS_DIR` | `phase2/offers/by-country` | Where parsed offer `.md` files are written |
@@ -116,6 +120,13 @@ If Ollama is offline, API errors return code `OLLAMA_UNAVAILABLE` or `LLM_ERROR`
 1. Set `OPENAI_API_KEY` in `.env` or paste the key in Settings
 2. Set **API base URL** (default `https://api.openai.com/v1`; any OpenAI-compatible endpoint works)
 3. Set the **model** name and save
+
+### OpenRouter
+
+1. Set `OPENROUTER_API_KEY` in `.env` or paste the key in Settings
+2. Set provider to **OpenRouter** and enter a model slug (e.g. `anthropic/claude-sonnet-4`)
+3. Optionally set **Provider order** — comma-separated OpenRouter provider slugs (e.g. `anthropic, deepinfra`) to control which upstream hosts the request
+4. Save and use **Test provider** to verify
 
 ### Per-task models
 

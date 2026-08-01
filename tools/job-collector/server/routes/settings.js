@@ -13,6 +13,9 @@ const SETTING_KEYS = [
   'openai_api_key',
   'openai_base_url',
   'openai_model',
+  'openrouter_api_key',
+  'openrouter_model',
+  'openrouter_provider_order',
   'llm_tasks',
   'collectors',
 ];
@@ -45,6 +48,7 @@ function formatSettingsForResponse(settings) {
   const {
     anthropic_api_key: anthropicKey,
     openai_api_key: openaiKey,
+    openrouter_api_key: openrouterKey,
     ...rest
   } = settings;
 
@@ -52,6 +56,7 @@ function formatSettingsForResponse(settings) {
     ...rest,
     anthropic_api_key_set: Boolean(anthropicKey),
     openai_api_key_set: Boolean(openaiKey),
+    openrouter_api_key_set: Boolean(openrouterKey),
   };
 }
 
@@ -88,6 +93,9 @@ router.put('/', (req, res) => {
     openai_api_key: resolveApiKey(body.openai_api_key, current.openai_api_key),
     openai_base_url: body.openai_base_url ?? current.openai_base_url ?? 'https://api.openai.com/v1',
     openai_model: body.openai_model ?? current.openai_model ?? '',
+    openrouter_api_key: resolveApiKey(body.openrouter_api_key, current.openrouter_api_key),
+    openrouter_model: body.openrouter_model ?? current.openrouter_model ?? '',
+    openrouter_provider_order: body.openrouter_provider_order ?? current.openrouter_provider_order ?? '',
     llm_tasks: normalizeLlmTasks(body.llm_tasks, current.llm_tasks),
     collectors: body.collectors ?? {},
   };
