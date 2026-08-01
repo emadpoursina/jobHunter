@@ -4,6 +4,7 @@
 //   1. writeCoverLetterMd writes non-empty markdown to a predictable path
 //   2. readRepoFile round-trips the written content
 //   3. writeCoverLetterMd refuses empty input
+//   4. sanitizeCoverLetterOutput strips trailing Notes:/rationale blocks
 // Exits 0 on success, 1 on failure. No test framework.
 import { mkdtemp, rm } from 'fs/promises';
 import { tmpdir } from 'os';
@@ -27,6 +28,7 @@ async function main() {
   process.env.REPO_ROOT = tempRoot;
 
   const { readRepoFile, writeCoverLetterMd } = await import('./repoFiles.js');
+  const { sanitizeCoverLetterOutput } = await import('./coverLetter.js');
 
   try {
     const job = {
@@ -55,6 +57,20 @@ async function main() {
       refusedEmpty = err.code === 'LLM_ERROR';
     }
     assert(refusedEmpty, 'writeCoverLetterMd refuses empty input');
+
+    const withNotes = `Amsterdam, Aug 1, 2026
+
+Dear Hiring Team,
+
+Body paragraph.
+
+Best regards,
+Emad Poursina
+
+Notes: Based on the 50% match score, the letter emphasizes Docker.`;
+    const cleaned = sanitizeCoverLetterOutput(withNotes);
+    assert(!/Notes:/i.test(cleaned), 'sanitizeCoverLetterOutput removes trailing Notes block');
+    assert(cleaned.includes('Dear Hiring Team'), 'sanitizeCoverLetterOutput keeps letter body');
   } finally {
     process.env.REPO_ROOT = prevRepoRoot;
     await rm(tempRoot, { recursive: true, force: true });

@@ -12,6 +12,24 @@ const DEFAULT_COVER_LETTER_PROMPT = `Write a tailored, ready-to-send cover lette
 - State only "requires employer-sponsored work authorization"; do not name a visa program
 - Output the finished letter only, with no preamble, notes, or code fences`;
 
+// Strip LLM meta-commentary (Notes:, rationale) that sometimes leaks after the letter
+export function sanitizeCoverLetterOutput(raw) {
+  let text = String(raw ?? '').trim();
+  if (!text) return text;
+
+  const fence = text.match(/^```(?:markdown|md)?\s*\n([\s\S]*?)\n```\s*$/i);
+  if (fence) text = fence[1].trim();
+
+  text = text.replace(/^here is your cover letter:?\s*\n+/i, '');
+
+  const metaIdx = text.search(
+    /(?:\n\n|\r\n\r\n)(?:---\s*)?(?:\*\*)?(?:Notes?|Rationale|Commentary|Explanation|Summary)(?:\*\*)?:/i,
+  );
+  if (metaIdx !== -1) text = text.slice(0, metaIdx).trim();
+
+  return text.trim();
+}
+
 async function buildSystemPrompt() {
   const agentPath = `${AGENTS_DIR}/cover-letter-generator.md`;
   const agentPrompt = await readRepoFile(agentPath);
@@ -70,7 +88,9 @@ Nice to have: ${niceToHave || 'Not listed'}
 Key responsibilities: ${responsibilities || 'Not listed'}
 Match score: ${job.matchScore ?? job.match_score ?? 'Not scored'}
 
-Generate the tailored cover letter now.`;
+Generate the tailored cover letter now.
+
+Output ONLY the letter — no preamble, no code fences, no "Notes:" block, no rationale about match score or editorial choices.`;
 }
 
 export async function generateCoverLetter(job) {
@@ -84,7 +104,7 @@ export async function generateCoverLetter(job) {
     ...taskLlm,
   });
 
-  const trimmed = coverLetterMarkdown.trim();
+  const trimmed = sanitizeCoverLetterOutput(coverLetterMarkdown);
   if (!trimmed) {
     const err = new Error('LLM returned an empty cover letter');
     err.code = 'LLM_ERROR';

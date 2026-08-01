@@ -742,6 +742,7 @@ NEVER include:
 - Git repo URLs for VoiceDash or Villion (private codebases)
 - Any claim of sole ownership over Villion's backend, Azure stack, CI/CD, or LiveKit agent
 - Any named visa or immigration program (Blue Card, TEER, Skilled Worker Visa, etc.)
+- **Notes / rationale blocks** after the sign-off (e.g. "Notes: Based on the match score…")
 ```
 
 ---
