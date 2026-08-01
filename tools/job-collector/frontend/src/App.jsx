@@ -3,6 +3,7 @@ import Dashboard from './pages/Dashboard.jsx';
 import Jobs from './pages/Jobs.jsx';
 import JobDetail from './pages/JobDetail.jsx';
 import CvViewer from './pages/CvViewer.jsx';
+import CoverLetterViewer from './pages/CoverLetterViewer.jsx';
 import Settings from './pages/Settings.jsx';
 
 const NAV_ITEMS = [
@@ -41,6 +42,7 @@ export default function App() {
             <Route path="/jobs" element={<Jobs />} />
             <Route path="/jobs/:id" element={<JobDetail />} />
             <Route path="/jobs/:id/cv" element={<CvViewer />} />
+            <Route path="/jobs/:id/cover-letter" element={<CoverLetterViewer />} />
             <Route path="/settings" element={<Settings />} />
           </Routes>
         </main>

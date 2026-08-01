@@ -1,9 +1,10 @@
 import { basename } from 'path';
 import { Router } from 'express';
 import { generateCv } from '../../pipeline/cv.js';
+import { generateCoverLetter } from '../../pipeline/coverLetter.js';
 import { cvToPdf } from '../../pipeline/cvPdf.js';
 import { parseOffer } from '../../pipeline/parser.js';
-import { readRepoFile, writeCvMd, writeOfferMd } from '../../pipeline/repoFiles.js';
+import { readRepoFile, writeCoverLetterMd, writeCvMd, writeOfferMd } from '../../pipeline/repoFiles.js';
 import { getJobById, updateJob } from '../db.js';
 import { asyncHandler } from '../errors.js';
 import { enqueueJob } from '../queue.js';
@@ -207,6 +208,114 @@ router.post('/jobs/:id/cv/pdf', asyncHandler(async (req, res) => {
     return res.status(503).json({
       error: err.message,
       code: err.code || 'CV_PDF_ERROR',
+    });
+  }
+
+  res.download(pdfPath, basename(pdfPath));
+}));
+
+// Enqueue tailored cover letter generation for an existing job
+router.post('/jobs/:id/cover-letter', (req, res) => {
+  const id = parseJobId(req.params.id);
+  if (id === null) {
+    return res.status(400).json({
+      error: 'Invalid job id',
+      code: 'VALIDATION_ERROR',
+    });
+  }
+
+  const job = getJobById(id);
+  if (!job) {
+    return res.status(404).json({
+      error: 'Job not found',
+      code: 'NOT_FOUND',
+    });
+  }
+
+  enqueueJob(async () => {
+    try {
+      const coverLetterMarkdown = await generateCoverLetter(job);
+      const coverLetterMdPath = await writeCoverLetterMd(job, coverLetterMarkdown);
+      updateJob(id, { coverLetterMdPath });
+      console.log(`[INFO] [pipeline] Cover letter generated for job ${id} at ${coverLetterMdPath}`);
+    } catch (err) {
+      console.error(`[ERROR] [pipeline] Cover letter generation failed for job ${id}:`, err.message);
+    }
+  });
+
+  res.status(202).json({ message: 'Cover letter generation started' });
+});
+
+// Return the generated cover letter markdown for a job
+router.get('/jobs/:id/cover-letter', asyncHandler(async (req, res) => {
+  const id = parseJobId(req.params.id);
+  if (id === null) {
+    return res.status(400).json({
+      error: 'Invalid job id',
+      code: 'VALIDATION_ERROR',
+    });
+  }
+
+  const job = getJobById(id);
+  if (!job) {
+    return res.status(404).json({
+      error: 'Job not found',
+      code: 'NOT_FOUND',
+    });
+  }
+
+  const coverLetterPath = job.coverLetterMdPath ?? job.cover_letter_md_path;
+  if (!coverLetterPath) {
+    return res.status(404).json({
+      error: 'Cover letter not generated for this job',
+      code: 'NOT_FOUND',
+    });
+  }
+
+  const markdown = await readRepoFile(coverLetterPath);
+  if (!markdown) {
+    return res.status(404).json({
+      error: 'Cover letter file not found on disk',
+      code: 'NOT_FOUND',
+    });
+  }
+
+  res.json({ markdown });
+}));
+
+// Convert the job's cover letter markdown to PDF and return it as a download
+router.post('/jobs/:id/cover-letter/pdf', asyncHandler(async (req, res) => {
+  const id = parseJobId(req.params.id);
+  if (id === null) {
+    return res.status(400).json({
+      error: 'Invalid job id',
+      code: 'VALIDATION_ERROR',
+    });
+  }
+
+  const job = getJobById(id);
+  if (!job) {
+    return res.status(404).json({
+      error: 'Job not found',
+      code: 'NOT_FOUND',
+    });
+  }
+
+  const coverLetterMdPath = job.coverLetterMdPath ?? job.cover_letter_md_path;
+  if (!coverLetterMdPath) {
+    return res.status(404).json({
+      error: 'Cover letter not generated for this job',
+      code: 'NOT_FOUND',
+    });
+  }
+
+  let pdfPath;
+  try {
+    pdfPath = await cvToPdf(coverLetterMdPath);
+  } catch (err) {
+    return res.status(503).json({
+      error: err.message,
+      code: err.code || 'COVER_LETTER_PDF_ERROR',
     });
   }
 

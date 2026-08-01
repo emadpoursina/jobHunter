@@ -554,6 +554,226 @@ Open source:    fa.javascript.info (Persian translation of Modern JavaScript Tut
 
 ---
 
+## 11. Cover Letter Context
+
+> This section is for the cover letter generator agent only.
+> It does not affect CV generation.
+> Keep it honest and in Emad's own voice — the agent paraphrases, it does not quote verbatim.
+
+---
+
+### 11.1 Default Pitch
+
+```
+I'm a backend engineer with 7+ years of production Node.js experience, currently
+backend and DevOps lead on VoiceDash — a live AI dictation SaaS — where I own
+the full deployment stack, release process, and code review. I'm seeking a senior
+backend role in Germany or the Netherlands and am available immediately.
+The role requires employer-sponsored work authorization.
+```
+
+---
+
+### 11.2 Hook Bank
+
+Reusable openers in Emad's voice. The agent picks the closest match to the job's
+domain and paraphrases it naturally — never quotes verbatim. Each hook is tagged
+with the job signals it fits.
+
+```
+[TAG: backend / Node.js / ownership]
+"What drew me to this role is the expectation that the engineer owns the backend
+end-to-end — not just writes code, but thinks about deployment, rollback, and
+what happens at 2am. That's the job I've been doing at VoiceDash."
+
+[TAG: Docker / DevOps / infra]
+"I dockerized VoiceDash from scratch — staging and production running side-by-side
+on a shared VPS, each environment isolated, releases coordinated with the Electron
+client. Infrastructure ownership is something I look for in a role, not something
+I want to hand off."
+
+[TAG: AI / STT / dictation / LLM]
+"Building the dictation pipeline at VoiceDash — routing audio between STT providers,
+feeding it into LLM post-processing, streaming the result back over Socket.IO in
+under two seconds — taught me how brittle AI integrations are in production and how
+much engineering discipline they actually require."
+
+[TAG: real-time / Socket.IO / streaming]
+"Real-time is one of those things that's easy to demo and hard to ship. At VoiceDash
+I built the Socket.IO audio streaming layer that the whole product runs on — it had
+to be reliable, low-latency, and recoverable without the user noticing."
+
+[TAG: relocation / Germany / DE]
+"Germany is my primary target — I've been deliberately applying to Berlin and Hamburg
+roles, not spraying applications across Europe. I want to relocate and build
+somewhere for a few years, not just pass through."
+
+[TAG: relocation / Netherlands / NL]
+"The Netherlands is one of my top targets — specifically because of the density of
+Node.js-first product companies and the practical path to a residence permit for
+engineers with sponsored roles."
+
+[TAG: SaaS / product / startup]
+"I've been building a SaaS from the backend up — VoiceDash isn't a client project,
+it's a live product with paying users, and that changes how you think about every
+decision: what to ship, what to skip, what a rollback actually costs."
+
+[TAG: release ownership / process / senior]
+"One thing I look for in a senior role is release ownership — being the person who
+decides what's ready, cuts the tag, coordinates the deploy, and is accountable for
+what goes out. That's the job I have now, and it's the job I want to keep growing into."
+
+[TAG: full-stack / React / Node]
+"I started full-stack and gradually pulled toward the backend — not because I can't
+do frontend, but because the backend problems are where I do my best thinking.
+I can read and contribute to a React codebase; I don't want to be the person whose
+primary ticket queue is UI components."
+
+[TAG: PostgreSQL / databases / data]
+"I've been deepening my PostgreSQL knowledge deliberately — working through
+The Art of PostgreSQL and Use The Index, Luke — because I've seen what happens
+when the database becomes the bottleneck and nobody on the team knows how to fix it."
+```
+
+---
+
+### 11.3 Themes to Emphasise
+
+Ordered by priority. These are selection hints for the agent — not new skills to invent.
+
+```
+1. Production ownership — I own what I ship end-to-end (VoiceDash: deployment,
+   monitoring, release decisions, rollbacks). Lead with this when the role asks
+   for ownership mindset.
+
+2. Docker / multi-environment infrastructure — full dockerization from scratch,
+   staging + production side-by-side. Lead with this for DevOps-adjacent roles.
+
+3. Release management & delivery judgment — git tags, server/client alignment,
+   rollback-ready deploys. Use for roles that mention "release process", "CI/CD
+   ownership", or "senior backend".
+
+4. Real-time backend — Socket.IO audio streaming in production. Use for any role
+   mentioning WebSockets, streaming, real-time, or low-latency.
+
+5. AI / STT integration in production — dynamic routing between STT providers,
+   LLM post-processing pipeline. Use for AI-adjacent product roles.
+
+6. Code review & engineering process — PR reviews, task assignment, weekly
+   reporting. Use when responsibilities mention "collaboration", "code quality",
+   or "mentoring".
+
+7. 7+ years Node.js in production — not a hobbyist stack, not a framework sprint.
+   Use as a grounding statement when tenure or depth is relevant.
+
+8. Stripe Payments (production) — Checkout, webhooks, billing portal at VoiceDash.
+   Use for SaaS or fintech-adjacent roles.
+```
+
+---
+
+### 11.4 Themes to Downplay
+
+```
+- Pure frontend framing — I'm a backend engineer who can do frontend, not the
+  reverse. Never lead with React or UI work unless the job is explicitly full-stack
+  and the posting emphasises it.
+
+- Villion backend ownership — I work on the React Native iOS app. I have team-level
+  exposure to the Azure/Node backend, not ownership of it. Never present Villion's
+  backend stack as mine.
+
+- Beginner / Learning stacks as strengths — NestJS, GraphQL, Jest, AWS, GitHub Actions
+  are all Learning-level. Acknowledge them as in-progress at most; never lead with them.
+
+- Mosaddeghian (trading education platform) — it's my own side project, not a
+  professional product. Only mention if the role is specifically about fintech,
+  trading, or educational SaaS and there's nothing better to cite.
+
+- WordPress — only relevant if the role explicitly involves WordPress or plugin dev.
+  Otherwise omit entirely; it reads as a mismatch for senior backend roles.
+
+- Volume stats without context — "208 Azure functions", "79+ admin pages" are
+  Villion platform figures. Never cite them without framing them as team/platform scale.
+```
+
+---
+
+### 11.5 Tone Defaults
+
+```
+Default tone:       Professional but warm and conversational.
+                    Write as Emad speaking directly — confident but not boastful.
+                    Avoid buzzwords: "passionate", "dynamic", "synergy", "results-driven".
+                    Avoid hollow openers: "I am writing to express my interest..."
+
+Use "startup":      When the company is < 50 people, seed/Series A, or the posting
+                    uses words like "move fast", "own it", "wear many hats".
+                    → Shorter sentences. More direct. Emphasise shipping and ownership.
+
+Use "enterprise":   When the company is > 500 people, publicly traded, or the posting
+                    uses words like "cross-functional", "stakeholders", "process".
+                    → Slightly more formal. Emphasise reliability, coordination, delivery track record.
+
+Use "technical-team": When the hiring manager is likely an engineer (CTO at a small
+                    company, or posting written with specific technical depth).
+                    → Lead with implementation details early. Skip broad strokes.
+                    → The reader knows what Docker Compose is — don't explain it.
+```
+
+---
+
+### 11.6 Hard Lines
+
+```
+ALWAYS include:
+- Work authorization line: "requires employer-sponsored work authorization"
+  (exact phrase — no variation, no named visa, no "EU Blue Card")
+- Closing links: LinkedIn (https://www.linkedin.com/in/emadpoursina/)
+  and GitHub (https://github.com/emadpoursina) on separate lines after sign-off
+- City in header: Amsterdam (current base for applications)
+- Sign-off: "Best regards, Emad Poursina" — no "Sincerely", no "Kind regards"
+
+NEVER include:
+- "I look forward to hearing from you" — rephrase every time
+- "I am writing to express my interest in..." — always cut this opener
+- "passionate", "dynamic", "synergy", "results-driven", "team player"
+- Azure as a substitute for AWS experience, or NestJS as a substitute for Express
+- Git repo URLs for VoiceDash or Villion (private codebases)
+- Any claim of sole ownership over Villion's backend, Azure stack, CI/CD, or LiveKit agent
+- Any named visa or immigration program (Blue Card, TEER, Skilled Worker Visa, etc.)
+```
+
+---
+
+### 11.7 Salary Stance
+
+```
+Quote as a gross/year range in the currency of the target country.
+Use expected ranges from §9 as the opening ask — not the floor.
+If a posting includes a salary, the agent checks §9 to confirm compatibility
+and includes a one-line salary statement if the field is non-null.
+
+| Country   | Code | Opening ask (gross/year)   | Floor (walk-away) |
+|-----------|------|----------------------------|-------------------|
+| Germany   | DE   | €68,000 – €75,000          | €55,000           |
+| Netherlands | NL | €75,000 – €85,000          | €65,000           |
+| Canada    | CA   | C$105,000 – C$120,000      | C$90,000          |
+| Ireland   | IE   | €65,000 – €75,000          | €55,000           |
+| Portugal  | PT   | €45,000 – €55,000          | €40,000           |
+
+Phrasing: "My expected salary for this role is [range] gross per year;
+I'm happy to discuss further."
+Never state the floor. Never quote net. Never give a single number
+unless the form forces it — if forced, use ~5% below the top of the range.
+```
+
+---
+
+**Prompt template:** [`../docs/agents/cover-letter-generator.md`](../docs/agents/cover-letter-generator.md)
+
+---
+
 ## Instructions for AI CV Generator
 
 When this profile is passed to an AI to generate a tailored CV, use these rules:

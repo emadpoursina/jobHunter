@@ -63,6 +63,28 @@ export async function writeCvMd(job, cvText) {
   return relativePath;
 }
 
+// Write generated cover letter markdown and return its relative path (overwrites on collision)
+export async function writeCoverLetterMd(job, coverLetterText) {
+  if (!coverLetterText || !String(coverLetterText).trim()) {
+    const err = new Error('Refusing to write empty cover letter');
+    err.code = 'LLM_ERROR';
+    throw err;
+  }
+
+  const company = pick(job, 'company') ?? 'Unknown';
+  const title = pick(job, 'title') ?? 'Unknown';
+  const generatedAt = formatDate(new Date());
+  const filename = `CoverLetter_${toPascalSlug(company)}_${toPascalSlug(title)}_${generatedAt}.md`;
+  const relativePath = `${CV_OUTPUT_DIR}/${filename}`;
+  const fullPath = repoPath(relativePath);
+
+  await mkdir(repoPath(CV_OUTPUT_DIR), { recursive: true });
+  await writeFile(fullPath, coverLetterText, 'utf8');
+  console.log(`[INFO] [repoFiles] Wrote cover letter file ${fullPath}`);
+
+  return relativePath;
+}
+
 // Pick the first defined value from a job record using camelCase or snake_case keys
 function pick(job, ...keys) {
   for (const key of keys) {

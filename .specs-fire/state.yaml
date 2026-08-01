@@ -97,6 +97,29 @@ intents:
           - company-site-apply-agent
         run_id: run-jobhunter-002
         completed_at: 2026-07-29T21:31:02.263Z
+  - id: cover-letter-generator
+    title: Per-job cover letter generation
+    status: in_progress
+    created: 2026-07-30T19:06:50Z
+    brief: .specs-fire/intents/cover-letter-generator/brief.md
+    work_items:
+      - id: cover-letter-pipeline-and-api
+        title: Cover letter pipeline + API
+        complexity: medium
+        mode: confirm
+        status: completed
+        depends_on: []
+        run_id: run-jobhunter-003
+        completed_at: 2026-08-01T07:25:30.430Z
+      - id: cover-letter-viewer-ui
+        title: Cover letter viewer UI
+        complexity: medium
+        mode: confirm
+        status: completed
+        depends_on:
+          - cover-letter-pipeline-and-api
+        run_id: run-jobhunter-003
+        completed_at: 2026-08-01T07:25:30.430Z
 runs:
   active: []
   completed:
@@ -134,3 +157,14 @@ runs:
           mode: confirm
       started: 2026-07-29T21:24:55.389Z
       completed: 2026-07-29T21:31:02.263Z
+    - id: run-jobhunter-003
+      scope: batch
+      work_items:
+        - id: cover-letter-pipeline-and-api
+          intent: cover-letter-generator
+          mode: confirm
+        - id: cover-letter-viewer-ui
+          intent: cover-letter-generator
+          mode: confirm
+      started: 2026-07-30T19:25:01.007Z
+      completed: 2026-08-01T07:25:30.430Z

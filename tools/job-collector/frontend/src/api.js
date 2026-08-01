@@ -58,6 +58,19 @@ export const api = {
     }
     return res.blob();
   },
+  generateCoverLetter: (id) => request('POST', `/jobs/${id}/cover-letter`),
+  getCoverLetterMarkdown: (id) => request('GET', `/jobs/${id}/cover-letter`),
+  downloadCoverLetterPdf: async (id) => {
+    const res = await fetch(`${BASE}/jobs/${id}/cover-letter/pdf`, { method: 'POST' });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw Object.assign(
+        new Error(data.error || res.statusText || 'PDF conversion failed'),
+        { code: data.code || 'INTERNAL_ERROR' },
+      );
+    }
+    return res.blob();
+  },
 
   // Apply
   generateApplyScript: (id) => request('POST', '/apply/script', { jobId: id }),

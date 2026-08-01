@@ -39,6 +39,9 @@ export default function JobDetail() {
   const [cvMarkdown, setCvMarkdown] = useState(null);
   const [generatingCv, setGeneratingCv] = useState(false);
   const [cvGenBaseline, setCvGenBaseline] = useState(null);
+  const [coverLetterMarkdown, setCoverLetterMarkdown] = useState(null);
+  const [generatingCoverLetter, setGeneratingCoverLetter] = useState(false);
+  const [coverLetterGenBaseline, setCoverLetterGenBaseline] = useState(null);
   const [updatingStatus, setUpdatingStatus] = useState(false);
   const [generatingApplyScript, setGeneratingApplyScript] = useState(false);
   const [markingApplied, setMarkingApplied] = useState(false);
@@ -75,7 +78,19 @@ export default function JobDetail() {
     }
     setCvMarkdown(nextMarkdown);
 
-    return { job: data, markdown: nextMarkdown };
+    const coverLetterPath = data.coverLetterMdPath ?? data.cover_letter_md_path;
+    let nextCoverLetter = null;
+    if (coverLetterPath) {
+      try {
+        const { markdown } = await api.getCoverLetterMarkdown(id);
+        nextCoverLetter = markdown;
+      } catch {
+        nextCoverLetter = null;
+      }
+    }
+    setCoverLetterMarkdown(nextCoverLetter);
+
+    return { job: data, markdown: nextMarkdown, coverLetterMarkdown: nextCoverLetter };
   }, [id]);
 
   useEffect(() => {
@@ -141,6 +156,43 @@ export default function JobDetail() {
     return () => clearInterval(interval);
   }, [generatingCv, cvGenBaseline, loadJob, showAlert]);
 
+  useEffect(() => {
+    if (!generatingCoverLetter || !coverLetterGenBaseline) return;
+
+    const interval = setInterval(async () => {
+      try {
+        if (Date.now() - coverLetterGenBaseline.startedAt > CV_POLL_TIMEOUT_MS) {
+          setGeneratingCoverLetter(false);
+          setCoverLetterGenBaseline(null);
+          showAlert('Cover letter generation timed out. Check server logs / LLM settings.');
+          return;
+        }
+
+        const { job: data, coverLetterMarkdown: nextMarkdown } = await loadJob();
+        const updated = jobUpdatedAt(data) > coverLetterGenBaseline.updatedAt;
+        const changed =
+          nextMarkdown != null &&
+          nextMarkdown.trim() &&
+          nextMarkdown !== coverLetterGenBaseline.markdown;
+        if (updated || changed) {
+          setGeneratingCoverLetter(false);
+          setCoverLetterGenBaseline(null);
+          if (nextMarkdown?.trim()) {
+            showAlert('Cover letter generated successfully.', 'info');
+          } else {
+            showAlert('Cover letter generation finished but the file is empty. Try another model.');
+          }
+        }
+      } catch (err) {
+        setGeneratingCoverLetter(false);
+        setCoverLetterGenBaseline(null);
+        showAlert(err.message);
+      }
+    }, CV_POLL_MS);
+
+    return () => clearInterval(interval);
+  }, [generatingCoverLetter, coverLetterGenBaseline, loadJob, showAlert]);
+
   // Enqueue CV generation on the server
   async function handleGenerateCv() {
     setGeneratingCv(true);
@@ -156,6 +208,24 @@ export default function JobDetail() {
     } catch (err) {
       setGeneratingCv(false);
       setCvGenBaseline(null);
+      showAlert(err.message);
+    }
+  }
+
+  async function handleGenerateCoverLetter() {
+    setGeneratingCoverLetter(true);
+    setAlert(null);
+    setCoverLetterGenBaseline({
+      updatedAt: jobUpdatedAt(job),
+      markdown: coverLetterMarkdown,
+      startedAt: Date.now(),
+    });
+
+    try {
+      await api.generateCoverLetter(id);
+    } catch (err) {
+      setGeneratingCoverLetter(false);
+      setCoverLetterGenBaseline(null);
       showAlert(err.message);
     }
   }
@@ -305,6 +375,7 @@ export default function JobDetail() {
   const scoreClass = matchScoreClass(job.matchScore);
   const offerPath = job.offerMdPath ?? job.offer_md_path;
   const cvPath = job.cvMdPath ?? job.cv_md_path;
+  const coverLetterPath = job.coverLetterMdPath ?? job.cover_letter_md_path;
   const requiredSkills = job.requiredSkills ?? job.required_skills ?? [];
   const niceToHave = job.niceToHave ?? job.nice_to_have ?? [];
   const responsibilities = job.responsibilities ?? [];
@@ -529,6 +600,70 @@ export default function JobDetail() {
             >
               Generate CV
             </button>
+          </div>
+        )}
+      </section>
+
+      <section className="card job-detail-section">
+        <div className="card-title">Cover letter</div>
+
+        {generatingCoverLetter && (
+          <div className="loading-wrap">
+            <div className="spinner" />
+            <span className="loading-text">Generating cover letter…</span>
+          </div>
+        )}
+
+        {!generatingCoverLetter && coverLetterPath && coverLetterMarkdown && (
+          <>
+            <CvPreview markdown={coverLetterMarkdown} />
+            <div className="btn-actions">
+              <Link to={`/jobs/${id}/cover-letter`} className="btn btn-primary">
+                Open full cover letter
+              </Link>
+              <button
+                type="button"
+                className="btn"
+                onClick={handleGenerateCoverLetter}
+                disabled={generatingCoverLetter}
+              >
+                Regenerate cover letter
+              </button>
+            </div>
+          </>
+        )}
+
+        {!generatingCoverLetter && coverLetterPath && !coverLetterMarkdown && (
+          <>
+            <p className="hint">
+              Cover letter file is missing or empty. Regenerate with a working model.
+            </p>
+            <div className="btn-actions">
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={handleGenerateCoverLetter}
+                disabled={generatingCoverLetter}
+              >
+                Regenerate cover letter
+              </button>
+            </div>
+          </>
+        )}
+
+        {!generatingCoverLetter && !coverLetterPath && (
+          <div className="btn-actions">
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={handleGenerateCoverLetter}
+              disabled={generatingCoverLetter}
+            >
+              Generate cover letter
+            </button>
+            <Link to={`/jobs/${id}/cover-letter`} className="btn">
+              Open viewer
+            </Link>
           </div>
         )}
       </section>

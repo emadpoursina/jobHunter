@@ -27,6 +27,7 @@ const DEFAULT_LLM_TASK = { provider: '', model: '' };
 export const DEFAULT_LLM_TASKS = {
   parse: { ...DEFAULT_LLM_TASK },
   cv: { ...DEFAULT_LLM_TASK },
+  cover_letter: { ...DEFAULT_LLM_TASK },
 };
 
 const DEFAULT_SETTINGS = {
@@ -40,6 +41,7 @@ const DEFAULT_SETTINGS = {
   llm_tasks: {
     parse: { provider: '', model: '' },
     cv: { provider: '', model: '' },
+    cover_letter: { provider: '', model: '' },
   },
   collectors: {},
 };
@@ -118,6 +120,7 @@ export function migrate() {
   addColumnIfMissing('jobs', 'applied_at', 'TEXT');
   addColumnIfMissing('jobs', 'applied_url', 'TEXT');
   addColumnIfMissing('jobs', 'apply_url', 'TEXT');
+  addColumnIfMissing('jobs', 'cover_letter_md_path', 'TEXT');
 
   seedDefaultSettings();
 }
