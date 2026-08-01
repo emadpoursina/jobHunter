@@ -1,6 +1,9 @@
 # OS
 .DS_Store
 
+# Accidental root npm install (FIRE yaml deps: .specsmd/fire/.../run-execute/scripts/)
+/node_modules/
+
 # Local-only folder (exports, PDFs, screenshots, etc.)
 non-repo-files/
 
