@@ -9,7 +9,7 @@
     "dev:frontend": "vite",
     "build": "vite build",
     "start": "bun server/index.js",
-    "stack:up": "docker compose up -d",
+    "stack:up": "docker compose up -d --build",
     "stack:build": "docker compose build",
     "stack:down": "docker compose down",
     "test:e2e": "bun scripts/e2e-test.mjs"
