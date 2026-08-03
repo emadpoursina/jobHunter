@@ -144,7 +144,7 @@ const collector = {
     queries: {
       type: 'array',
       description:
-        'Keywords for roles you want (matched → LLM parse). Non-matches are still stored as Unmatched.',
+        'Keywords for roles you want (matched → LLM parse). Non-matches are skipped.',
     },
     location: {
       type: 'string',
@@ -153,7 +153,7 @@ const collector = {
     maxResults: {
       type: 'number',
       default: 10,
-      description: 'Max matched listings to LLM-parse per run (all others still stored)',
+      description: 'Max matched listings to LLM-parse per run (extra matches stored as raw)',
     },
   },
 

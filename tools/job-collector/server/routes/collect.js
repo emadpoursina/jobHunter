@@ -81,10 +81,8 @@ async function processRawOffers(runId, source, rawOffers) {
     }
 
     try {
-      // Off-query hits (and matched overflow) are stored without an LLM pass
+      // Off-query hits are not stored — only query-matched listings are kept
       if (rawOffer.queryMatched === false) {
-        const jobId = insertWithoutParse(rawOffer, source, 'unmatched');
-        if (jobId) jobsNew += 1;
         continue;
       }
 
