@@ -18,6 +18,7 @@ const SOURCE_OPTIONS = [
   { value: 'linkedin', label: 'LinkedIn' },
   { value: 'indeed', label: 'Indeed' },
   { value: 'germantechjobs', label: 'GermanTechJobs' },
+  { value: 'hiringcafe', label: 'HiringCafe' },
 ];
 
 const SORT_OPTIONS = [

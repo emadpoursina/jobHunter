@@ -7,7 +7,7 @@ import RunButton from '../components/RunButton.jsx';
 import StatusBadge from '../components/StatusBadge.jsx';
 
 const RUN_POLL_MS = 3000;
-const SCRAPER_SOURCES = new Set(['linkedin', 'indeed', 'germantechjobs']);
+const SCRAPER_SOURCES = new Set(['linkedin', 'indeed', 'germantechjobs', 'hiringcafe']);
 
 // Merge stored collector config with defaults for run requests
 function normalizeCollectorConfig(stored = {}) {
