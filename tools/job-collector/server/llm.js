@@ -65,7 +65,14 @@ async function withRetry(fn, retries = 1) {
 }
 
 // Route a prompt to the configured LLM provider (optional per-call overrides)
-export async function callLlm({ system, user, maxTokens = 1000, provider, model } = {}) {
+export async function callLlm({
+  system,
+  user,
+  maxTokens = 1000,
+  provider,
+  model,
+  providerOrder,
+} = {}) {
   const resolvedProvider = provider || getSetting('llm_provider') || 'openai';
   const inputLen = (system?.length ?? 0) + (user?.length ?? 0);
   console.log(`[INFO] [llm] Calling ${resolvedProvider}, input ~${inputLen} chars`);
@@ -74,7 +81,7 @@ export async function callLlm({ system, user, maxTokens = 1000, provider, model 
     return callOpenAI({ system, user, maxTokens, model });
   }
   if (resolvedProvider === 'openrouter') {
-    return callOpenRouter({ system, user, maxTokens, model });
+    return callOpenRouter({ system, user, maxTokens, model, providerOrder });
   }
 
   throw llmError(`Unknown LLM provider: ${resolvedProvider}`);
@@ -87,6 +94,7 @@ export function resolveTaskLlm(task) {
   return {
     provider: cfg.provider || undefined,
     model: cfg.model || undefined,
+    providerOrder: cfg.provider_order || undefined,
   };
 }
 
@@ -117,10 +125,17 @@ async function callOpenAI({ system, user, maxTokens, model: modelOverride }) {
 }
 
 // Send a chat completions request via OpenRouter
-async function callOpenRouter({ system, user, maxTokens, model: modelOverride }) {
+async function callOpenRouter({
+  system,
+  user,
+  maxTokens,
+  model: modelOverride,
+  providerOrder: providerOrderOverride,
+}) {
   const apiKey = getSetting('openrouter_api_key') ?? '';
   const model = modelOverride || getSetting('openrouter_model') || '';
-  const providerOrder = getSetting('openrouter_provider_order') ?? '';
+  const providerOrder =
+    providerOrderOverride || getSetting('openrouter_provider_order') || '';
   const provider = buildOpenRouterProviderPrefs(providerOrder);
 
   if (!apiKey) {

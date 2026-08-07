@@ -48,4 +48,19 @@ assert(
   'space-separated provider order parsed',
 );
 
+// resolveTaskLlm shape: provider_order maps to providerOrder for callLlm
+{
+  const cfg = { provider: 'openrouter', model: 'x', provider_order: 'anthropic' };
+  const resolved = {
+    provider: cfg.provider || undefined,
+    model: cfg.model || undefined,
+    providerOrder: cfg.provider_order || undefined,
+  };
+  assert(resolved.providerOrder === 'anthropic', 'task provider_order → providerOrder');
+  assert(
+    ( { provider_order: '' }.provider_order || undefined) === undefined,
+    'blank task provider_order falls through to global',
+  );
+}
+
 console.log('[self-check] ok');

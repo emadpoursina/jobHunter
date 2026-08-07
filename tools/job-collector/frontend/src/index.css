@@ -327,6 +327,19 @@ select:focus {
   margin-bottom: 0.75rem;
 }
 
+.field-row {
+  display: grid;
+  grid-template-columns: minmax(10rem, 1fr) minmax(12rem, 2fr);
+  gap: 0.75rem 1rem;
+  align-items: start;
+}
+
+@media (max-width: 640px) {
+  .field-row {
+    grid-template-columns: 1fr;
+  }
+}
+
 .browser-collector {
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);

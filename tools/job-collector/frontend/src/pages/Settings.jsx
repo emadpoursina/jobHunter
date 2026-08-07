@@ -8,11 +8,12 @@ const DEFAULT_COLLECTOR_CONFIG = {
   maxResults: 10,
 };
 
-const DEFAULT_LLM_TASK = { provider: '', model: '' };
+const DEFAULT_LLM_TASK = { provider: '', model: '', provider_order: '' };
 
 const LLM_TASK_DEFS = [
   { key: 'parse', label: 'Parse offer' },
   { key: 'cv', label: 'Generate CV' },
+  { key: 'cover_letter', label: 'Generate cover letter' },
 ];
 
 // Merge stored collector config with defaults for the settings form
@@ -33,13 +34,24 @@ function normalizeLlmTasks(stored) {
     tasks[key] = {
       provider: entry.provider ?? '',
       model: entry.model ?? '',
+      provider_order: entry.provider_order ?? '',
     };
   }
   return tasks;
 }
 
+function normalizeQueries(queries) {
+  if (!Array.isArray(queries)) return [];
+  return queries.map((q) => String(q).trim()).filter(Boolean);
+}
+
 // Build the full settings payload sent to PUT /api/settings
 function buildSettingsPayload(form, openaiApiKey, openrouterApiKey) {
+  const collectors = {};
+  for (const [name, config] of Object.entries(form.collectors)) {
+    collectors[name] = { ...config, queries: normalizeQueries(config.queries) };
+  }
+
   return {
     llm_provider: form.llmProvider,
     openai_api_key: openaiApiKey,
@@ -49,7 +61,7 @@ function buildSettingsPayload(form, openaiApiKey, openrouterApiKey) {
     openrouter_model: form.openrouterModel,
     openrouter_provider_order: form.openrouterProviderOrder,
     llm_tasks: form.llmTasks,
-    collectors: form.collectors,
+    collectors,
   };
 }
 
@@ -207,12 +219,22 @@ export default function Settings() {
     }));
   }
 
+  // Effective provider for a task (empty override → global)
+  function effectiveTaskProvider(taskProvider) {
+    return taskProvider || form.llmProvider;
+  }
+
   // Placeholder for task model input when using Default provider
   function defaultModelHint(taskProvider) {
-    const provider = taskProvider || form.llmProvider;
+    const provider = effectiveTaskProvider(taskProvider);
     if (provider === 'openai') return form.openaiModel || 'global OpenAI model';
     if (provider === 'openrouter') return form.openrouterModel || 'global OpenRouter model';
     return 'global model';
+  }
+
+  // Placeholder for per-task OpenRouter provider order
+  function defaultProviderOrderHint() {
+    return form.openrouterProviderOrder || 'e.g. anthropic, deepinfra';
   }
 
   if (loading) {
@@ -389,32 +411,51 @@ export default function Settings() {
 
         {LLM_TASK_DEFS.map(({ key, label }) => {
           const task = form.llmTasks[key] ?? DEFAULT_LLM_TASK;
+          const usesOpenRouter = effectiveTaskProvider(task.provider) === 'openrouter';
           return (
             <div key={key} className="collector-card">
               <h3>{label}</h3>
-              <div className="field">
-                <label htmlFor={`task-${key}-provider`}>Provider</label>
-                <select
-                  id={`task-${key}-provider`}
-                  value={task.provider}
-                  onChange={(e) => updateLlmTask(key, 'provider', e.target.value)}
-                >
-                  <option value="">Default ({form.llmProvider})</option>
-                  <option value="openai">OpenAI</option>
-                  <option value="openrouter">OpenRouter</option>
-                </select>
+              <div className="field-row">
+                <div className="field">
+                  <label htmlFor={`task-${key}-provider`}>Provider</label>
+                  <select
+                    id={`task-${key}-provider`}
+                    value={task.provider}
+                    onChange={(e) => updateLlmTask(key, 'provider', e.target.value)}
+                  >
+                    <option value="">Default ({form.llmProvider})</option>
+                    <option value="openai">OpenAI</option>
+                    <option value="openrouter">OpenRouter</option>
+                  </select>
+                </div>
+                <div className="field">
+                  <label htmlFor={`task-${key}-model`}>Model</label>
+                  <input
+                    id={`task-${key}-model`}
+                    type="text"
+                    placeholder={defaultModelHint(task.provider)}
+                    value={task.model}
+                    onChange={(e) => updateLlmTask(key, 'model', e.target.value)}
+                  />
+                </div>
               </div>
-              <div className="field">
-                <label htmlFor={`task-${key}-model`}>Model</label>
-                <input
-                  id={`task-${key}-model`}
-                  type="text"
-                  placeholder={defaultModelHint(task.provider)}
-                  value={task.model}
-                  onChange={(e) => updateLlmTask(key, 'model', e.target.value)}
-                />
-                <p className="hint">Leave blank to use that provider&apos;s global model.</p>
-              </div>
+              {usesOpenRouter && (
+                <div className="field">
+                  <label htmlFor={`task-${key}-provider-order`}>Provider order (optional)</label>
+                  <input
+                    id={`task-${key}-provider-order`}
+                    type="text"
+                    placeholder={defaultProviderOrderHint()}
+                    value={task.provider_order}
+                    onChange={(e) => updateLlmTask(key, 'provider_order', e.target.value)}
+                  />
+                  <p className="hint">
+                    Comma-separated OpenRouter provider slugs. Leave blank for the global
+                    OpenRouter provider order.
+                  </p>
+                </div>
+              )}
+              <p className="hint">Leave model blank to use that provider&apos;s global model.</p>
             </div>
           );
         })}
@@ -490,14 +531,7 @@ export default function Settings() {
                       placeholder="One query per line, e.g. backend engineer Berlin"
                       value={(config.queries ?? []).join('\n')}
                       onChange={(e) =>
-                        updateCollector(
-                          collector.name,
-                          'queries',
-                          e.target.value
-                            .split('\n')
-                            .map((line) => line.trim())
-                            .filter(Boolean),
-                        )
+                        updateCollector(collector.name, 'queries', e.target.value.split('\n'))
                       }
                     />
                     <p className="hint">{collector.configSchema.queries?.description}</p>

@@ -41,6 +41,7 @@ function normalizeLlmTasks(incoming, current) {
         return REMOVED_PROVIDERS.has(p) ? '' : p;
       })(),
       model: String(taskIn.model ?? taskCur.model ?? ''),
+      provider_order: String(taskIn.provider_order ?? taskCur.provider_order ?? ''),
     };
   }
   return result;
@@ -65,10 +66,12 @@ function formatSettingsForResponse(settings) {
 router.get('/', (_req, res) => {
   const settings = getAllSettings();
   if (!settings.llm_tasks) {
-    settings.llm_tasks = {
-      parse: { ...DEFAULT_LLM_TASKS.parse },
-      cv: { ...DEFAULT_LLM_TASKS.cv },
-    };
+    settings.llm_tasks = Object.fromEntries(
+      Object.entries(DEFAULT_LLM_TASKS).map(([task, cfg]) => [task, { ...cfg }]),
+    );
+  } else {
+    // Ensure newer tasks (e.g. cover_letter) appear even if DB was seeded earlier
+    settings.llm_tasks = normalizeLlmTasks(settings.llm_tasks, DEFAULT_LLM_TASKS);
   }
   res.json({ settings: formatSettingsForResponse(settings) });
 });
