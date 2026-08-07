@@ -109,12 +109,13 @@ router.put('/', (req, res) => {
 });
 
 // Ping the configured LLM provider with a tiny prompt
+// ponytail: 256 covers reasoning-model hidden tokens that burn a tiny max_tokens (e.g. DeepSeek) before any visible content; raise if a model needs a larger thinking budget for "ping"
 router.post('/test', asyncHandler(async (_req, res) => {
   const provider = getSetting('llm_provider') ?? 'openai';
   const reply = await callLlm({
     system: 'Reply with exactly one short word.',
     user: 'ping',
-    maxTokens: 16,
+    maxTokens: 256,
   });
 
   res.json({

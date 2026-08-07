@@ -198,6 +198,11 @@ async function callChatCompletions({
         refusal: choice?.message?.refusal,
         error: data.error,
       });
+      if (choice?.finish_reason === 'length') {
+        throw llmError(
+          `${label} hit max_tokens (${maxTokens}) before producing content (common with reasoning models). Try a higher max_tokens.`,
+        );
+      }
       throw llmError(`${label} returned an empty response`);
     }
 
