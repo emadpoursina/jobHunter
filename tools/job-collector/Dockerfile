@@ -22,8 +22,7 @@ COPY pipeline ./pipeline
 COPY --from=builder /app/frontend/dist ./frontend/dist
 
 ENV PORT=3061 \
-    REPO_ROOT=/repo \
-    OLLAMA_BASE_URL=http://host.docker.internal:11434
+    REPO_ROOT=/repo
 
 EXPOSE 3061
 CMD ["bun", "server/index.js"]

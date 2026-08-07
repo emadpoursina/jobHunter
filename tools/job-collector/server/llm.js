@@ -67,13 +67,10 @@ async function withRetry(fn, retries = 1) {
 
 // Route a prompt to the configured LLM provider (optional per-call overrides)
 export async function callLlm({ system, user, maxTokens = 1000, provider, model } = {}) {
-  const resolvedProvider = provider || getSetting('llm_provider') || 'ollama';
+  const resolvedProvider = provider || getSetting('llm_provider') || 'openai';
   const inputLen = (system?.length ?? 0) + (user?.length ?? 0);
   console.log(`[INFO] [llm] Calling ${resolvedProvider}, input ~${inputLen} chars`);
 
-  if (resolvedProvider === 'ollama') {
-    return callOllama({ system, user, maxTokens, model });
-  }
   if (resolvedProvider === 'anthropic') {
     return callAnthropic({ system, user, maxTokens, model });
   }
@@ -95,52 +92,6 @@ export function resolveTaskLlm(task) {
     provider: cfg.provider || undefined,
     model: cfg.model || undefined,
   };
-}
-
-// Send a chat request to the local Ollama server
-async function callOllama({ system, user, maxTokens, model: modelOverride }) {
-  const baseUrl = (getSetting('ollama_base_url') ?? 'http://localhost:11434').replace(/\/$/, '');
-  const model = modelOverride || getSetting('ollama_model') || '';
-
-  if (!model) {
-    throw llmError('No Ollama model configured. Go to Settings to select a model.');
-  }
-
-  console.log(`[INFO] [llm] Ollama model=${model}`);
-
-  const doFetch = async () => {
-    const res = await fetch(`${baseUrl}/api/chat`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model,
-        stream: false,
-        messages: [
-          { role: 'system', content: system },
-          { role: 'user', content: user },
-        ],
-        options: {
-          num_predict: maxTokens,
-        },
-      }),
-    });
-
-    if (!res.ok) {
-      const body = await res.text();
-      console.error(`[ERROR] [llm] Ollama returned ${res.status}: ${body}`);
-      throw llmError(`Ollama returned ${res.status}: ${body}`);
-    }
-
-    const data = await res.json();
-    return requireLlmText(data.message?.content, 'Ollama');
-  };
-
-  try {
-    return await withRetry(doFetch);
-  } catch (err) {
-    if (err.code === 'LLM_ERROR') throw err;
-    throw llmError(`Cannot reach Ollama at ${baseUrl}. Start Ollama with \`ollama serve\`.`);
-  }
 }
 
 // Send a messages request to the Anthropic API
@@ -313,21 +264,3 @@ async function callChatCompletions({
   }
 }
 
-// List model names exposed by the configured Ollama instance
-export async function getOllamaModels() {
-  const baseUrl = (getSetting('ollama_base_url') ?? 'http://localhost:11434').replace(/\/$/, '');
-
-  try {
-    const res = await fetch(`${baseUrl}/api/tags`);
-
-    if (!res.ok) {
-      throw llmError(`Cannot reach Ollama at ${baseUrl}`);
-    }
-
-    const data = await res.json();
-    return (data.models ?? []).map((model) => model.name);
-  } catch (err) {
-    if (err.code === 'LLM_ERROR') throw err;
-    throw llmError(`Cannot reach Ollama at ${baseUrl}. Start Ollama with \`ollama serve\`.`);
-  }
-}

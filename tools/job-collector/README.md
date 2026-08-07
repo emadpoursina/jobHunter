@@ -9,7 +9,7 @@ Local tool for collecting job offers, parsing them with an LLM, saving structure
 ## Prerequisites
 
 - **Bun** 1.x
-- **Ollama** (default LLM provider) — or an **Anthropic API key**
+- An **LLM API key** (OpenAI, Anthropic, or OpenRouter — configure in Settings)
 - **Playwright Chromium** (LinkedIn / Indeed scrapers only):
 
 ```bash
@@ -44,11 +44,11 @@ curl http://localhost:3001/api/health
 
 ## Docker
 
-Requires Docker and (for LLM) Ollama on the host listening on `11434`.
+Requires Docker and an LLM API key (set in `.env` or Settings).
 
 ```bash
 cd tools/job-collector
-cp -n .env.example .env   # optional; compose overrides REPO_ROOT / OLLAMA_BASE_URL
+cp -n .env.example .env   # optional; compose overrides REPO_ROOT
 bun run stack:up          # builds image + starts (rebuilds UI on each up)
 ```
 
@@ -66,8 +66,6 @@ curl http://localhost:3061/api/health
 | `./data` → `/app/data` | SQLite (`jobs.db`) |
 | `../..` → `/repo` | jobHunter repo root (profile, agents, offers, generated CVs) |
 
-Inside the container, `OLLAMA_BASE_URL` is `http://host.docker.internal:11434` so Settings/Ollama calls reach the host. Start Ollama with `ollama serve` before parsing jobs.
-
 Stop: `bun run stack:down`.
 
 ---
@@ -80,9 +78,7 @@ Copy `.env.example` to `.env` and adjust as needed.
 |----------|---------|-------------|
 | `PORT` | `3001` | Express API port |
 | `REPO_ROOT` | `../..` | Path to jobHunter repo root (relative to `tools/job-collector/`) |
-| `LLM_PROVIDER` | `ollama` | `ollama`, `anthropic`, `openai`, or `openrouter` (also configurable in Settings UI) |
-| `OLLAMA_BASE_URL` | `http://localhost:11434` | Ollama API base URL |
-| `OLLAMA_MODEL` | — | Default Ollama model name |
+| `LLM_PROVIDER` | `openai` | `anthropic`, `openai`, or `openrouter` (also configurable in Settings UI) |
 | `ANTHROPIC_API_KEY` | — | Required when using Anthropic |
 | `OPENAI_API_KEY` | — | Required when using OpenAI-compatible API |
 | `OPENAI_BASE_URL` | `https://api.openai.com/v1` | OpenAI-compatible chat completions base URL |
@@ -101,25 +97,16 @@ Settings saved via the UI are persisted in SQLite and override env defaults for 
 
 ## LLM setup
 
-### Ollama (default)
+### OpenAI (default)
 
-1. Install and start Ollama: `ollama serve`
-2. Pull a model: `ollama pull mistral`
-3. Open **Settings** in the UI (`http://localhost:5173/settings`)
-4. Set provider to **Ollama**, confirm base URL, pick a model from the dropdown, save
-
-If Ollama is offline, API errors return code `OLLAMA_UNAVAILABLE` or `LLM_ERROR` with the message: *Start Ollama with `ollama serve`.*
+1. Set `OPENAI_API_KEY` in `.env` or paste the key in Settings
+2. Set **API base URL** (default `https://api.openai.com/v1`; any OpenAI-compatible endpoint works)
+3. Set the **model** name and save
 
 ### Anthropic
 
 1. Set `ANTHROPIC_API_KEY` in `.env` or paste the key in Settings
 2. Set provider to **Anthropic** and save
-
-### OpenAI (compatible)
-
-1. Set `OPENAI_API_KEY` in `.env` or paste the key in Settings
-2. Set **API base URL** (default `https://api.openai.com/v1`; any OpenAI-compatible endpoint works)
-3. Set the **model** name and save
 
 ### OpenRouter
 
@@ -143,6 +130,8 @@ In **Settings → Task models**, override provider/model for **Parse offer** and
 | `bun run dev:frontend` | Vite frontend only |
 | `bun run build` | Production frontend build |
 | `bun run start` | Production API server |
+| `bun run test:e2e` | E2E checklist (auto-detects `:3001` dev or `:3061` Docker) |
+| `bun run test:e2e:docker` | E2E against Docker explicitly (`:3061`) |
 
 ---
 
@@ -198,8 +187,7 @@ Common codes:
 | `VALIDATION_ERROR` | 400 | Invalid request body or params |
 | `NOT_FOUND` | 404 | Job, run, or file not found |
 | `PARSE_ERROR` | 422 | LLM returned invalid JSON during parse |
-| `LLM_ERROR` | 503 | LLM call failed (check Ollama / API key) |
-| `OLLAMA_UNAVAILABLE` | 503 | Cannot reach Ollama `/api/tags` |
+| `LLM_ERROR` | 503 | LLM call failed (check API key / model) |
 | `INTERNAL_ERROR` | 500 | Unexpected server error |
 
 ---
@@ -236,8 +224,7 @@ Generated offer and CV markdown under `REPO_ROOT` are gitignored at the repo roo
 
 | Problem | Fix |
 |---------|-----|
-| Settings model dropdown empty | Start Ollama: `ollama serve` |
-| Parse / CV fails with LLM error | Check Settings provider and model; confirm Ollama model is pulled |
+| Parse / CV fails with LLM error | Check Settings provider, model, and API key |
 | Collect run saves some jobs but logs parse warnings | One listing failed LLM JSON extraction; others still saved. Parser strips markdown fences and preamble; try a different model if warnings persist |
 | Scraper run fails immediately | Run `bunx playwright install chromium` |
 | Duplicate jobs from scrapers | Expected — same URL is deduplicated; `runs.jobs_new` stays 0 |

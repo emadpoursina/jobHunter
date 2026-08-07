@@ -80,5 +80,4 @@ export const api = {
   getSettings: () => request('GET', '/settings'),
   saveSettings: (settings) => request('PUT', '/settings', { settings }),
   testLlm: () => request('POST', '/settings/test'),
-  getOllamaModels: () => request('GET', '/ollama/models'),
 };

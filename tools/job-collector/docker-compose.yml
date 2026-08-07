@@ -11,7 +11,6 @@ services:
     environment:
       PORT: "3061"
       REPO_ROOT: /repo
-      OLLAMA_BASE_URL: http://host.docker.internal:11434
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
       OPENAI_BASE_URL: ${OPENAI_BASE_URL:-}
@@ -19,8 +18,7 @@ services:
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
       OPENROUTER_MODEL: ${OPENROUTER_MODEL:-}
       OPENROUTER_PROVIDER_ORDER: ${OPENROUTER_PROVIDER_ORDER:-}
-      LLM_PROVIDER: ${LLM_PROVIDER:-ollama}
-      OLLAMA_MODEL: ${OLLAMA_MODEL:-}
+      LLM_PROVIDER: ${LLM_PROVIDER:-openai}
     volumes:
       - ./data:/app/data
       - ../..:/repo

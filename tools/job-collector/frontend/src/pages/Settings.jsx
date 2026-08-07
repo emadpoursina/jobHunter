@@ -42,8 +42,6 @@ function normalizeLlmTasks(stored) {
 function buildSettingsPayload(form, anthropicApiKey, openaiApiKey, openrouterApiKey) {
   return {
     llm_provider: form.llmProvider,
-    ollama_base_url: form.ollamaBaseUrl,
-    ollama_model: form.ollamaModel,
     anthropic_api_key: anthropicApiKey,
     openai_api_key: openaiApiKey,
     openai_base_url: form.openaiBaseUrl,
@@ -59,9 +57,7 @@ function buildSettingsPayload(form, anthropicApiKey, openaiApiKey, openrouterApi
 // Map API settings response onto form state fields
 function formFromSettings(settings, collectors) {
   return {
-    llmProvider: settings.llm_provider ?? 'ollama',
-    ollamaBaseUrl: settings.ollama_base_url ?? 'http://localhost:11434',
-    ollamaModel: settings.ollama_model ?? '',
+    llmProvider: settings.llm_provider ?? 'openai',
     anthropicApiKeySet: Boolean(settings.anthropic_api_key_set),
     openaiApiKeySet: Boolean(settings.openai_api_key_set),
     openaiBaseUrl: settings.openai_base_url ?? 'https://api.openai.com/v1',
@@ -77,18 +73,13 @@ function formFromSettings(settings, collectors) {
 export default function Settings() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [testingOllama, setTestingOllama] = useState(false);
   const [testingProvider, setTestingProvider] = useState(false);
   const [testResult, setTestResult] = useState(null);
-  const [refreshingModels, setRefreshingModels] = useState(false);
   const [collectorDefs, setCollectorDefs] = useState([]);
-  const [ollamaModels, setOllamaModels] = useState([]);
   const [alert, setAlert] = useState(null);
 
   const [form, setForm] = useState({
-    llmProvider: 'ollama',
-    ollamaBaseUrl: 'http://localhost:11434',
-    ollamaModel: '',
+    llmProvider: 'openai',
     anthropicApiKeySet: false,
     openaiApiKeySet: false,
     openaiBaseUrl: 'https://api.openai.com/v1',
@@ -132,10 +123,6 @@ export default function Settings() {
 
         setCollectorDefs(collectors);
         setForm(formFromSettings(settings, mergedCollectors));
-
-        if ((settings.llm_provider ?? 'ollama') === 'ollama') {
-          await loadOllamaModels();
-        }
       } catch (err) {
         if (!cancelled) showAlert(err.message);
       } finally {
@@ -148,32 +135,6 @@ export default function Settings() {
       cancelled = true;
     };
   }, [showAlert]);
-
-  // Fetch available Ollama models for the dropdown
-  async function loadOllamaModels() {
-    try {
-      const { models } = await api.getOllamaModels();
-      setOllamaModels(models ?? []);
-      return models ?? [];
-    } catch (err) {
-      setOllamaModels([]);
-      throw err;
-    }
-  }
-
-  // Refresh the Ollama model list
-  async function handleRefreshModels() {
-    setRefreshingModels(true);
-    setAlert(null);
-    try {
-      const models = await loadOllamaModels();
-      showAlert(`Found ${models.length} model(s).`, 'info');
-    } catch (err) {
-      showAlert(err.message);
-    } finally {
-      setRefreshingModels(false);
-    }
-  }
 
   // Apply saved settings response and clear key inputs
   function applySavedSettings(settings, keepCollectors = true) {
@@ -198,24 +159,6 @@ export default function Settings() {
       showAlert(err.message);
     } finally {
       setSaving(false);
-    }
-  }
-
-  // Save settings then verify Ollama connectivity
-  async function handleSaveAndTestOllama() {
-    setTestingOllama(true);
-    setAlert(null);
-    try {
-      const payload = buildSettingsPayload(form, anthropicApiKey, openaiApiKey, openrouterApiKey);
-      const { settings } = await api.saveSettings(payload);
-      applySavedSettings(settings, false);
-
-      const models = await loadOllamaModels();
-      showAlert(`Connected to Ollama — ${models.length} model(s) available.`, 'info');
-    } catch (err) {
-      showAlert(err.message);
-    } finally {
-      setTestingOllama(false);
     }
   }
 
@@ -272,7 +215,6 @@ export default function Settings() {
   // Placeholder for task model input when using Default provider
   function defaultModelHint(taskProvider) {
     const provider = taskProvider || form.llmProvider;
-    if (provider === 'ollama') return form.ollamaModel || 'global Ollama model';
     if (provider === 'openai') return form.openaiModel || 'global OpenAI model';
     if (provider === 'openrouter') return form.openrouterModel || 'global OpenRouter model';
     if (provider === 'anthropic') return 'claude-sonnet-4-20250514';
@@ -302,13 +244,6 @@ export default function Settings() {
         <div className="tabs">
           <button
             type="button"
-            className={`tab${form.llmProvider === 'ollama' ? ' active' : ''}`}
-            onClick={() => setForm((prev) => ({ ...prev, llmProvider: 'ollama' }))}
-          >
-            Ollama (local)
-          </button>
-          <button
-            type="button"
             className={`tab${form.llmProvider === 'anthropic' ? ' active' : ''}`}
             onClick={() => setForm((prev) => ({ ...prev, llmProvider: 'anthropic' }))}
           >
@@ -329,67 +264,6 @@ export default function Settings() {
             OpenRouter
           </button>
         </div>
-
-        {form.llmProvider === 'ollama' && (
-          <>
-            <div className="field">
-              <label htmlFor="ollama-url">Ollama base URL</label>
-              <input
-                id="ollama-url"
-                type="text"
-                value={form.ollamaBaseUrl}
-                onChange={(e) =>
-                  setForm((prev) => ({ ...prev, ollamaBaseUrl: e.target.value }))
-                }
-              />
-            </div>
-
-            <div className="field">
-              <label htmlFor="ollama-model">Model</label>
-              <div className="btn-actions" style={{ marginTop: 0, marginBottom: 8 }}>
-                <select
-                  id="ollama-model"
-                  value={form.ollamaModel}
-                  onChange={(e) =>
-                    setForm((prev) => ({ ...prev, ollamaModel: e.target.value }))
-                  }
-                  style={{ flex: 1 }}
-                >
-                  <option value="">Select a model…</option>
-                  {ollamaModels.map((model) => (
-                    <option key={model} value={model}>
-                      {model}
-                    </option>
-                  ))}
-                </select>
-                <button
-                  type="button"
-                  className="btn"
-                  onClick={handleRefreshModels}
-                  disabled={refreshingModels}
-                >
-                  {refreshingModels ? 'Refreshing…' : 'Refresh'}
-                </button>
-              </div>
-              {ollamaModels.length === 0 && (
-                <p className="hint">
-                  No models loaded. Click Refresh if Ollama is running.
-                </p>
-              )}
-            </div>
-
-            <div className="btn-actions">
-              <button
-                type="button"
-                className="btn btn-primary"
-                onClick={handleSaveAndTestOllama}
-                disabled={testingOllama || saving}
-              >
-                {testingOllama ? 'Testing…' : 'Save & test'}
-              </button>
-            </div>
-          </>
-        )}
 
         {form.llmProvider === 'anthropic' && (
           <>
@@ -570,7 +444,6 @@ export default function Settings() {
                   onChange={(e) => updateLlmTask(key, 'provider', e.target.value)}
                 >
                   <option value="">Default ({form.llmProvider})</option>
-                  <option value="ollama">Ollama</option>
                   <option value="anthropic">Anthropic</option>
                   <option value="openai">OpenAI</option>
                   <option value="openrouter">OpenRouter</option>

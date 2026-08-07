@@ -31,9 +31,7 @@ export const DEFAULT_LLM_TASKS = {
 };
 
 const DEFAULT_SETTINGS = {
-  llm_provider: 'ollama',
-  ollama_base_url: 'http://localhost:11434',
-  ollama_model: '',
+  llm_provider: 'openai',
   anthropic_api_key: '',
   openai_api_key: '',
   openai_base_url: 'https://api.openai.com/v1',
@@ -391,7 +389,30 @@ function camelToSnake(str) {
 }
 
 function seedDefaultSettings() {
-  if (getSetting('llm_provider') !== null) return;
+  if (getSetting('llm_provider') !== null) {
+    // Drop removed Ollama provider; remapped installs fall through to openai
+    if (getSetting('llm_provider') === 'ollama') {
+      setSetting('llm_provider', 'openai');
+    }
+    for (const key of ['ollama_base_url', 'ollama_model']) {
+      sqlite.prepare('DELETE FROM settings WHERE key = ?').run(key);
+    }
+    const tasks = getSetting('llm_tasks');
+    if (tasks && typeof tasks === 'object') {
+      let changed = false;
+      const next = {};
+      for (const [task, cfg] of Object.entries(tasks)) {
+        if (cfg && typeof cfg === 'object' && cfg.provider === 'ollama') {
+          next[task] = { ...cfg, provider: '' };
+          changed = true;
+        } else {
+          next[task] = cfg;
+        }
+      }
+      if (changed) setSetting('llm_tasks', next);
+    }
+    return;
+  }
 
   for (const [key, value] of Object.entries(DEFAULT_SETTINGS)) {
     setSetting(key, value);

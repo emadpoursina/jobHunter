@@ -7,8 +7,6 @@ const router = Router();
 
 const SETTING_KEYS = [
   'llm_provider',
-  'ollama_base_url',
-  'ollama_model',
   'anthropic_api_key',
   'openai_api_key',
   'openai_base_url',
@@ -20,8 +18,9 @@ const SETTING_KEYS = [
   'collectors',
 ];
 
-// Keep stored key when the client sends '' or omits the field
+// Keep stored key when the client sends '' or omits the field; null clears it
 function resolveApiKey(incoming, current) {
+  if (incoming === null) return '';
   if (incoming === '') return current ?? '';
   return incoming ?? current ?? '';
 }
@@ -36,7 +35,10 @@ function normalizeLlmTasks(incoming, current) {
     const taskIn = next[task] && typeof next[task] === 'object' ? next[task] : {};
     const taskCur = base[task] && typeof base[task] === 'object' ? base[task] : {};
     result[task] = {
-      provider: String(taskIn.provider ?? taskCur.provider ?? ''),
+      provider: (() => {
+        const p = String(taskIn.provider ?? taskCur.provider ?? '');
+        return p === 'ollama' ? '' : p;
+      })(),
       model: String(taskIn.model ?? taskCur.model ?? ''),
     };
   }
@@ -85,10 +87,11 @@ router.put('/', (req, res) => {
 
   const current = getAllSettings();
 
+  let llmProvider = body.llm_provider ?? current.llm_provider ?? 'openai';
+  if (llmProvider === 'ollama') llmProvider = 'openai';
+
   const updated = {
-    llm_provider: body.llm_provider ?? current.llm_provider ?? 'ollama',
-    ollama_base_url: body.ollama_base_url ?? current.ollama_base_url ?? 'http://localhost:11434',
-    ollama_model: body.ollama_model ?? '',
+    llm_provider: llmProvider,
     anthropic_api_key: resolveApiKey(body.anthropic_api_key, current.anthropic_api_key),
     openai_api_key: resolveApiKey(body.openai_api_key, current.openai_api_key),
     openai_base_url: body.openai_base_url ?? current.openai_base_url ?? 'https://api.openai.com/v1',
@@ -109,7 +112,7 @@ router.put('/', (req, res) => {
 
 // Ping the configured LLM provider with a tiny prompt
 router.post('/test', asyncHandler(async (_req, res) => {
-  const provider = getSetting('llm_provider') ?? 'ollama';
+  const provider = getSetting('llm_provider') ?? 'openai';
   const reply = await callLlm({
     system: 'Reply with exactly one short word.',
     user: 'ping',

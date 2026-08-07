@@ -11,7 +11,7 @@ order before starting any task:
 - `cursor-docs/03-api.md`        — every Express route with request/response shapes
 - `cursor-docs/04-collectors.md` — collector plugin interface + LinkedIn/Indeed/Manual
 - `cursor-docs/05-pipeline.md`   — parser and CV generator modules
-- `cursor-docs/06-llm-router.md` — unified LLM module (Ollama + Anthropic)
+- `cursor-docs/06-llm-router.md` — unified LLM module (Anthropic / OpenAI / OpenRouter)
 - `cursor-docs/07-frontend.md`   — React pages, components, api.js
 - `cursor-docs/08-repo-integration.md` — how to read/write the existing repo files
 - `cursor-docs/09-conventions.md` — naming, error handling, logging, env vars
@@ -28,7 +28,7 @@ order before starting any task:
    the backend's perspective.
 
 3. **One LLM module (`server/llm.js`).** All LLM calls go through it.
-   No direct `fetch()` to Ollama or Anthropic from pipeline or route files.
+   No direct `fetch()` to Anthropic/OpenAI/OpenRouter from pipeline or route files.
 
 4. **Collectors return `RawOffer[]` only.** They do not parse, call the LLM,
    or write to the DB. That happens in the pipeline stage after collection.
@@ -50,7 +50,7 @@ order before starting any task:
 
 - Backend: Bun + Express 5 + bun:sqlite + p-queue + Playwright
 - Frontend: React 18 + Vite 5 + react-router-dom (no CSS framework)
-- LLM: Ollama (default) or Anthropic API, switched via settings DB
+- LLM: Anthropic, OpenAI, or OpenRouter via settings DB
 - Database: SQLite at `data/jobs.db`
 
 ## This project does NOT use

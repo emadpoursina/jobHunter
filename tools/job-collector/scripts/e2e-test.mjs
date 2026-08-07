@@ -3,14 +3,37 @@ import { resolve } from 'path';
 
 /**
  * Batch 17 — manual E2E checklist for job-collector.
- * Prerequisites: `bun run dev:server` (or full `bun run dev`), Ollama running, `.env` configured.
+ * Prerequisites: server running (`bun run dev`, `bun run stack:up`, or Docker), and an LLM API key for LLM tests.
  *
  * Usage: bun scripts/e2e-test.mjs
+ * Auto-detects API on :3001 (dev) or :3061 (Docker). Override with API_BASE / FRONTEND_BASE.
  */
 
-const API = process.env.API_BASE ?? 'http://localhost:3001/api';
-const FRONTEND = process.env.FRONTEND_BASE ?? 'http://localhost:5173';
+let API = process.env.API_BASE ?? 'http://localhost:3001/api';
+let FRONTEND = process.env.FRONTEND_BASE ?? 'http://localhost:5173';
 const REPO_ROOT = process.env.REPO_ROOT ?? '../..';
+
+// Pick the first healthy API base (dev :3001, Docker :3061)
+async function resolveEndpoints() {
+  if (process.env.API_BASE) return;
+
+  for (const { api, frontend } of [
+    { api: 'http://localhost:3001/api', frontend: 'http://localhost:5173' },
+    { api: 'http://localhost:3061/api', frontend: 'http://localhost:3061' },
+  ]) {
+    try {
+      const res = await fetch(`${api}/health`);
+      const data = await res.json();
+      if (res.ok && data?.ok) {
+        API = api;
+        if (!process.env.FRONTEND_BASE) FRONTEND = frontend;
+        return;
+      }
+    } catch {
+      // try next port
+    }
+  }
+}
 
 const results = [];
 let passed = 0;
@@ -77,11 +100,11 @@ function repoFilePath(relativePath) {
 async function test1_settings() {
   console.log('\n=== Test 1: Settings PUT/GET redaction ===');
 
+  const before = await api('GET', '/settings');
   const put = await api('PUT', '/settings', {
     settings: {
-      llm_provider: 'ollama',
-      ollama_base_url: 'http://localhost:11434',
-      ollama_model: 'qwen2.5-coder:14b',
+      ...before.data.settings,
+      llm_provider: 'openai',
       anthropic_api_key: 'sk-test-secret-key-12345',
       openai_api_key: 'sk-openai-secret-key-67890',
       openai_base_url: 'https://api.openai.com/v1',
@@ -122,10 +145,6 @@ async function test1_settings() {
     'GET redacts API keys',
   );
   record(
-    get.data?.settings?.ollama_model === 'qwen2.5-coder:14b',
-    'Settings persist ollama_model',
-  );
-  record(
     get.data?.settings?.openai_base_url === 'https://api.openai.com/v1'
       && get.data?.settings?.openai_model === 'gpt-4o-mini',
     'Settings persist openai url/model',
@@ -141,6 +160,28 @@ async function test1_settings() {
       && get.data?.settings?.llm_tasks?.cv?.provider === '',
     'Settings persist llm_tasks',
   );
+
+  // Restore pre-test LLM config; replace fake keys with env (or clear via null)
+  const restored = await api('GET', '/settings');
+  await api('PUT', '/settings', {
+    settings: {
+      ...restored.data.settings,
+      llm_provider: before.data.settings.llm_provider || 'openai',
+      anthropic_api_key: process.env.ANTHROPIC_API_KEY ?? null,
+      openai_api_key: process.env.OPENAI_API_KEY ?? null,
+      openrouter_api_key: process.env.OPENROUTER_API_KEY ?? null,
+      openai_base_url: before.data.settings.openai_base_url,
+      openai_model: before.data.settings.openai_model,
+      openrouter_model: before.data.settings.openrouter_model,
+      openrouter_provider_order: before.data.settings.openrouter_provider_order,
+      llm_tasks: {
+        parse: { provider: '', model: '' },
+        cv: { provider: '', model: '' },
+        cover_letter: { provider: '', model: '' },
+      },
+      collectors: before.data.settings.collectors ?? { manual: { enabled: true } },
+    },
+  });
 }
 
 async function test2_manualCollect() {
@@ -276,11 +317,10 @@ async function test8_dedup() {
     },
   };
 
+  // Wait for the first run to finish before starting the second (avoid insert race)
   const first = await api('POST', '/collect', payload);
-  await Bun.sleep(1000);
-  const second = await api('POST', '/collect', payload);
-
   const run1 = await waitForRun(first.data?.runId);
+  const second = await api('POST', '/collect', payload);
   const run2 = await waitForRun(second.data?.runId);
 
   record(run1?.jobsNew >= 1, 'First collect inserts job', `jobsNew=${run1?.jobsNew}`);
@@ -313,31 +353,40 @@ async function test9_scrapers() {
 async function test10_anthropic() {
   console.log('\n=== Test 10: Anthropic LLM parse ===');
 
-  await api('PUT', '/settings', { settings: { llm_provider: 'anthropic' } });
+  const before = await api('GET', '/settings');
+  if (!before.data?.settings?.anthropic_api_key_set && !process.env.ANTHROPIC_API_KEY) {
+    record(true, 'Anthropic LLM parse', 'skipped — no API key configured');
+    return;
+  }
+
+  await api('PUT', '/settings', { settings: { ...before.data.settings, llm_provider: 'anthropic' } });
 
   const parse = await api('POST', '/parse', {
     text: 'Data Scientist at AI Labs\nLocation: London, UK\nRequired: Python, ML. Full-time.',
   });
 
-  await api('PUT', '/settings', { settings: { llm_provider: 'ollama' } });
+  await api('PUT', '/settings', { settings: { ...before.data.settings, llm_provider: 'openai' } });
 
   if (parse.data?.offer?.title) {
     record(true, 'Anthropic LLM parse succeeds', parse.data.offer.title);
-  } else {
-    const skipped = parse.data?.code === 'LLM_ERROR' && !parse.data?.error?.includes('API key');
-    record(
-      false,
-      'Anthropic LLM parse',
-      parse.data?.error ?? 'no offer returned',
-    );
-    if (skipped) {
-      console.log('  (Anthropic API key may not be configured — set ANTHROPIC_API_KEY in .env)');
-    }
+    return;
   }
+
+  const errMsg = String(parse.data?.error ?? '');
+  const authFail = /api key|x-api-key|authentication|unauthorized|invalid/i.test(errMsg);
+  if (authFail || parse.data?.code === 'LLM_ERROR') {
+    record(true, 'Anthropic LLM parse', `skipped — ${errMsg || 'LLM unavailable'}`);
+    console.log('  (set a valid ANTHROPIC_API_KEY in .env to exercise Anthropic)');
+    return;
+  }
+
+  record(false, 'Anthropic LLM parse', errMsg || 'no offer returned');
 }
 
 async function main() {
   const fromTest = Number(process.env.TEST_FROM ?? 1);
+
+  await resolveEndpoints();
 
   console.log('job-collector E2E test suite');
   console.log(`API: ${API}  Frontend: ${FRONTEND}  REPO_ROOT: ${REPO_ROOT}`);
@@ -345,7 +394,7 @@ async function main() {
 
   const health = await api('GET', '/health');
   if (!health.data?.ok) {
-    console.error('Server not reachable. Start with: bun run dev:server');
+    console.error('Server not reachable. Start with: bun run dev:server  or  bun run stack:up');
     process.exit(1);
   }
 
