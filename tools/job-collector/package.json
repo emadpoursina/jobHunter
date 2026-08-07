@@ -12,7 +12,8 @@
     "stack:up": "docker compose up -d --build",
     "stack:build": "docker compose build",
     "stack:down": "docker compose down",
-    "test:e2e": "bun scripts/e2e-test.mjs"
+    "test:e2e": "bun scripts/e2e-test.mjs",
+    "test:e2e:docker": "API_BASE=http://localhost:3061/api FRONTEND_BASE=http://localhost:3061 bun scripts/e2e-test.mjs"
   },
   "dependencies": {
     "cheerio": "^1.0.0",
