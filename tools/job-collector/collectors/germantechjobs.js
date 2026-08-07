@@ -3,6 +3,8 @@ import { cleanHtml } from './base.js';
 
 const RSS_URL = 'https://germantechjobs.de/rss';
 const SOURCE = 'germantechjobs';
+// Board is DE-only; RSS bodies rarely contain the word "Germany"
+const DE_LOCATION_ALIASES = new Set(['germany', 'deutschland', 'de']);
 
 // Normalize and validate query strings from collector config
 function normalizeQueries(config = {}) {
@@ -97,14 +99,15 @@ async function fetchRssItems() {
   return items;
 }
 
-// True when the item matches the query (and optional location) keywords
+// True when the item matches the query (and optional city/remote keyword)
 function matchesFilters(item, query, location) {
   const q = query.toLowerCase();
   if (!item.haystack.includes(q)) return false;
 
   if (location) {
     const loc = location.toLowerCase();
-    if (!item.haystack.includes(loc)) return false;
+    // Country aliases always match — every listing is already in Germany
+    if (!DE_LOCATION_ALIASES.has(loc) && !item.haystack.includes(loc)) return false;
   }
 
   return true;
@@ -148,7 +151,8 @@ const collector = {
     },
     location: {
       type: 'string',
-      description: 'Optional extra keyword (city/remote), e.g. "Berlin"',
+      description:
+        'Optional city/remote keyword (e.g. "Berlin"). "Germany" is ignored — board is DE-only.',
     },
     maxResults: {
       type: 'number',
@@ -220,5 +224,18 @@ if (import.meta.main) {
     throw new Error('maxResults should cap LLM-parse candidates');
   }
 
-  console.log(`ok: nonsense→${unmatched.length} unmatched; developer→${yes.length} matched + ${no.length} unmatched`);
+  // "Germany" must not zero out matches — RSS rarely contains that word
+  const withCountry = await collector.run({
+    queries: ['javascript'],
+    location: 'Germany',
+    maxResults: 2,
+  });
+  const jsMatched = withCountry.filter((o) => o.queryMatched === true);
+  if (jsMatched.length < 1) {
+    throw new Error('location=Germany should not filter out javascript matches on DE-only board');
+  }
+
+  console.log(
+    `ok: nonsense→${unmatched.length} unmatched; developer→${yes.length} matched + ${no.length} unmatched; js+Germany→${jsMatched.length} matched`,
+  );
 }
