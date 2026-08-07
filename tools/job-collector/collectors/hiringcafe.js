@@ -247,10 +247,11 @@ function formatSalary(v5 = {}) {
   return '';
 }
 
-// Stable HiringCafe URL for dedup ( /req/{objectID} mirrors /job/ )
+// Public listing URL: /job/{requisition_id} (objectID /req/ shells are not real listings)
 function sourceUrlForHit(hit) {
-  const objectId = hit.objectID || hit.id;
-  if (objectId) return `${BASE_URL}/req/${encodeURIComponent(objectId)}`;
+  const requisitionId =
+    typeof hit.requisition_id === 'string' ? hit.requisition_id.trim() : '';
+  if (requisitionId) return `${BASE_URL}/job/${encodeURIComponent(requisitionId)}`;
 
   const applyUrl = typeof hit.apply_url === 'string' ? hit.apply_url.trim() : '';
   if (!applyUrl) return null;
@@ -439,6 +440,9 @@ if (import.meta.main) {
   }
   if (offers.some((o) => o.source !== SOURCE)) throw new Error('source must be hiringcafe');
   if (offers.some((o) => o.queryMatched !== true)) throw new Error('search hits should be matched');
+  if (offers.some((o) => !/^https:\/\/hiringcafe\.com\/job\/[^/?#]+$/.test(o.sourceUrl))) {
+    throw new Error('sourceUrl must be https://hiringcafe.com/job/{requisition_id}');
+  }
 
   const state = await buildSearchState('javascript', 'Germany');
   if (state.searchQuery !== 'javascript') throw new Error('searchQuery must stay keyword-only');
@@ -446,7 +450,16 @@ if (import.meta.main) {
     throw new Error('Germany must geocode to DE country component');
   }
 
+  // Live listing must resolve (308 slug redirect or 200), not 404
+  const probe = await fetch(offers[0].sourceUrl, {
+    headers: headers({ Accept: 'text/html' }),
+    redirect: 'manual',
+  });
+  if (probe.status !== 200 && probe.status !== 308) {
+    throw new Error(`sample sourceUrl returned ${probe.status}, expected 200 or 308`);
+  }
+
   console.log(
-    `ok: ${offers.length} offers; sample="${offers[0].title}" @ ${offers[0].company} (${offers[0].location})`,
+    `ok: ${offers.length} offers; sample="${offers[0].title}" @ ${offers[0].company} (${offers[0].location}) ${offers[0].sourceUrl}`,
   );
 }
