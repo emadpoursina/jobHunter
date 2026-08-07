@@ -1,6 +1,5 @@
 import { getSetting } from './db.js';
 
-const ANTHROPIC_MODEL = 'claude-sonnet-4-20250514';
 const OPENROUTER_BASE_URL = 'https://openrouter.ai/api/v1';
 
 // Build OpenRouter provider.order from a comma/space-separated slug list
@@ -71,9 +70,6 @@ export async function callLlm({ system, user, maxTokens = 1000, provider, model 
   const inputLen = (system?.length ?? 0) + (user?.length ?? 0);
   console.log(`[INFO] [llm] Calling ${resolvedProvider}, input ~${inputLen} chars`);
 
-  if (resolvedProvider === 'anthropic') {
-    return callAnthropic({ system, user, maxTokens, model });
-  }
   if (resolvedProvider === 'openai') {
     return callOpenAI({ system, user, maxTokens, model });
   }
@@ -92,54 +88,6 @@ export function resolveTaskLlm(task) {
     provider: cfg.provider || undefined,
     model: cfg.model || undefined,
   };
-}
-
-// Send a messages request to the Anthropic API
-async function callAnthropic({ system, user, maxTokens, model: modelOverride }) {
-  const apiKey = getSetting('anthropic_api_key') ?? '';
-  const model = modelOverride || ANTHROPIC_MODEL;
-
-  if (!apiKey) {
-    throw llmError('No Anthropic API key configured.');
-  }
-
-  console.log(`[INFO] [llm] Anthropic model=${model}`);
-
-  const doFetch = async () => {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-      },
-      body: JSON.stringify({
-        model,
-        max_tokens: maxTokens,
-        system,
-        messages: [{ role: 'user', content: user }],
-      }),
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      console.error(`[ERROR] [llm] Anthropic returned ${res.status}:`, data);
-      throw llmError(data?.error?.message ?? `Anthropic returned ${res.status}`);
-    }
-
-    return requireLlmText(
-      data.content.map((block) => block.text || '').join(''),
-      'Anthropic',
-    );
-  };
-
-  try {
-    return await withRetry(doFetch);
-  } catch (err) {
-    if (err.code === 'LLM_ERROR') throw err;
-    throw llmError(`Cannot reach Anthropic API: ${err.message}`);
-  }
 }
 
 // Send a chat completions request to an OpenAI-compatible API

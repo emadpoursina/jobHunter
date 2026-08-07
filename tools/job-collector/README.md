@@ -9,7 +9,7 @@ Local tool for collecting job offers, parsing them with an LLM, saving structure
 ## Prerequisites
 
 - **Bun** 1.x
-- An **LLM API key** (OpenAI, Anthropic, or OpenRouter — configure in Settings)
+- An **LLM API key** (OpenAI or OpenRouter — configure in Settings)
 - **Playwright Chromium** (LinkedIn / Indeed scrapers only):
 
 ```bash
@@ -78,8 +78,7 @@ Copy `.env.example` to `.env` and adjust as needed.
 |----------|---------|-------------|
 | `PORT` | `3001` | Express API port |
 | `REPO_ROOT` | `../..` | Path to jobHunter repo root (relative to `tools/job-collector/`) |
-| `LLM_PROVIDER` | `openai` | `anthropic`, `openai`, or `openrouter` (also configurable in Settings UI) |
-| `ANTHROPIC_API_KEY` | — | Required when using Anthropic |
+| `LLM_PROVIDER` | `openai` | `openai` or `openrouter` (also configurable in Settings UI) |
 | `OPENAI_API_KEY` | — | Required when using OpenAI-compatible API |
 | `OPENAI_BASE_URL` | `https://api.openai.com/v1` | OpenAI-compatible chat completions base URL |
 | `OPENAI_MODEL` | — | Model name for OpenAI-compatible API |
@@ -102,11 +101,6 @@ Settings saved via the UI are persisted in SQLite and override env defaults for 
 1. Set `OPENAI_API_KEY` in `.env` or paste the key in Settings
 2. Set **API base URL** (default `https://api.openai.com/v1`; any OpenAI-compatible endpoint works)
 3. Set the **model** name and save
-
-### Anthropic
-
-1. Set `ANTHROPIC_API_KEY` in `.env` or paste the key in Settings
-2. Set provider to **Anthropic** and save
 
 ### OpenRouter
 

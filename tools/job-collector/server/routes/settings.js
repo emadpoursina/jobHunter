@@ -7,7 +7,6 @@ const router = Router();
 
 const SETTING_KEYS = [
   'llm_provider',
-  'anthropic_api_key',
   'openai_api_key',
   'openai_base_url',
   'openai_model',
@@ -17,6 +16,8 @@ const SETTING_KEYS = [
   'llm_tasks',
   'collectors',
 ];
+
+const REMOVED_PROVIDERS = new Set(['ollama', 'anthropic']);
 
 // Keep stored key when the client sends '' or omits the field; null clears it
 function resolveApiKey(incoming, current) {
@@ -37,7 +38,7 @@ function normalizeLlmTasks(incoming, current) {
     result[task] = {
       provider: (() => {
         const p = String(taskIn.provider ?? taskCur.provider ?? '');
-        return p === 'ollama' ? '' : p;
+        return REMOVED_PROVIDERS.has(p) ? '' : p;
       })(),
       model: String(taskIn.model ?? taskCur.model ?? ''),
     };
@@ -48,7 +49,6 @@ function normalizeLlmTasks(incoming, current) {
 // Shape settings for API responses, redacting sensitive values
 function formatSettingsForResponse(settings) {
   const {
-    anthropic_api_key: anthropicKey,
     openai_api_key: openaiKey,
     openrouter_api_key: openrouterKey,
     ...rest
@@ -56,7 +56,6 @@ function formatSettingsForResponse(settings) {
 
   return {
     ...rest,
-    anthropic_api_key_set: Boolean(anthropicKey),
     openai_api_key_set: Boolean(openaiKey),
     openrouter_api_key_set: Boolean(openrouterKey),
   };
@@ -88,11 +87,10 @@ router.put('/', (req, res) => {
   const current = getAllSettings();
 
   let llmProvider = body.llm_provider ?? current.llm_provider ?? 'openai';
-  if (llmProvider === 'ollama') llmProvider = 'openai';
+  if (REMOVED_PROVIDERS.has(llmProvider)) llmProvider = 'openai';
 
   const updated = {
     llm_provider: llmProvider,
-    anthropic_api_key: resolveApiKey(body.anthropic_api_key, current.anthropic_api_key),
     openai_api_key: resolveApiKey(body.openai_api_key, current.openai_api_key),
     openai_base_url: body.openai_base_url ?? current.openai_base_url ?? 'https://api.openai.com/v1',
     openai_model: body.openai_model ?? current.openai_model ?? '',

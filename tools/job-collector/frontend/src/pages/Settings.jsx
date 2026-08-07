@@ -39,10 +39,9 @@ function normalizeLlmTasks(stored) {
 }
 
 // Build the full settings payload sent to PUT /api/settings
-function buildSettingsPayload(form, anthropicApiKey, openaiApiKey, openrouterApiKey) {
+function buildSettingsPayload(form, openaiApiKey, openrouterApiKey) {
   return {
     llm_provider: form.llmProvider,
-    anthropic_api_key: anthropicApiKey,
     openai_api_key: openaiApiKey,
     openai_base_url: form.openaiBaseUrl,
     openai_model: form.openaiModel,
@@ -58,7 +57,6 @@ function buildSettingsPayload(form, anthropicApiKey, openaiApiKey, openrouterApi
 function formFromSettings(settings, collectors) {
   return {
     llmProvider: settings.llm_provider ?? 'openai',
-    anthropicApiKeySet: Boolean(settings.anthropic_api_key_set),
     openaiApiKeySet: Boolean(settings.openai_api_key_set),
     openaiBaseUrl: settings.openai_base_url ?? 'https://api.openai.com/v1',
     openaiModel: settings.openai_model ?? '',
@@ -80,7 +78,6 @@ export default function Settings() {
 
   const [form, setForm] = useState({
     llmProvider: 'openai',
-    anthropicApiKeySet: false,
     openaiApiKeySet: false,
     openaiBaseUrl: 'https://api.openai.com/v1',
     openaiModel: '',
@@ -90,7 +87,6 @@ export default function Settings() {
     llmTasks: normalizeLlmTasks(null),
     collectors: {},
   });
-  const [anthropicApiKey, setAnthropicApiKey] = useState('');
   const [openaiApiKey, setOpenaiApiKey] = useState('');
   const [openrouterApiKey, setOpenrouterApiKey] = useState('');
 
@@ -141,7 +137,6 @@ export default function Settings() {
     setForm((prev) =>
       formFromSettings(settings, keepCollectors ? (settings.collectors ?? prev.collectors) : prev.collectors),
     );
-    setAnthropicApiKey('');
     setOpenaiApiKey('');
     setOpenrouterApiKey('');
   }
@@ -151,7 +146,7 @@ export default function Settings() {
     setSaving(true);
     setAlert(null);
     try {
-      const payload = buildSettingsPayload(form, anthropicApiKey, openaiApiKey, openrouterApiKey);
+      const payload = buildSettingsPayload(form, openaiApiKey, openrouterApiKey);
       const { settings } = await api.saveSettings(payload);
       applySavedSettings(settings);
       showAlert('Settings saved.', 'info');
@@ -168,7 +163,7 @@ export default function Settings() {
     setTestResult(null);
     setAlert(null);
     try {
-      const payload = buildSettingsPayload(form, anthropicApiKey, openaiApiKey, openrouterApiKey);
+      const payload = buildSettingsPayload(form, openaiApiKey, openrouterApiKey);
       const { settings } = await api.saveSettings(payload);
       applySavedSettings(settings);
 
@@ -217,7 +212,6 @@ export default function Settings() {
     const provider = taskProvider || form.llmProvider;
     if (provider === 'openai') return form.openaiModel || 'global OpenAI model';
     if (provider === 'openrouter') return form.openrouterModel || 'global OpenRouter model';
-    if (provider === 'anthropic') return 'claude-sonnet-4-20250514';
     return 'global model';
   }
 
@@ -244,13 +238,6 @@ export default function Settings() {
         <div className="tabs">
           <button
             type="button"
-            className={`tab${form.llmProvider === 'anthropic' ? ' active' : ''}`}
-            onClick={() => setForm((prev) => ({ ...prev, llmProvider: 'anthropic' }))}
-          >
-            Anthropic API
-          </button>
-          <button
-            type="button"
             className={`tab${form.llmProvider === 'openai' ? ' active' : ''}`}
             onClick={() => setForm((prev) => ({ ...prev, llmProvider: 'openai' }))}
           >
@@ -264,37 +251,6 @@ export default function Settings() {
             OpenRouter
           </button>
         </div>
-
-        {form.llmProvider === 'anthropic' && (
-          <>
-            <div className="field">
-              <label htmlFor="anthropic-key">Anthropic API key</label>
-              <input
-                id="anthropic-key"
-                type="password"
-                placeholder={
-                  form.anthropicApiKeySet ? 'Key is set — enter new key to replace' : 'sk-ant-…'
-                }
-                value={anthropicApiKey}
-                onChange={(e) => setAnthropicApiKey(e.target.value)}
-              />
-              {form.anthropicApiKeySet && (
-                <p className="hint">Leave blank to keep the existing key.</p>
-              )}
-            </div>
-
-            <div className="btn-actions">
-              <button
-                type="button"
-                className="btn btn-primary"
-                onClick={handleSave}
-                disabled={saving}
-              >
-                {saving ? 'Saving…' : 'Save'}
-              </button>
-            </div>
-          </>
-        )}
 
         {form.llmProvider === 'openai' && (
           <>
@@ -444,7 +400,6 @@ export default function Settings() {
                   onChange={(e) => updateLlmTask(key, 'provider', e.target.value)}
                 >
                   <option value="">Default ({form.llmProvider})</option>
-                  <option value="anthropic">Anthropic</option>
                   <option value="openai">OpenAI</option>
                   <option value="openrouter">OpenRouter</option>
                 </select>

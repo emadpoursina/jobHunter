@@ -105,7 +105,6 @@ async function test1_settings() {
     settings: {
       ...before.data.settings,
       llm_provider: 'openai',
-      anthropic_api_key: 'sk-test-secret-key-12345',
       openai_api_key: 'sk-openai-secret-key-67890',
       openai_base_url: 'https://api.openai.com/v1',
       openai_model: 'gpt-4o-mini',
@@ -123,10 +122,8 @@ async function test1_settings() {
   const putJson = JSON.stringify(put.data);
   record(
     put.status === 200
-      && put.data?.settings?.anthropic_api_key_set === true
       && put.data?.settings?.openai_api_key_set === true
       && put.data?.settings?.openrouter_api_key_set === true
-      && !putJson.includes('sk-test-secret')
       && !putJson.includes('sk-openai-secret')
       && !putJson.includes('sk-or-test-secret'),
     'PUT redacts API keys',
@@ -136,10 +133,8 @@ async function test1_settings() {
   const get = await api('GET', '/settings');
   const getJson = JSON.stringify(get.data);
   record(
-    get.data?.settings?.anthropic_api_key_set === true
-      && get.data?.settings?.openai_api_key_set === true
+    get.data?.settings?.openai_api_key_set === true
       && get.data?.settings?.openrouter_api_key_set === true
-      && !getJson.includes('sk-test-secret')
       && !getJson.includes('sk-openai-secret')
       && !getJson.includes('sk-or-test-secret'),
     'GET redacts API keys',
@@ -167,7 +162,6 @@ async function test1_settings() {
     settings: {
       ...restored.data.settings,
       llm_provider: before.data.settings.llm_provider || 'openai',
-      anthropic_api_key: process.env.ANTHROPIC_API_KEY ?? null,
       openai_api_key: process.env.OPENAI_API_KEY ?? null,
       openrouter_api_key: process.env.OPENROUTER_API_KEY ?? null,
       openai_base_url: before.data.settings.openai_base_url,
@@ -350,39 +344,6 @@ async function test9_scrapers() {
   }
 }
 
-async function test10_anthropic() {
-  console.log('\n=== Test 10: Anthropic LLM parse ===');
-
-  const before = await api('GET', '/settings');
-  if (!before.data?.settings?.anthropic_api_key_set && !process.env.ANTHROPIC_API_KEY) {
-    record(true, 'Anthropic LLM parse', 'skipped — no API key configured');
-    return;
-  }
-
-  await api('PUT', '/settings', { settings: { ...before.data.settings, llm_provider: 'anthropic' } });
-
-  const parse = await api('POST', '/parse', {
-    text: 'Data Scientist at AI Labs\nLocation: London, UK\nRequired: Python, ML. Full-time.',
-  });
-
-  await api('PUT', '/settings', { settings: { ...before.data.settings, llm_provider: 'openai' } });
-
-  if (parse.data?.offer?.title) {
-    record(true, 'Anthropic LLM parse succeeds', parse.data.offer.title);
-    return;
-  }
-
-  const errMsg = String(parse.data?.error ?? '');
-  const authFail = /api key|x-api-key|authentication|unauthorized|invalid/i.test(errMsg);
-  if (authFail || parse.data?.code === 'LLM_ERROR') {
-    record(true, 'Anthropic LLM parse', `skipped — ${errMsg || 'LLM unavailable'}`);
-    console.log('  (set a valid ANTHROPIC_API_KEY in .env to exercise Anthropic)');
-    return;
-  }
-
-  record(false, 'Anthropic LLM parse', errMsg || 'no offer returned');
-}
-
 async function main() {
   const fromTest = Number(process.env.TEST_FROM ?? 1);
 
@@ -423,7 +384,6 @@ async function main() {
   if (fromTest <= 7) await test7_uiSmoke(jobId);
   if (fromTest <= 8) await test8_dedup();
   if (fromTest <= 9) await test9_scrapers();
-  if (fromTest <= 10) await test10_anthropic();
 
   console.log('\n========================================');
   console.log(`SUMMARY: ${passed} passed, ${failed} failed`);
