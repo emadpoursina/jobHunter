@@ -28,6 +28,7 @@ export const DEFAULT_LLM_TASKS = {
   parse: { ...DEFAULT_LLM_TASK },
   cv: { ...DEFAULT_LLM_TASK },
   cover_letter: { ...DEFAULT_LLM_TASK },
+  profile_update: { ...DEFAULT_LLM_TASK },
 };
 
 const DEFAULT_SETTINGS = {
@@ -42,6 +43,7 @@ const DEFAULT_SETTINGS = {
     parse: { ...DEFAULT_LLM_TASK },
     cv: { ...DEFAULT_LLM_TASK },
     cover_letter: { ...DEFAULT_LLM_TASK },
+    profile_update: { ...DEFAULT_LLM_TASK },
   },
   collectors: {},
 };

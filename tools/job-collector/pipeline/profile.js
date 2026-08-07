@@ -1,8 +1,10 @@
-import { stat } from 'fs/promises';
+import { createHash } from 'crypto';
+import { mkdir, rename, stat, writeFile } from 'fs/promises';
+import { dirname } from 'path';
 import { getSetting, setSetting } from '../server/db.js';
 import { repoPath, readRepoFile } from './repoFiles.js';
 
-const PROFILE_PATH = process.env.PROFILE_PATH ?? 'phase2/profile/master-profile.md';
+export const PROFILE_PATH = process.env.PROFILE_PATH ?? 'phase2/profile/master-profile.md';
 const CACHE_KEY = 'parsed_profile';
 const MTIME_KEY = 'parsed_profile_mtime';
 
@@ -97,6 +99,73 @@ export async function parseProfileFile(relativePath = PROFILE_PATH) {
     throw err;
   }
   return parseProfileText(md);
+}
+
+// SHA-256 fingerprint of profile Markdown for optimistic-lock checks
+export function hashProfileRevision(markdown) {
+  return createHash('sha256').update(markdown, 'utf8').digest('hex');
+}
+
+// Read profile Markdown with its current revision fingerprint
+export async function getProfileDocument() {
+  const markdown = await getProfileMarkdown();
+  return { markdown, revision: hashProfileRevision(markdown) };
+}
+
+function assertRevisionMatch(currentMarkdown, baseRevision) {
+  if (baseRevision === undefined || baseRevision === null || baseRevision === '') return;
+  const current = hashProfileRevision(currentMarkdown);
+  if (current !== baseRevision) {
+    const err = new Error('Profile has changed since this revision; refresh and try again');
+    err.code = 'PROFILE_REVISION_CONFLICT';
+    throw err;
+  }
+}
+
+// Atomic write: temp file in same directory, then rename
+async function writeProfileFileAtomic(content) {
+  const fullPath = repoPath(PROFILE_PATH);
+  const tempPath = `${fullPath}.tmp-${process.pid}`;
+  await mkdir(dirname(fullPath), { recursive: true });
+  await writeFile(tempPath, content, 'utf8');
+  await rename(tempPath, fullPath);
+}
+
+// Read raw profile Markdown from the configured PROFILE_PATH
+export async function getProfileMarkdown() {
+  const md = await readRepoFile(PROFILE_PATH);
+  if (md === null) {
+    const err = new Error(`Profile not found at ${PROFILE_PATH}`);
+    err.code = 'NOT_FOUND';
+    throw err;
+  }
+  return md;
+}
+
+// Clear parsed profile cache so autofill re-reads the file on next use
+export function invalidateProfileCache() {
+  setSetting(CACHE_KEY, null);
+  setSetting(MTIME_KEY, null);
+}
+
+// Validate and save profile Markdown; never writes on validation failure
+export async function saveProfileMarkdown(content, { baseRevision } = {}) {
+  if (typeof content !== 'string' || !content.trim()) {
+    const err = new Error('Profile content must be a non-empty string');
+    err.code = 'VALIDATION_ERROR';
+    throw err;
+  }
+
+  const current = await readRepoFile(PROFILE_PATH);
+  if (current !== null) {
+    assertRevisionMatch(current, baseRevision);
+  }
+
+  parseProfileText(content);
+  await writeProfileFileAtomic(content);
+  invalidateProfileCache();
+  const markdown = content;
+  return { markdown, revision: hashProfileRevision(markdown) };
 }
 
 // Return cached parsed profile, re-parsing when the file mtime changes or refresh=true

@@ -1,5 +1,5 @@
 import { access, mkdir, readFile, writeFile } from 'fs/promises';
-import { resolve } from 'path';
+import { dirname, resolve } from 'path';
 import { makeSlug } from '../collectors/base.js';
 
 const REPO_ROOT = resolve(process.env.REPO_ROOT ?? '.');
@@ -20,6 +20,13 @@ export async function readRepoFile(relativePath) {
   } catch {
     return null;
   }
+}
+
+// Write a repo file by relative path (creates parent directories)
+export async function writeRepoFile(relativePath, content) {
+  const fullPath = repoPath(relativePath);
+  await mkdir(dirname(fullPath), { recursive: true });
+  await writeFile(fullPath, content, 'utf8');
 }
 
 // Write a parsed offer to the repo and return its relative path

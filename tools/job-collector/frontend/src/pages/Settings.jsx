@@ -14,6 +14,7 @@ const LLM_TASK_DEFS = [
   { key: 'parse', label: 'Parse offer' },
   { key: 'cv', label: 'Generate CV' },
   { key: 'cover_letter', label: 'Generate cover letter' },
+  { key: 'profile_update', label: 'Update master profile' },
 ];
 
 // Merge stored collector config with defaults for the settings form

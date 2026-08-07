@@ -120,6 +120,50 @@ intents:
           - cover-letter-pipeline-and-api
         run_id: run-jobhunter-003
         completed_at: 2026-08-01T07:25:30.430Z
+  - id: master-profile-editor
+    title: Master profile editor
+    status: in_progress
+    created: 2026-08-07T20:47:00Z
+    brief: .specs-fire/intents/master-profile-editor/brief.md
+    work_items:
+      - id: profile-document-access-api
+        title: Profile document access and API
+        complexity: medium
+        mode: confirm
+        status: completed
+        depends_on: []
+        run_id: run-jobhunter-004
+        completed_at: 2026-08-07T21:33:09.097Z
+      - id: profile-ai-update-flow
+        title: AI profile update flow and task configuration
+        complexity: high
+        mode: validate
+        status: completed
+        depends_on:
+          - profile-document-access-api
+        design_doc: .specs-fire/intents/master-profile-editor/work-items/profile-ai-update-flow-design.md
+        checkpoint_1: approved
+        run_id: run-jobhunter-005
+        completed_at: 2026-08-07T21:42:03.865Z
+      - id: profile-editor-page
+        title: Dedicated Profile editor page
+        complexity: medium
+        mode: confirm
+        status: completed
+        depends_on:
+          - profile-document-access-api
+          - profile-ai-update-flow
+        run_id: run-jobhunter-006
+        completed_at: 2026-08-07T21:51:20.611Z
+      - id: profile-editor-verification
+        title: Profile editor verification
+        complexity: low
+        mode: autopilot
+        status: completed
+        depends_on:
+          - profile-editor-page
+        run_id: run-jobhunter-007
+        completed_at: 2026-08-07T22:00:00.770Z
 runs:
   active: []
   completed:
@@ -168,3 +212,35 @@ runs:
           mode: confirm
       started: 2026-07-30T19:25:01.007Z
       completed: 2026-08-01T07:25:30.430Z
+    - id: run-jobhunter-004
+      scope: batch
+      work_items:
+        - id: profile-document-access-api
+          intent: master-profile-editor
+          mode: confirm
+      started: 2026-08-07T21:15:55.438Z
+      completed: 2026-08-07T21:33:09.097Z
+    - id: run-jobhunter-005
+      scope: batch
+      work_items:
+        - id: profile-ai-update-flow
+          intent: master-profile-editor
+          mode: validate
+      started: 2026-08-07T21:38:43.604Z
+      completed: 2026-08-07T21:42:03.865Z
+    - id: run-jobhunter-006
+      scope: batch
+      work_items:
+        - id: profile-editor-page
+          intent: master-profile-editor
+          mode: confirm
+      started: 2026-08-07T21:50:01.790Z
+      completed: 2026-08-07T21:51:20.611Z
+    - id: run-jobhunter-007
+      scope: batch
+      work_items:
+        - id: profile-editor-verification
+          intent: master-profile-editor
+          mode: autopilot
+      started: 2026-08-07T21:58:42.040Z
+      completed: 2026-08-07T22:00:00.770Z

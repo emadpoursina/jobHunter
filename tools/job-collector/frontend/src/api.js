@@ -76,6 +76,15 @@ export const api = {
   generateApplyScript: (id) => request('POST', '/apply/script', { jobId: id }),
   markApplied: (id, appliedUrl) => request('POST', `/jobs/${id}/applied`, { appliedUrl }),
 
+  // Profile
+  getProfile: () => request('GET', '/profile'),
+  saveProfile: (markdown, baseRevision) =>
+    request('PUT', '/profile', { markdown, baseRevision }),
+  previewProfileUpdate: (prompt, baseRevision) =>
+    request('POST', '/profile/ai-preview', { prompt, baseRevision }),
+  applyProfileUpdate: (proposal, baseRevision) =>
+    request('POST', '/profile/ai-apply', { proposal, baseRevision }),
+
   // Settings
   getSettings: () => request('GET', '/settings'),
   saveSettings: (settings) => request('PUT', '/settings', { settings }),

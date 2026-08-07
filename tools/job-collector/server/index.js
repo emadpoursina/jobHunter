@@ -11,6 +11,7 @@ import pipelineRouter from './routes/pipeline.js';
 import collectRouter from './routes/collect.js';
 import jobsRouter from './routes/jobs.js';
 import applyRouter from './routes/apply.js';
+import profileRouter from './routes/profile.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DIST_DIR = path.resolve(__dirname, '../frontend/dist');
@@ -33,6 +34,7 @@ app.use('/api', pipelineRouter);
 app.use('/api', collectRouter);
 app.use('/api/jobs', jobsRouter);
 app.use('/api/apply', applyRouter);
+app.use('/api/profile', profileRouter);
 
 app.use('/api', (_req, res) => {
   res.status(404).json({ error: 'Not found', code: 'NOT_FOUND' });

@@ -1183,6 +1183,104 @@ select:focus {
   margin: 1.25rem 0;
 }
 
+.main:has(.profile-editor-page) {
+  max-width: 1200px;
+}
+
+.profile-editor-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.profile-editor-actions {
+  margin-top: 0;
+}
+
+.profile-unsaved-banner {
+  margin-bottom: 1rem;
+}
+
+.profile-editor-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.profile-editor-pane {
+  display: flex;
+  flex-direction: column;
+  min-height: 420px;
+}
+
+.profile-editor-textarea {
+  flex: 1;
+  min-height: 360px;
+  width: 100%;
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.profile-preview-wrap {
+  flex: 1;
+  overflow: auto;
+  max-height: 520px;
+}
+
+.profile-ai-card,
+.profile-proposal-card {
+  margin-bottom: 1rem;
+}
+
+.profile-proposal-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.profile-diff-pre {
+  font-family: var(--mono);
+  font-size: 12px;
+  line-height: 1.45;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem;
+  overflow: auto;
+  max-height: 240px;
+  margin-bottom: 1rem;
+}
+
+.profile-diff-remove {
+  color: var(--red);
+  display: block;
+}
+
+.profile-diff-add {
+  color: var(--green);
+  display: block;
+}
+
+.profile-diff-same {
+  color: var(--text3);
+  display: block;
+}
+
+@media (max-width: 960px) {
+  .profile-editor-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 720px) {
   .layout {
     grid-template-columns: 1fr;
