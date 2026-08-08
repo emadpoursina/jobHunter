@@ -3,6 +3,16 @@ import { api } from '../api.js';
 import CvPreview from '../components/CvPreview.jsx';
 import { buildLineDiff, diffHasChanges } from '../profileDiff.js';
 
+function downloadMarkdown(markdown, filename) {
+  const blob = new Blob([markdown], { type: 'text/markdown;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement('a');
+  anchor.href = url;
+  anchor.download = filename;
+  anchor.click();
+  URL.revokeObjectURL(url);
+}
+
 // Warn when leaving the page with unsaved profile edits
 function useUnsavedGuard(dirty) {
   useEffect(() => {
@@ -93,6 +103,10 @@ export default function ProfileEditor({ onDirtyChange }) {
     setAiBaseRevision(null);
   }
 
+  function handleDownload() {
+    downloadMarkdown(draft, 'master-profile.md');
+  }
+
   async function handleSave() {
     setSaving(true);
     setAlert(null);
@@ -174,6 +188,9 @@ export default function ProfileEditor({ onDirtyChange }) {
           <p className="subtitle">Edit master-profile.md — manual save or AI-assisted updates.</p>
         </div>
         <div className="btn-actions profile-editor-actions">
+          <button type="button" className="btn" onClick={handleDownload}>
+            Download master profile
+          </button>
           <button
             type="button"
             className="btn"
