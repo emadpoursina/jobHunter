@@ -1,7 +1,7 @@
 # Master Profile — Backend Developer
 
 > Emad Poursina  
-> Version: 2.1 — Updated 2026-07-28
+> Version: 2.2 — Updated 2026-08-08
 > This document is the single source of truth for generating tailored CVs.
 
 ---
@@ -16,7 +16,7 @@ Telegram:          @emad_poursina
 LinkedIn:          https://www.linkedin.com/in/emadpoursina/
 GitHub:            https://github.com/emadpoursina
 Location:          Iran
-Seeking:           Relocation — Germany (primary), Netherlands, Canada, Ireland, Portugal
+Seeking:           Relocation — Netherlands, Canada, Ireland, Germany, Portugal
 Work Authorization: Requires employer-sponsored work authorization
 Languages:         Farsi (Native), English (Fluent), German (A1 — learning)
 ```
@@ -30,7 +30,8 @@ Currently backend & DevOps lead on VoiceDash — a live AI dictation SaaS —
 owning the full deployment stack (Docker Compose, staging/production environments,
 release management, and code review). Four years as Technical Lead (2019–2023)
 owning architecture and delivery across full-stack JavaScript projects.
-Seeking senior backend roles in Germany and Europe; available immediately and requires employer-sponsored work authorization.
+Seeking senior backend roles in English-speaking countries (Netherlands, Canada, Ireland) and Germany;
+available with one month notice and requires employer-sponsored work authorization.
 
 ---
 
@@ -123,6 +124,17 @@ Honest skill levels for AI tailoring. Skills marked **Learning** must not be pre
 | Product & release judgment | Intermediate | 1+ | VoiceDash — what to ship, update risk, keeping changes aligned with existing architecture |
 | Remote Team Collaboration | Expert | 7+ | All roles remote; VoiceDash, Villion — remote team work under senior developer |
 
+### Agentic Coding & AI Tooling
+
+| Skill | Level | Notes |
+|---|---|---|
+| Agentic coding workflows | Intermediate | Primary dev mode since mid-2026 — Cursor + Claude agents for planning, implementation, and verification |
+| specs.md (FIRE flow) | Intermediate | Used on MirzaBenevis, NamehAmal, sirenGuard, jobHunter; planner → builder cycle |
+| Ponytail | Beginner | AI-assisted Git workflow tooling — added to VoiceDash team |
+| RTK (rtk-ai) | Beginner | AI toolkit integration — added to VoiceDash |
+| Codebase Memory MCP | Beginner | MCP server for codebase context — added to VoiceDash AI layer |
+| Model selection & harness design | Beginner / Learning | Evaluating which model fits which task; prompt harness patterns; agent skill/rule design |
+
 ---
 
 ## 4. Work Experience
@@ -206,10 +218,11 @@ Your responsibilities:
 - Performed code reviews, weekly reporting, and task assignment for other developers
 - Aligned server and desktop client releases; managed tags, rollbacks, and rollout risk
 - Refactored AI-generated MVP incrementally toward a stable, scalable architecture
+- Introduced an agentic coding layer: RTK, specs.md (Ponytail), and Codebase Memory MCP for team workflows
 
 Technologies used:
 Electron, React, Node.js, Express, MongoDB, Socket.IO, Docker, Docker Compose,
-TypeScript, BullMQ, Redis, Stripe, Sentry
+TypeScript, BullMQ, Redis, Stripe, Sentry, RTK, Ponytail, Codebase Memory MCP
 
 Product URL:    https://voicedash.ai (private codebase — no public repo)
 ```
@@ -400,10 +413,11 @@ Your contributions:
 - Refactored an AI-generated MVP incrementally — preserving loyalty to the existing
   architecture instead of rewrite churn — until the codebase became stable and scalable
 - Judged rollout risk per change (backend-only vs client+server coupling) before release
+- Introduced agentic coding tooling for the team: RTK, Ponytail (specs.md framework), and Codebase Memory MCP
 
 Technologies:
 Electron, React, Node.js, Express, MongoDB, Socket.IO, Docker, Docker Compose,
-TypeScript, BullMQ, Redis, Stripe, Sentry
+TypeScript, BullMQ, Redis, Stripe, Sentry, RTK, Ponytail, Codebase Memory MCP
 ```
 
 ---
@@ -440,8 +454,8 @@ Role progression:
 - As the senior developer gained confidence, moved from testing into small fixes and polish
 - Took on substantial refactoring where AI-generated code had left spaghetti sections in the mobile app
 - Progressed to component-level work (e.g. improved booking flows, date picker)
-- Now owns full features end-to-end — latest: trip feature (existed but was messy; redesigned
-  architecture, restructured, and reimplemented with legacy support)
+- Redesigned and reimplemented the trip feature with legacy support
+- Current focus: bug fixes and testing across the mobile app
 
 Your contributions:
 - Ran structured manual testing across complex booking and membership scenarios
@@ -459,6 +473,91 @@ Technologies (platform / team context — do not claim sole ownership on CVs):
 Node.js 20+, Azure Functions v4, MongoDB, Stripe, Azure Blob Storage, Azure Communication,
 Azure SignalR, Next.js 15, React 19, Tailwind CSS 4, shadcn/ui, LiveKit (agents SDK + WebRTC),
 Dropbox Sign, Docker, GitHub Actions, Netlify, EAS/TestFlight
+```
+
+---
+
+### Project 8: jobHunter
+
+```
+Name:           jobHunter
+URL:            https://github.com/emadpoursina/jobHunter
+Status:         Active (personal tooling)
+Type:           Job search framework — structured workflow, research, and application tooling
+Role:           Sole developer
+Duration:       2026 – Present
+
+What it does:
+A phased framework for finding, qualifying, and applying to backend / full-stack JavaScript roles
+with employer visa sponsorship. Covers four phases: networking (Phase 0), market research and skill
+gap analysis (Phase 1), profile and tailored applications (Phase 2), and skill gap closure (Phase 3).
+Includes AI agents for job offer research, CV generation, and project profile extraction. Built with
+Cursor and specs.md FIRE flow.
+
+Technologies:
+Markdown-based (no runtime stack); specs.md (FIRE), Cursor agents, Claude
+```
+
+---
+
+### Project 9: MirzaBenevis
+
+```
+Name:           MirzaBenevis
+URL:            https://github.com/emadpoursina/MirzaBenevis
+Status:         In development
+Type:           Personal forex backtest tracker (Chrome extension + API + dashboard)
+Role:           Sole developer
+Duration:       2026 – Present
+
+What it does:
+Chrome MV3 extension captures trade data from Faraz chart R:R tools and candle history.
+An Express + Prisma API stores it in PostgreSQL; a React + Recharts dashboard shows trade
+list, detail view, and statistics.
+
+Technologies:
+Node.js, Express, Prisma, PostgreSQL, React, Vite, Recharts, Chrome MV3, Docker, Bun,
+specs.md (FIRE)
+```
+
+---
+
+### Project 10: NamehAmal
+
+```
+Name:           NamehAmal
+URL:            https://github.com/emadpoursina/NamehAmal
+Status:         Live (self-hosted)
+Type:           Minimal local-first time tracker
+Role:           Sole developer
+Duration:       2026 – Present
+
+What it does:
+Local-first time tracking app. Tracks sessions by category with a live timer, manual entry,
+daily dashboard, weekly stats, and category targets. Runs as a Docker container on a self-hosted
+VPS behind nginx.
+
+Technologies:
+Next.js (App Router), TypeScript, Prisma, SQLite, Docker, Bun, specs.md (FIRE), Vitest
+```
+
+---
+
+### Project 11: sirenGuard
+
+```
+Name:           sirenGuard
+URL:            https://github.com/emadpoursina/sirenGuard
+Status:         In development
+Type:           Distraction blocker
+Role:           Sole developer
+Duration:       2026 – Present
+
+What it does:
+A distraction blocker application.
+
+Technologies:
+TBD (see repo)
 ```
 
 ---
@@ -502,7 +601,7 @@ Problem solving:    Practical, delivery-focused; incremental refactor over big-b
 Communication:      Fluent in English (written and spoken)
 Release mindset:    Staging before production; server/client deploy alignment; rollback-ready tags
 Preferred work style: Remote collaboration
-Availability:       Immediate
+Availability:       1 month notice period
 Open to:            Full-time, remote or hybrid, relocation with visa sponsorship
 ```
 
@@ -532,8 +631,8 @@ Expected salary (opening position for applications, senior backend band, gross/y
                          number, use ~5% below the top of the range to leave negotiation room.
 Work type:              Remote or hybrid (open to on-site for right opportunity)
 Work authorization:     Requires employer-sponsored work authorization
-Earliest start date:    Immediate
-Relocation priority:    Germany (primary) → Netherlands → Canada → Ireland → Portugal
+Earliest start date:    1 month notice
+Relocation priority:    Netherlands → Canada → Ireland → Germany → Portugal
 Deal breakers:          No unpaid overtime; no 24/7 on-call without compensation;
                         roles requiring skills marked "Learning" as mandatory without ramp-up time
 ```
@@ -547,7 +646,11 @@ GitHub:         https://github.com/emadpoursina
 LinkedIn:       https://www.linkedin.com/in/emadpoursina/
 Portfolio:      Rousta TV (https://roustatv.com/), Quiz Manager (https://azmoon.sujiland.com/login),
                 VoiceDash (https://voicedash.ai — live product, private codebase),
-                Villion (https://joinvillion.com, https://villionadmin.netlify.app — live product, private codebase)
+                Villion (https://joinvillion.com, https://villionadmin.netlify.app — live product, private codebase),
+                NamehAmal (https://github.com/emadpoursina/NamehAmal — time tracker, public),
+                MirzaBenevis (https://github.com/emadpoursina/MirzaBenevis — forex tracker, public),
+                jobHunter (https://github.com/emadpoursina/jobHunter — job search framework, public),
+                sirenGuard (https://github.com/emadpoursina/sirenGuard — distraction blocker, public)
 Blog:           —
 Open source:    fa.javascript.info (Persian translation of Modern JavaScript Tutorial)
 ```
@@ -568,8 +671,8 @@ Open source:    fa.javascript.info (Persian translation of Modern JavaScript Tut
 I'm a backend engineer with 7+ years of production Node.js experience, currently
 backend and DevOps lead on VoiceDash — a live AI dictation SaaS — where I own
 the full deployment stack, release process, and code review. I'm seeking a senior
-backend role in Germany or the Netherlands and am available immediately.
-The role requires employer-sponsored work authorization.
+backend role in the Netherlands, Canada, Ireland, or Germany and am available with
+one month's notice. The role requires employer-sponsored work authorization.
 ```
 
 ---
@@ -603,15 +706,16 @@ much engineering discipline they actually require."
 I built the Socket.IO audio streaming layer that the whole product runs on — it had
 to be reliable, low-latency, and recoverable without the user noticing."
 
-[TAG: relocation / Germany / DE]
-"Germany is my primary target — I've been deliberately applying to Berlin and Hamburg
-roles, not spraying applications across Europe. I want to relocate and build
-somewhere for a few years, not just pass through."
-
 [TAG: relocation / Netherlands / NL]
-"The Netherlands is one of my top targets — specifically because of the density of
+"The Netherlands is my top target — specifically because of the density of
 Node.js-first product companies and the practical path to a residence permit for
-engineers with sponsored roles."
+engineers with sponsored roles. English is the working language on most teams there,
+which is where I operate best."
+
+[TAG: relocation / Germany / DE]
+"Germany is high on my list — I've been deliberately targeting Berlin, Hamburg, and Munich
+roles. My German is still early, but it's not a blocker for English-first engineering teams,
+and I'm committed to improving it after I've relocated."
 
 [TAG: SaaS / product / startup]
 "I've been building a SaaS from the backend up — VoiceDash isn't a client project,
@@ -731,7 +835,7 @@ ALWAYS include:
   (exact phrase — no variation, no named visa, no "EU Blue Card")
 - Closing links: LinkedIn (https://www.linkedin.com/in/emadpoursina/)
   and GitHub (https://github.com/emadpoursina) on separate lines after sign-off
-- City in header: Amsterdam (current base for applications)
+- City in header: Iran (current base) — use target city (e.g. Amsterdam / Berlin) only if the posting asks for local applicants and relocation is being offered
 - Sign-off: "Best regards, Emad Poursina" — no "Sincerely", no "Kind regards"
 
 NEVER include:
