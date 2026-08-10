@@ -1,8 +1,9 @@
 ---
 id: application-funnel-stages
 title: Application funnel stages
-status: in_progress
+status: completed
 created: 2026-08-10T20:02:14Z
+completed_at: 2026-08-10T20:37:42.021Z
 ---
 
 # Intent: Application funnel stages
