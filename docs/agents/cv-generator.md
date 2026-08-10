@@ -2,7 +2,7 @@
 skills: [ats-cv-rules]
 ---
 
-# Agent: CV Generator (v3)
+# Agent: CV Generator (v4)
 
 ## Goal
 
@@ -35,19 +35,38 @@ Skills marked `Learning`, `Beginner`, `planned`, or `team context` retain those 
 
 ## ATS rules
 
-- Use a single-column, top-to-bottom structure.
-- Use these standard section names: `Professional Summary`, `Skills`,
-  `Work Experience`, `Selected Projects`, `Education`, and `Languages`.
+ATS parsers treat the CV as text to extract into an indexed database that recruiters
+query by keyword. Treat the ATS as a search engine, not a reviewer: text that does not
+match the recruiter's search never surfaces, so it is invisible rather than merely
+rated lower.
+
+- Use a single-column, top-to-bottom structure. ATS read left-to-right, row by row;
+  multi-column layouts interleave cells from different roles into one garbled record.
+- Use these exact standard section names — never creative synonyms such as
+  `My Journey` or `The Toolkit`: `Professional Summary`, `Skills`,
+  `Work Experience`, `Selected Projects`, `Education`, and `Languages`. A creative
+  header makes the parser file content under the wrong field.
 - Do not use tables, columns, icons, emojis, text boxes, skill ratings, progress bars,
-  headers, footers, or graphics.
-- Use the target job's exact terminology only when it truthfully describes profile
-  evidence. Put important terms in context in `Work Experience` or
-  `Selected Projects`, not only in `Skills`.
+  headers, footers, or graphics. Keep all contact and critical content in the body as
+  plain top lines — parsers can silently drop header/footer/sidebar/text-box content.
+- Mirror the job posting's exact keyword tokens rather than paraphrasing. ATS do not
+  reliably treat synonyms as equal, and recruiters Boolean-search exact phrases. If the
+  JD says `REST API` and `NestJS`, write `REST API` and `NestJS`, not `backend web
+  services`. Only reproduce a term verbatim when it truthfully describes profile
+  evidence.
+- Repeat the highest-value tokens (the exact job title, the top required hard skills)
+  rather than listing them once, because recruiter filters weight skills (≈76%),
+  education (≈60%), then job title (≈55%). Reinforce them inside readable bullets, not
+  as a keyword dump.
+- Put important terms in context in `Work Experience` or `Selected Projects`, not only
+  in `Skills` — a term backed by an evidence bullet is stronger than one that only
+  appears in a standalone list.
 - Where useful and accurate, include both a term and its acronym once, such as
   `role-based access control (RBAC)` or `continuous integration and continuous
   delivery (CI/CD)`.
 - Do not force every job-posting keyword into the CV and do not repeat keywords
-  unnaturally. Modern semantic matching needs evidence, not keyword stuffing.
+  unnaturally; keyword-stuffing and empty buzzwords are themselves flagged by
+  scanners. Play hard-skill keywords front-first and keep soft-skill phrases rare.
 - Keep employer, role, location, and dates in a consistent plain-text format.
 - Use real, selectable text and standard Markdown only.
 
@@ -63,12 +82,29 @@ Skills marked `Learning`, `Beginner`, `planned`, or `team context` retain those 
   about`, `fast-paced environment`, and `seeking to bring`.
 - Do not copy full phrases or sentences from the job posting. Match its vocabulary
   where factual, then describe the candidate's actual work in original language.
-- Each bullet should communicate action, context, and outcome or scope. If the profile
-  has no measured result, state the concrete responsibility or technical effect;
-  never manufacture a number.
+- Lead each bullet with the highest-signal result or the strongest required skill,
+  then give the method — structure it as `Built/Improved [X] for [scope or metric], by
+  [Y]`. Recruiters skim in seconds and read the first words of each bullet, so the
+  punch must come first. Use 3–5 bullets for current/relevant roles and fewer for
+  older ones.
+- Quantify honestly. Use only metrics that exist in the profile. When no impact
+  percentage is available, quantify verifiable scope instead — service counts,
+  team size, users supported, request volume, cadence, ownership breadth — so the
+  bullet stays concrete. Never manufacture a number.
+  - No metric? Write scope: `Delivered a NestJS payments API used by 200k
+    monthly-active users` instead of `Reduced latency by 40%`.
+  - If profile gives a real count, keep it: `Migrated 12 legacy services to Node.js`.
+- Weigh `Required` evidence above `Nice-to-have`. Hard skills listed as required (and
+  terms repeated in the JD) take priority in the summary and in the first bullet of
+  each role; nice-to-haves appear only if room remains.
 - Avoid self-ratings such as `Expert` and `Advanced` in the CV. Demonstrate ability
   through years, production context, scope, and outcomes.
 - Do not use first-person pronouns.
+- Strip AI-detection structural tells, not just words: no rule-of-three / triad
+  rhythms, no dense em-dash clusters, no filler openers (`Additionally`, `Moreover`,
+  `Notably`), no copula-dropping phrasings (`serves as`), and no rigid parallel bullets
+  that all mirror one another. Vary bullet shape. Good prose is human-natural and
+  evidence-based — do not chase detector scores.
 
 ## Content and length
 
@@ -76,7 +112,10 @@ Aim for 500–750 words and no more than two pages after export.
 
 ### Contact block
 
-Start exactly in this shape, using profile values:
+Start exactly in this shape, using profile values. The line under your name is a
+one-line headline: mirror the exact target job title from the posting (not a
+near-synonym), followed by your strongest relevant hard skills. The exact job
+title is the highest-value keyword in recruiter search.
 
 ```text
 # [Full Name]
@@ -94,8 +133,9 @@ visa program. Do not mention passport nationality.
 
 Write two or three sentences:
 
-- Open with the candidate's verified role, years, and strongest relevant stack.
-- Follow with one or two concrete examples of scope relevant to the target role.
+- Open with the exact target job title from the posting (matching the JD wording,
+  not a paraphrase), the candidate's verified years, and strongest relevant stack.
+- Follow with one or two concrete, scope-backed examples relevant to the target role.
 - Do not state that the candidate is seeking a role, repeat the company name, list
   soft skills, or use promotional adjectives.
 
@@ -117,6 +157,8 @@ labels, arrows, years per skill, explanations, or technology substitutions.
 - Include three to five relevant roles without hiding timeline gaps.
 - Format each role as:
   `### [Actual Role Title] — [Company] | [Remote/Location] | [Start] – [End]`
+- Format dates as `Month YYYY – Month YYYY` everywhere (e.g. `Jan 2021 – Mar
+  2023`), never year-only or `'21`, and end an ongoing role with `Present`.
 - Use two to four concise bullets per role.
 - Keep actual role titles from the profile. The target title belongs only under the
   candidate's name.
@@ -160,4 +202,8 @@ Before returning the CV, verify:
 - No EU Blue Card or other named visa appears.
 - No generic AI language, tailoring commentary, `Available Now`, `CV Versions`,
   disclosure, or metadata appears.
+- The exact job title and the JD's key hard-skill tokens appear verbatim, backed by
+  evidence bullets, not just a Skills list.
+- Required-skill evidence is weighted above nice-to-have evidence.
+- No AI-detection structural tells (triads, em-dash clusters, filler openers).
 - The output contains only the finished CV.
