@@ -41,13 +41,14 @@ All phases run in parallel once Phase 1 baseline is complete. Phase 2 and Phase 
   1. Maintain master profile → `phase2/profile/master-profile.md` (source of truth for who you are)
   2. Create offer file per target role → `phase2/offers/_offer-template.md` (copypaste the JD)
   3. AI generates tailored CV → `phase2/documents/generated/` (AI draft, 100% human review before send)
-  4. Submit and track pipeline state → `phase2/applications/pipeline.md`
+  4. Submit and track pipeline state → job-collector (`application_stage` on jobs in SQLite)
   5. Log recruiter/interview feedback → `phase2/applications/feedback.md`
 - **Key Files:**
   - `phase2/profile/master-profile.md` — single source of truth, updated as skills ship
   - `phase2/offers/<role-name>.md` — one per live job posting
   - `phase2/documents/generated/CV_<Company>_<Role>_<Date>.md` — AI-generated tailored output
-  - `phase2/applications/pipeline.md` — track: sent → screening → interview → offer/rejection
+  - job-collector — live funnel: sent → screening → interview → offer/rejection (`application_stage`)
+  - `phase2/applications/pipeline.md` — legacy; not maintained (no DB sync)
 - **Agent Spec:** `docs/agents/cv-generator.md`
 - **When:** Ongoing; Phase 1 research informs which offers to target
 
@@ -120,7 +121,7 @@ jobHunter/
 │   │       ├── CV_Company_Role_2026-08-10.md
 │   │       └── ...
 │   └── applications/
-│       ├── pipeline.md                # Status tracking
+│       ├── pipeline.md                # Legacy (unused; live tracker is job-collector)
 │       └── feedback.md                # Recruiter notes
 │
 ├── phase3/                            # Phase 3 — learning & gaps
@@ -189,7 +190,8 @@ When working in this folder, follow the spec at:
 - `profile/master-profile.md` — single source of truth, update as Phase 3 closes gaps
 - `offers/` — create one `.md` file per JD (use `_offer-template.md` as template)
 - `documents/generated/` — AI-generated tailored CVs go here, review 100% before sending
-- `applications/pipeline.md` — track: sent → screening → interview → offer/rejection
+- job-collector — live application funnel (`application_stage` on jobs)
+- `applications/pipeline.md` — legacy; not maintained
 
 **Before every send:** 100% human review of generated CV. No exceptions.
 ```
@@ -269,7 +271,7 @@ Each is a Hermes Skill candidate. Ask Hermes to "create a skill from docs/agents
 2. Copy the JD into `phase2/offers/<Company_Role_Date>.md`
 3. Ask Hermes: "Generate a tailored CV using docs/agents/cv-generator.md"
 4. Review the generated CV in `phase2/documents/generated/` (100% human approval)
-5. Update `phase2/applications/pipeline.md` with offer metadata
+5. Update application funnel stage in job-collector (`application_stage`, e.g. `sent`)
 6. When you get feedback, log it in `phase2/applications/feedback.md`
 7. Let the feedback inform Phase 3 backlog prioritization
 
@@ -296,7 +298,7 @@ When you're stuck or need guidance, ask Hermes:
 - "Which skills appear most in the last phase1 research?" → reads gap-report.md, requirements-summary.md
 - "Generate a tailored CV for [offer-file]" → runs cv-generator spec
 - "Update master profile based on what's in phase3/backlog.md" → merges completed items into profile
-- "What's the current pipeline status?" → reads applications/pipeline.md, reports statistics
+- "What's the current pipeline status?" → reads job-collector jobs / `application_stage`, reports statistics
 - "Re-sample live offers for Germany and summarize new skill patterns" → runs job-offer-research spec
 
 ---

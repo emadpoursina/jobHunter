@@ -66,6 +66,6 @@
 ## Application
 
 - **Applied:** <!-- yes / no -->
-- **Pipeline ID:** <!-- link to phase2/applications/pipeline.md row -->
+- **Job collector ID:** <!-- job-collector job id / application_stage -->
 - **Generated CV:** `phase2/documents/generated/CV_...md`
 - **Stage:** <!-- draft / reviewed / sent -->

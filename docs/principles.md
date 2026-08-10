@@ -38,7 +38,7 @@ For each priority country document:
 ## Networking (Phase 0)
 
 - Run in parallel with Phase 2 from day one.
-- Log every outreach and link referrals to `phase2/applications/pipeline.md`.
+- Log every outreach and link referrals to the matching job in job-collector (`application_stage`).
 
 ## Metrics
 

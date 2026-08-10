@@ -25,8 +25,7 @@ Hard rules:
 - Skills marked "Learning" in the profile are NOT proficient (⚠️, never 🟡)
 - Save CV to phase2/documents/generated/CV_[Company]_[JobTitle]_[YYYY-MM-DD].md
 - Save disclosure to phase2/documents/generated/CV_[Company]_[JobTitle]_[YYYY-MM-DD].gaps.md
-- Update phase2/applications/pipeline.md with stage: draft
-- Update the job offer file Application section with the generated CV path
+- Update the job offer file Application section with the generated CV path (funnel stage lives in job-collector)
 ```
 
 ---

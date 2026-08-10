@@ -12,6 +12,40 @@ workspace:
   run_scope_history: []
   scanned_at: 2026-07-18T11:15:18Z
 intents:
+  - id: application-funnel-stages
+    title: Application funnel stages
+    status: in_progress
+    created: 2026-08-10T20:02:14Z
+    brief: .specs-fire/intents/application-funnel-stages/brief.md
+    work_items:
+      - id: schema-stage-migration
+        title: Schema + stage migration
+        complexity: medium
+        mode: confirm
+        status: pending
+        depends_on: []
+      - id: stage-api-and-mark-applied
+        title: Stage API + mark-applied wiring
+        complexity: medium
+        mode: confirm
+        status: pending
+        depends_on:
+          - schema-stage-migration
+      - id: funnel-stage-ui
+        title: Funnel stage UI
+        complexity: medium
+        mode: confirm
+        status: pending
+        depends_on:
+          - stage-api-and-mark-applied
+      - id: docs-pipeline-to-job-collector
+        title: Docs — pipeline.md → job-collector
+        complexity: low
+        mode: autopilot
+        status: completed
+        depends_on: []
+        run_id: run-jobhunter-009
+        completed_at: 2026-08-10T20:31:41.487Z
   - id: agent-skills
     title: Shared agent skill library
     status: in_progress
@@ -303,3 +337,11 @@ runs:
           mode: confirm
       started: 2026-08-10T19:15:05.670Z
       completed: 2026-08-10T19:36:50.522Z
+    - id: run-jobhunter-009
+      scope: batch
+      work_items:
+        - id: docs-pipeline-to-job-collector
+          intent: application-funnel-stages
+          mode: autopilot
+      started: 2026-08-10T20:30:21.278Z
+      completed: 2026-08-10T20:31:41.487Z

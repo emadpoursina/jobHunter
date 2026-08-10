@@ -8,7 +8,7 @@ Individual offer files for roles you are applying to — distinct from the Phase
 2. Copy [`_offer-template.md`](_offer-template.md) → `by-country/<code>/offer-<company>-<role-slug>.md`
 3. Run [`docs/agents/cv-generator.md`](../../docs/agents/cv-generator.md)
 4. Output → `../documents/generated/CV_<Company>_<JobTitle>_<Date>.md`
-5. Track in [`../applications/pipeline.md`](../applications/pipeline.md)
+5. Track funnel stage in job-collector (`application_stage` on the job)
 
 ## Layout
 

@@ -194,7 +194,7 @@ jobHunter/
 4. Work [`phase3/backlog.md`](phase3/backlog.md) via [`phase3/flagship-project.md`](phase3/flagship-project.md) **in parallel** with applications.
 5. Keep [`phase2/profile/master-profile.md`](phase2/profile/master-profile.md) updated as skills ship.
 6. Create offer files from [`phase2/offers/_offer-template.md`](phase2/offers/_offer-template.md); run [CV generator agent](docs/agents/cv-generator.md) → `phase2/documents/generated/`.
-7. Track applications in `phase2/applications/pipeline.md`, networking in `networking/`, metrics in `metrics/by-country.md`.
+7. Track applications in job-collector (`application_stage` on jobs), networking in `networking/`, metrics in `metrics/by-country.md`. (`phase2/applications/pipeline.md` is legacy / unused.)
 
 ---
 

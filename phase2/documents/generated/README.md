@@ -6,7 +6,7 @@ Tailored CVs and Gaps Disclosures from the [CV generator agent](../../docs/agent
 - CV: `CV_<CompanySlug>_<JobTitleSlug>_<YYYY-MM-DD>.md` — CV only
 - Disclosure: `CV_<CompanySlug>_<JobTitleSlug>_<YYYY-MM-DD>.gaps.md` — user-only, never send
 
-**Stages:** `draft` (AI output) → `reviewed` (human approved) → linked in `../applications/pipeline.md` when sent.
+**Stages:** `draft` (AI output) → `reviewed` (human approved) → mark `application_stage=sent` in job-collector when sent.
 
 Do not send a CV until the Gaps Disclosure checklist is complete.
 

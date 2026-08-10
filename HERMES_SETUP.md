@@ -176,7 +176,8 @@ When working in this folder, follow the spec at: `docs/agents/cv-generator.md`
 - `profile/master-profile.md` — single source of truth
 - `offers/` — one `.md` file per JD (use `_offer-template.md` as template)
 - `documents/generated/` — AI-generated CVs (100% human review before send)
-- `applications/pipeline.md` — track status (sent → screening → interview → offer/rejection)
+- job-collector — live funnel status (`application_stage`: sent → screening → interview → offer/rejection)
+- `applications/pipeline.md` — legacy; not maintained
 
 **Before every send:** 100% human review of generated CV. No exceptions.
 ```
@@ -254,7 +255,7 @@ docker compose exec -it -w /workspace/jobHunter hermes-jobhunter /opt/hermes/.ve
 # - Create phase2/offers/<Company>_<Role>_<Date>.md with the JD
 # - Generate a tailored CV using the cv-generator spec
 # - Output to phase2/documents/generated/
-# - Update phase2/applications/pipeline.md with metadata
+# - Update application_stage in job-collector (e.g. sent)
 ```
 
 ### Re-Sampling Live Offers (Every 2 Weeks)

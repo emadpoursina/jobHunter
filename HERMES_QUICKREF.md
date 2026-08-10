@@ -48,7 +48,7 @@ These are commands you type after opening a Hermes session (see "Open a Hermes C
 ### Ask About Your Status
 
 ```
-> What's in my current application pipeline? Read phase2/applications/pipeline.md and summarize.
+> What's in my current application pipeline? Use job-collector jobs / application_stage and summarize.
 
 > What skill gaps does the market want? Read phase1/skills/gap-report.md and analyze.
 
