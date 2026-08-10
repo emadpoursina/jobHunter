@@ -1,7 +1,7 @@
 # Master Profile — Backend Developer
 
 > Emad Poursina  
-> Version: 2.2 — Updated 2026-08-08
+> Version: 2.3 — Updated 2026-08-08
 > This document is the single source of truth for generating tailored CVs.
 
 ---
@@ -25,11 +25,18 @@ Languages:         Farsi (Native), English (Fluent), German (A1 — learning)
 
 ## 2. Professional Summary
 
-Backend Engineer with 7+ years building production Node.js systems.
+Backend Engineer with 7+ years building production Node.js systems, all of it in startups where
+there was no dedicated DevOps team, no on-call rotation to hand off to, and no senior architect
+to approve the design before writing it. That context built a different kind of engineer: one who
+has debugged production at midnight, refactored an AI-generated codebase under live traffic,
+and made release calls with incomplete information.
 Currently backend & DevOps lead on VoiceDash — a live AI dictation SaaS —
 owning the full deployment stack (Docker Compose, staging/production environments,
 release management, and code review). Four years as Technical Lead (2019–2023)
 owning architecture and delivery across full-stack JavaScript projects.
+Before engineering became the full-time focus, ran a web design business — handling sales,
+clients, content, and pricing — which built a commercial instinct that shows up in how
+technical decisions get framed and communicated to non-technical stakeholders.
 Seeking senior backend roles in English-speaking countries (Netherlands, Canada, Ireland) and Germany;
 available with one month notice and requires employer-sponsored work authorization.
 
@@ -603,6 +610,27 @@ Release mindset:    Staging before production; server/client deploy alignment; r
 Preferred work style: Remote collaboration
 Availability:       1 month notice period
 Open to:            Full-time, remote or hybrid, relocation with visa sponsorship
+
+Startup background:
+Every role in my career has been in a startup or small team. That means no dedicated DevOps,
+no separate QA team, no senior architect to review the plan. I have owned infrastructure,
+release decisions, code review, debugging, and delivery on the same day, sometimes at the same
+time. Startup engineers get comfortable with uncomfortable context — partial information, fast
+decisions, systems that only one person understands. I've been that person repeatedly. The skills
+that come from that environment — judgment under pressure, comfort with ownership, and the ability
+to make a call without a committee — are hard to replicate in a big-company context and transfer
+directly to any team that values engineers who think beyond their ticket queue.
+
+Business / commercial background:
+Before engineering became my full focus, I ran a web design business. During that period I
+deliberately stepped back from coding and studied the business side: how to find clients, how
+to sell, how to price, how to write content that converts, how to structure client conversations,
+and how to keep a project on track when the client changes their mind. I didn't scale it into
+something lasting, but I came away with a different kind of fluency — the ability to translate
+technical decisions into business language, understand what a feature is actually worth to the
+person asking for it, and communicate risk and trade-offs to non-technical stakeholders without
+losing precision. That's useful in a senior engineering role, especially at a startup where the
+engineer in the room is sometimes the only technical voice in a product conversation.
 ```
 
 ---
@@ -737,6 +765,24 @@ primary ticket queue is UI components."
 "I've been deepening my PostgreSQL knowledge deliberately — working through
 The Art of PostgreSQL and Use The Index, Luke — because I've seen what happens
 when the database becomes the bottleneck and nobody on the team knows how to fix it."
+
+[TAG: startup / small team / ownership / senior]
+"Every role I've had has been in a startup or small team — which means no dedicated
+DevOps, no separate QA, no senior architect to sign off the design. I've owned
+infrastructure, release decisions, code review, and production debugging in the same
+week, sometimes on the same day. The judgment that comes from that environment —
+making a call with partial information, understanding the full cost of a decision,
+being accountable for what goes out — is what I'm looking for in the next role too."
+
+[TAG: business / commercial / product / startup / non-technical stakeholders]
+"Before engineering became my full focus, I ran a web design business. I spent
+serious time on the business side — client conversations, pricing, sales, how to
+communicate value without hiding behind technical language. It didn't become a lasting
+company, but it gave me a commercial instinct that shows up in how I frame technical
+trade-offs to non-technical stakeholders. I can sit in a product conversation, understand
+what a feature is actually worth to the person asking, and communicate risk in terms
+they care about. That's useful in a senior role at a startup where the engineer in the
+room is sometimes the only technical voice."
 ```
 
 ---
@@ -772,6 +818,15 @@ Ordered by priority. These are selection hints for the agent — not new skills 
 
 8. Stripe Payments (production) — Checkout, webhooks, billing portal at VoiceDash.
    Use for SaaS or fintech-adjacent roles.
+
+9. Startup resilience — 7+ years in startups with no dedicated DevOps, QA, or
+   architecture review layer. Use for small-company or "we move fast" roles, and for
+   any role that emphasises ownership, autonomy, or breadth over narrow specialisation.
+
+10. Business / commercial background — ran a web design business; studied sales,
+    pricing, client management, and content from an owner's perspective. Use when the
+    role involves non-technical stakeholders, product decisions, or client-facing work,
+    or when the company emphasises engineers who understand business context.
 ```
 
 ---
