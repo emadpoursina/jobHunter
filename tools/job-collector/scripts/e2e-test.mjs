@@ -273,6 +273,11 @@ async function test6_status(jobId) {
 
   const patch = await api('PATCH', `/jobs/${jobId}`, { status: 'applied' });
   record(patch.data?.job?.status === 'applied', 'PATCH status to applied');
+  record(
+    Boolean(patch.data?.job?.appliedAt),
+    'PATCH status=applied stamps applied_at',
+    `appliedAt=${patch.data?.job?.appliedAt ?? 'null'}`,
+  );
 }
 
 async function test7_uiSmoke(jobId) {

@@ -215,22 +215,50 @@ export function updateJob(id, fields) {
     .prepare(`UPDATE jobs SET ${assignments} WHERE id = ?`)
     .run(...columns.map((col) => row[col]), id);
 
+  // Status-only "Mark applied" path must stamp applied_at (first time only)
+  if (row.status === 'applied') {
+    stampAppliedAt(id);
+  }
+
   return getJobById(id);
 }
 
 // Mark a job as applied; first application wins, subsequent calls are no-ops
 export function markApplied(id, { appliedUrl = null } = {}) {
   const row = sqlite
-    .prepare('SELECT applied_at FROM jobs WHERE id = ?')
+    .prepare('SELECT applied_at, apply_url FROM jobs WHERE id = ?')
     .get(id);
   if (!row) return null;
-  if (row.applied_at) return getJobById(id);
 
+  if (row.applied_at) {
+    // Keep status in sync even when the timestamp was already recorded
+    sqlite
+      .prepare("UPDATE jobs SET status = 'applied' WHERE id = ? AND status != 'applied'")
+      .run(id);
+    return getJobById(id);
+  }
+
+  const url = appliedUrl || row.apply_url || null;
   sqlite
-    .prepare("UPDATE jobs SET applied_at = datetime('now'), applied_url = ? WHERE id = ?")
-    .run(appliedUrl, id);
+    .prepare(
+      "UPDATE jobs SET status = 'applied', applied_at = datetime('now'), applied_url = ? WHERE id = ?",
+    )
+    .run(url, id);
 
   return getJobById(id);
+}
+
+// Stamp applied_at / applied_url once when a job becomes applied
+function stampAppliedAt(id) {
+  sqlite
+    .prepare(
+      `UPDATE jobs
+       SET applied_at = datetime('now'),
+           applied_url = COALESCE(applied_url, apply_url)
+       WHERE id = ?
+         AND (applied_at IS NULL OR applied_at = '')`,
+    )
+    .run(id);
 }
 
 // Check whether a job with the same source URL already exists
