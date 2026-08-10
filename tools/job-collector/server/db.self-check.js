@@ -1,12 +1,30 @@
-// Self-check for server/db.js applied_at stamping
+// Self-check for server/db.js applied_at + application_stage migration
 // Run: cd tools/job-collector && bun run server/db.self-check.js
 // Asserts:
 //   1. markApplied sets applied_at + status=applied
 //   2. markApplied is idempotent — second call does not change applied_at
 //   3. updateJob({ status: 'applied' }) stamps applied_at (UI "Mark applied" path)
-//   4. Cleanup: throwaway rows deleted
+//   4. application_stage column exists; migrate() is idempotent
+//   5. status=applied → application_stage=sent + pipeline status fallback
+//   6. status=rejected → application_stage=rejected + pipeline status fallback
+//   7. Cleanup: throwaway rows deleted
 // Exits 0 on success, 1 on failure. No test framework.
-import { insertJob, getJobById, markApplied, updateJob, deleteJob } from './db.js';
+import {
+  insertJob,
+  getJobById,
+  markApplied,
+  updateJob,
+  deleteJob,
+  migrate,
+  migrateApplicationStages,
+  APPLICATION_STAGES,
+} from './db.js';
+import { Database } from 'bun:sqlite';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const DB_PATH = path.join(__dirname, '..', 'data', 'jobs.db');
 
 let failures = 0;
 function assert(cond, msg) {
@@ -19,7 +37,23 @@ function assert(cond, msg) {
 }
 
 function main() {
-  console.log('[self-check] db.js applied_at');
+  console.log('[self-check] db.js applied_at + application_stage');
+
+  assert(
+    APPLICATION_STAGES.includes('not_started') &&
+      APPLICATION_STAGES.includes('sent') &&
+      APPLICATION_STAGES.length === 9,
+    `APPLICATION_STAGES documents 9 funnel values (${APPLICATION_STAGES.length})`,
+  );
+
+  const cols = new Database(DB_PATH).prepare('PRAGMA table_info(jobs)').all();
+  assert(
+    cols.some((c) => c.name === 'application_stage'),
+    'jobs.application_stage column exists',
+  );
+  migrate();
+  migrate();
+  assert(true, 'migrate() re-run is idempotent (no throw)');
 
   const ids = [];
 
@@ -38,6 +72,12 @@ function main() {
       process.exit(1);
     }
     ids.push(id);
+
+    const inserted = getJobById(id);
+    assert(
+      inserted.applicationStage === 'not_started',
+      `new job defaults application_stage=not_started ("${inserted.applicationStage}")`,
+    );
 
     const first = markApplied(id, { appliedUrl: 'https://example.com/apply' });
     assert(first !== null, 'markApplied returns job row');
@@ -93,6 +133,56 @@ function main() {
     assert(
       again.appliedAt === stampedAt,
       `updateJob does not overwrite existing applied_at ("${again.appliedAt}")`,
+    );
+
+    // --- application_stage migration mapping ---
+    migrateApplicationStages();
+    const remappedApplied = getJobById(id);
+    assert(
+      remappedApplied.applicationStage === 'sent',
+      `applied → application_stage=sent ("${remappedApplied.applicationStage}")`,
+    );
+    assert(
+      remappedApplied.status === 'parsed',
+      `applied status falls back to parsed when titled ("${remappedApplied.status}")`,
+    );
+
+    const remappedViaStatus = getJobById(id2);
+    assert(
+      remappedViaStatus.applicationStage === 'sent',
+      `status-applied path also remaps to sent ("${remappedViaStatus.applicationStage}")`,
+    );
+
+    const id3 = insertJob({
+      source: 'selfcheck',
+      sourceUrl: `selfcheck-rejected-${Date.now()}`,
+      rawText: 'selfcheck rejected job',
+      title: 'Selfcheck Rejected',
+      company: 'Selfcheck Co',
+      cvMdPath: '/tmp/fake-cv.md',
+    });
+    if (!id3) {
+      console.error('  FAIL  insertJob #3 returned null');
+      process.exit(1);
+    }
+    ids.push(id3);
+    updateJob(id3, { status: 'rejected' });
+    migrateApplicationStages();
+    const remappedRejected = getJobById(id3);
+    assert(
+      remappedRejected.applicationStage === 'rejected',
+      `rejected → application_stage=rejected ("${remappedRejected.applicationStage}")`,
+    );
+    assert(
+      remappedRejected.status === 'cv_generated',
+      `rejected status falls back to cv_generated when CV path set ("${remappedRejected.status}")`,
+    );
+
+    migrateApplicationStages();
+    assert(
+      getJobById(id3).applicationStage === 'rejected' &&
+        getJobById(id3).status === 'cv_generated',
+      'second migrateApplicationStages leaves remapped rows unchanged',
     );
   } finally {
     for (const id of ids) {

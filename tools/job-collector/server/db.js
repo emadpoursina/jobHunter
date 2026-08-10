@@ -8,6 +8,20 @@ const PACKAGE_ROOT = path.resolve(__dirname, '..');
 const DB_PATH = path.join(PACKAGE_ROOT, 'data', 'jobs.db');
 
 const JSON_COLUMNS = ['required_skills', 'nice_to_have', 'responsibilities'];
+
+/** Application funnel stages (separate from collector/CV `status`). */
+export const APPLICATION_STAGES = [
+  'not_started',
+  'draft',
+  'reviewed',
+  'sent',
+  'screening',
+  'interview',
+  'offer',
+  'rejected',
+  'withdrawn',
+];
+
 const JOB_SUMMARY_COLUMNS = [
   'id',
   'source',
@@ -17,6 +31,7 @@ const JOB_SUMMARY_COLUMNS = [
   'country_code',
   'match_score',
   'status',
+  'application_stage',
   'visa_sponsorship',
   'applied_at',
   'created_at',
@@ -123,8 +138,42 @@ export function migrate() {
   addColumnIfMissing('jobs', 'applied_url', 'TEXT');
   addColumnIfMissing('jobs', 'apply_url', 'TEXT');
   addColumnIfMissing('jobs', 'cover_letter_md_path', 'TEXT');
+  addColumnIfMissing(
+    'jobs',
+    'application_stage',
+    "TEXT NOT NULL DEFAULT 'not_started'",
+  );
 
+  migrateApplicationStages();
   seedDefaultSettings();
+}
+
+/**
+ * One-time (idempotent) remap: legacy decision statuses → application_stage,
+ * then restore collector/CV pipeline status from CV path / title.
+ * Safe to re-run: only rows still on status=applied|rejected are rewritten.
+ */
+export function migrateApplicationStages() {
+  const pipelineStatusSql = `
+    CASE
+      WHEN cv_md_path IS NOT NULL AND cv_md_path != '' THEN 'cv_generated'
+      WHEN title IS NOT NULL AND title != '' THEN 'parsed'
+      ELSE 'raw'
+    END`;
+
+  sqlite.run(`
+    UPDATE jobs
+    SET application_stage = 'sent',
+        status = ${pipelineStatusSql}
+    WHERE status = 'applied'
+  `);
+
+  sqlite.run(`
+    UPDATE jobs
+    SET application_stage = 'rejected',
+        status = ${pipelineStatusSql}
+    WHERE status = 'rejected'
+  `);
 }
 
 // Add a column to a table if it does not already exist (SQLite has no ADD COLUMN IF NOT EXISTS)
