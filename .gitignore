@@ -48,3 +48,6 @@ tools/*/.env
 .specsmd/**/node_modules/
 
 scratch/
+
+# --- Local ATS research scrapes (repo root only) ---
+/*.html
