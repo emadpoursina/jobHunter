@@ -118,7 +118,7 @@ export default function Dashboard() {
       setStats({
         total: jobs.length,
         withCv: jobs.filter((j) => j.status === 'cv_generated').length,
-        applied: jobs.filter((j) => j.status === 'applied').length,
+        applied: jobs.filter((j) => j.applicationStage === 'sent' || j.status === 'applied').length,
       });
 
       const enabledScrapers = (collectors ?? []).filter(

@@ -272,7 +272,16 @@ async function test6_status(jobId) {
   }
 
   const patch = await api('PATCH', `/jobs/${jobId}`, { status: 'applied' });
-  record(patch.data?.job?.status === 'applied', 'PATCH status to applied');
+  record(
+    patch.data?.job?.applicationStage === 'sent',
+    'PATCH status=applied maps to application_stage=sent',
+    `stage=${patch.data?.job?.applicationStage ?? 'null'}`,
+  );
+  record(
+    patch.data?.job?.status !== 'applied',
+    'PATCH status=applied does not leave long-lived status=applied',
+    `status=${patch.data?.job?.status ?? 'null'}`,
+  );
   record(
     Boolean(patch.data?.job?.appliedAt),
     'PATCH status=applied stamps applied_at',

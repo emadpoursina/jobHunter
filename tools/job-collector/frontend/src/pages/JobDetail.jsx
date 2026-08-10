@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { api } from '../api.js';
 import CvPreview from '../components/CvPreview.jsx';
 import { matchScoreClass } from '../components/JobCard.jsx';
-import StatusBadge from '../components/StatusBadge.jsx';
+import StatusBadge, { APPLICATION_STAGE_OPTIONS } from '../components/StatusBadge.jsx';
 
 const CV_POLL_MS = 2000;
 const CV_POLL_TIMEOUT_MS = 120000;
@@ -333,9 +333,13 @@ export default function JobDetail() {
     }
   }
 
-  const isDecisionStatus = job?.status === 'applied' || job?.status === 'rejected';
+  const isDecisionStage =
+    job?.applicationStage === 'sent' ||
+    job?.applicationStage === 'rejected' ||
+    job?.applicationStage === 'withdrawn' ||
+    Boolean(job?.appliedAt);
 
-  // Update job status (applied, rejected, or neutral)
+  // Update collector status (neutral reset) or legacy status path
   async function handleStatusChange(status) {
     setUpdatingStatus(true);
     setAlert(null);
@@ -343,8 +347,23 @@ export default function JobDetail() {
     try {
       const { job: updated } = await api.updateJob(id, { status });
       setJob(updated);
-      const message = status === 'neutral' ? 'Reset to neutral.' : `Marked as ${status}.`;
+      const message = status === 'neutral' ? 'Collector status reset.' : `Marked as ${status}.`;
       showAlert(message, 'info');
+    } catch (err) {
+      showAlert(err.message);
+    } finally {
+      setUpdatingStatus(false);
+    }
+  }
+
+  async function handleStageChange(applicationStage) {
+    setUpdatingStatus(true);
+    setAlert(null);
+
+    try {
+      const { job: updated } = await api.updateJob(id, { applicationStage });
+      setJob(updated);
+      showAlert(`Stage set to ${applicationStage}.`, 'info');
     } catch (err) {
       showAlert(err.message);
     } finally {
@@ -446,6 +465,7 @@ export default function JobDetail() {
           </p>
           <div className="job-detail-badges">
             <StatusBadge status={job.status} />
+            <StatusBadge status={job.applicationStage} variant="stage" />
             <VisaBadge visa={job.visaSponsorship ?? job.visa_sponsorship} />
             <span className={`match-score ${scoreClass}`}>
               {job.matchScore != null ? `${job.matchScore}% match` : 'No score'}
@@ -784,40 +804,58 @@ export default function JobDetail() {
       )}
 
       <section className="card job-detail-section">
-        <div className="card-title">Status</div>
+        <div className="card-title">Application stage</div>
+        <div className="filter-field" style={{ maxWidth: 280, marginBottom: 12 }}>
+          <label htmlFor="job-stage">Funnel stage</label>
+          <select
+            id="job-stage"
+            value={job.applicationStage || 'not_started'}
+            onChange={(e) => handleStageChange(e.target.value)}
+            disabled={updatingStatus}
+          >
+            {APPLICATION_STAGE_OPTIONS.map(({ value, label }) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
+          </select>
+        </div>
         <div className="btn-actions">
           <button
             type="button"
             className="btn"
             onClick={() => handleStatusChange('neutral')}
-            disabled={updatingStatus || !isDecisionStatus}
+            disabled={updatingStatus}
+            title="Reset collector/CV status only (raw/parsed/cv_generated)"
           >
-            Mark neutral
-          </button>
-          <button
-            type="button"
-            className="btn"
-            onClick={() => handleStatusChange('applied')}
-            disabled={updatingStatus || job.status === 'applied'}
-          >
-            Mark applied
+            Reset collector status
           </button>
           <button
             type="button"
             className="btn"
             onClick={handleMarkApplied}
-            disabled={markingApplied || Boolean(job.appliedAt)}
-            title="Record applied_at and company apply URL after you submit the application"
+            disabled={markingApplied || job.applicationStage === 'sent'}
+            title="Set stage to sent and record applied_at"
           >
-            {job.appliedAt ? 'Application recorded' : 'Record application'}
+            {job.applicationStage === 'sent' || job.appliedAt
+              ? 'Marked applied (sent)'
+              : 'Mark applied'}
           </button>
           <button
             type="button"
             className="btn"
-            onClick={() => handleStatusChange('rejected')}
-            disabled={updatingStatus || job.status === 'rejected'}
+            onClick={() => handleStageChange('rejected')}
+            disabled={updatingStatus || job.applicationStage === 'rejected'}
           >
             Mark rejected
+          </button>
+          <button
+            type="button"
+            className="btn"
+            onClick={() => handleStageChange('not_started')}
+            disabled={updatingStatus || !isDecisionStage}
+          >
+            Reset stage
           </button>
           <button
             type="button"
@@ -828,6 +866,19 @@ export default function JobDetail() {
             Delete job
           </button>
         </div>
+        {job.appliedAt && (
+          <p className="detail-row" style={{ marginTop: 12 }}>
+            Applied at: {job.appliedAt}
+            {job.appliedUrl ? (
+              <>
+                {' · '}
+                <a href={job.appliedUrl} target="_blank" rel="noopener noreferrer">
+                  applied URL
+                </a>
+              </>
+            ) : null}
+          </p>
+        )}
       </section>
 
       {alert && (

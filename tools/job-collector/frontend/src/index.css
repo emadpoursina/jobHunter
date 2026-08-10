@@ -624,16 +624,44 @@ select:focus {
   border-color: var(--green-border);
 }
 
-.status-applied {
+.status-applied,
+.stage-sent {
   background: #ede9fe;
   color: #5b21b6;
   border-color: #c4b5fd;
 }
 
-.status-rejected {
+.status-rejected,
+.stage-rejected {
   background: var(--red-bg);
   color: var(--red);
   border-color: #fca5a5;
+}
+
+.stage-not-started,
+.stage-draft,
+.stage-reviewed {
+  background: var(--surface2);
+  color: var(--text2);
+}
+
+.stage-screening,
+.stage-interview {
+  background: var(--blue-bg);
+  color: var(--blue);
+  border-color: var(--blue-border);
+}
+
+.stage-offer {
+  background: var(--green-bg);
+  color: var(--green);
+  border-color: var(--green-border);
+}
+
+.stage-withdrawn {
+  background: var(--surface2);
+  color: var(--text3);
+  border-color: var(--border2);
 }
 
 .status-unmatched {

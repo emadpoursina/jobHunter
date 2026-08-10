@@ -4,9 +4,12 @@ title: Funnel stage UI
 intent: application-funnel-stages
 complexity: medium
 mode: confirm
-status: pending
-depends_on: [stage-api-and-mark-applied]
+status: completed
+depends_on:
+  - stage-api-and-mark-applied
 created: 2026-08-10T20:03:30Z
+run_id: run-jobhunter-010
+completed_at: 2026-08-10T20:37:42.014Z
 ---
 
 # Work Item: Funnel stage UI

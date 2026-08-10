@@ -22,22 +22,28 @@ intents:
         title: Schema + stage migration
         complexity: medium
         mode: confirm
-        status: pending
+        status: completed
         depends_on: []
+        run_id: run-jobhunter-010
+        completed_at: 2026-08-10T20:37:42.014Z
       - id: stage-api-and-mark-applied
         title: Stage API + mark-applied wiring
         complexity: medium
         mode: confirm
-        status: pending
+        status: completed
         depends_on:
           - schema-stage-migration
+        run_id: run-jobhunter-010
+        completed_at: 2026-08-10T20:37:42.014Z
       - id: funnel-stage-ui
         title: Funnel stage UI
         complexity: medium
         mode: confirm
-        status: pending
+        status: completed
         depends_on:
           - stage-api-and-mark-applied
+        run_id: run-jobhunter-010
+        completed_at: 2026-08-10T20:37:42.014Z
       - id: docs-pipeline-to-job-collector
         title: Docs — pipeline.md → job-collector
         complexity: low
@@ -241,35 +247,7 @@ intents:
         run_id: run-jobhunter-007
         completed_at: 2026-08-07T22:00:00.770Z
 runs:
-  active:
-    - id: run-jobhunter-010
-      scope: batch
-      work_items:
-        - id: schema-stage-migration
-          intent: application-funnel-stages
-          mode: confirm
-          status: completed
-          current_phase: review
-          checkpoint_state: approved
-          current_checkpoint: plan
-          completed_at: 2026-08-10T20:33:46.035Z
-        - id: stage-api-and-mark-applied
-          intent: application-funnel-stages
-          mode: confirm
-          status: completed
-          current_phase: review
-          checkpoint_state: approved
-          current_checkpoint: plan
-          completed_at: 2026-08-10T20:35:35.237Z
-        - id: funnel-stage-ui
-          intent: application-funnel-stages
-          mode: confirm
-          status: in_progress
-          current_phase: plan
-          checkpoint_state: none
-          current_checkpoint: plan
-      current_item: funnel-stage-ui
-      started: 2026-08-10T20:32:07.532Z
+  active: []
   completed:
     - id: run-jobhunter-001
       scope: batch
@@ -373,3 +351,17 @@ runs:
           mode: autopilot
       started: 2026-08-10T20:30:21.278Z
       completed: 2026-08-10T20:31:41.487Z
+    - id: run-jobhunter-010
+      scope: batch
+      work_items:
+        - id: schema-stage-migration
+          intent: application-funnel-stages
+          mode: confirm
+        - id: stage-api-and-mark-applied
+          intent: application-funnel-stages
+          mode: confirm
+        - id: funnel-stage-ui
+          intent: application-funnel-stages
+          mode: confirm
+      started: 2026-08-10T20:32:07.532Z
+      completed: 2026-08-10T20:37:42.014Z

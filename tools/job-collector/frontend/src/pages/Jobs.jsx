@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { api } from '../api.js';
 import JobCard from '../components/JobCard.jsx';
+import { APPLICATION_STAGE_OPTIONS } from '../components/StatusBadge.jsx';
 
 const STATUS_OPTIONS = [
   { value: '', label: 'All statuses' },
@@ -8,8 +9,11 @@ const STATUS_OPTIONS = [
   { value: 'parsed', label: 'Parsed' },
   { value: 'unmatched', label: 'Not a match' },
   { value: 'cv_generated', label: 'CV ready' },
-  { value: 'applied', label: 'Applied' },
-  { value: 'rejected', label: 'Rejected' },
+];
+
+const STAGE_OPTIONS = [
+  { value: '', label: 'All stages' },
+  ...APPLICATION_STAGE_OPTIONS,
 ];
 
 const SOURCE_OPTIONS = [
@@ -28,9 +32,9 @@ const SORT_OPTIONS = [
 
 const BULK_ACTIONS = [
   { id: 'remove', label: 'Remove', danger: true },
-  { id: 'rejected', label: 'Mark rejected' },
-  { id: 'applied', label: 'Mark applied' },
-  { id: 'neutral', label: 'Mark neutral' },
+  { id: 'rejected', label: 'Stage: rejected' },
+  { id: 'applied', label: 'Mark applied (sent)' },
+  { id: 'neutral', label: 'Reset collector status' },
   { id: 'cv', label: 'Generate CV' },
 ];
 
@@ -62,6 +66,9 @@ function sortJobs(jobs, sortBy) {
 async function applyBulkAction(id, action) {
   if (action === 'remove') return api.deleteJob(id);
   if (action === 'cv') return api.generateCv(id);
+  if (action === 'applied') return api.markApplied(id);
+  if (action === 'rejected') return api.updateJob(id, { applicationStage: 'rejected' });
+  if (action === 'neutral') return api.updateJob(id, { status: 'neutral' });
   return api.updateJob(id, { status: action });
 }
 
@@ -73,6 +80,7 @@ export default function Jobs() {
   const [bulkBusy, setBulkBusy] = useState(false);
 
   const [statusFilter, setStatusFilter] = useState('');
+  const [stageFilter, setStageFilter] = useState('');
   const [sourceFilter, setSourceFilter] = useState('');
   const [countryFilter, setCountryFilter] = useState('');
   const [sortBy, setSortBy] = useState('score');
@@ -91,6 +99,7 @@ export default function Jobs() {
     try {
       const filters = {};
       if (statusFilter) filters.status = statusFilter;
+      if (stageFilter) filters.application_stage = stageFilter;
       if (sourceFilter) filters.source = sourceFilter;
       if (countryFilter) filters.country_code = countryFilter;
 
@@ -101,7 +110,7 @@ export default function Jobs() {
     } finally {
       setLoading(false);
     }
-  }, [statusFilter, sourceFilter, countryFilter, showAlert]);
+  }, [statusFilter, stageFilter, sourceFilter, countryFilter, showAlert]);
 
   useEffect(() => {
     setLoading(true);
@@ -116,7 +125,7 @@ export default function Jobs() {
   // Reset to first page when filters or sort change
   useEffect(() => {
     setPage(1);
-  }, [statusFilter, sourceFilter, countryFilter, sortBy, pageSize]);
+  }, [statusFilter, stageFilter, sourceFilter, countryFilter, sortBy, pageSize]);
 
   const [countryOptions, setCountryOptions] = useState([{ value: '', label: 'All countries' }]);
 
@@ -240,6 +249,21 @@ export default function Jobs() {
           >
             {STATUS_OPTIONS.map(({ value, label }) => (
               <option key={value || 'all'} value={value}>
+                {label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="filter-field">
+          <label htmlFor="filter-stage">Stage</label>
+          <select
+            id="filter-stage"
+            value={stageFilter}
+            onChange={(e) => setStageFilter(e.target.value)}
+          >
+            {STAGE_OPTIONS.map(({ value, label }) => (
+              <option key={value || 'all-stages'} value={value}>
                 {label}
               </option>
             ))}

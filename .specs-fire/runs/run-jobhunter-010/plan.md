@@ -56,6 +56,43 @@ Wire `application_stage` through getJobs filter, updateJob validation/stamping, 
 | `tools/job-collector/server/routes/jobs.js` | GET filter, PATCH validation |
 | `tools/job-collector/server/db.self-check.js` | Stage API behavior asserts |
 
+---
+
+## Work Item: funnel-stage-ui
+
+### Approach
+
+Add stage filter + badges on Jobs list; stage select and mark-applied/rejected on Job detail; bulk sent/rejected via stage APIs; drop `applied`/`rejected` from collector status filter.
+
+### Files to Modify
+
+| File | Changes |
+|------|---------|
+| `frontend/src/pages/Jobs.jsx` | Stage filter + bulk actions |
+| `frontend/src/pages/JobDetail.jsx` | Stage UI |
+| `frontend/src/components/StatusBadge.jsx` | Stage variant |
+| `frontend/src/components/JobCard.jsx` | Stage badge |
+| `frontend/src/api.js` | application_stage query |
+| `frontend/src/pages/Dashboard.jsx` | Applied count via stage |
+| `frontend/src/index.css` | Stage badge colors |
+| `scripts/e2e-test.mjs` | Assert stage mapping |
+
+---
+
+## Work Item: stage-api-and-mark-applied
+
+### Approach
+
+Wire `application_stage` through getJobs filter, updateJob validation/stamping, markApplied → `sent` + pipeline status, and PATCH/GET routes. Map legacy `status: 'applied'|'rejected'` writes to funnel stages for UI cutover.
+
+### Files to Modify
+
+| File | Changes |
+|------|---------|
+| `tools/job-collector/server/db.js` | Filter, validate stage, markApplied, status→stage mapping |
+| `tools/job-collector/server/routes/jobs.js` | GET filter, PATCH validation |
+| `tools/job-collector/server/db.self-check.js` | Stage API behavior asserts |
+
 ### Tests
 
 | Test File | Coverage |

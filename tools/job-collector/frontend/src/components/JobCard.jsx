@@ -47,6 +47,7 @@ export default function JobCard({ job, selected = false, onToggleSelect, selectD
           <h2 className="job-card-title">{job.title || 'Untitled role'}</h2>
           <div className="job-card-badges">
             <StatusBadge status={job.status} />
+            <StatusBadge status={job.applicationStage} variant="stage" />
             <VisaBadge visa={job.visaSponsorship} />
           </div>
         </div>

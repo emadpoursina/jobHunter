@@ -23,6 +23,7 @@ function jobsQuery(filters = {}) {
   if (filters.status) params.set('status', filters.status);
   if (filters.source) params.set('source', filters.source);
   if (filters.country_code) params.set('country_code', filters.country_code);
+  if (filters.application_stage) params.set('application_stage', filters.application_stage);
   const qs = params.toString();
   return qs ? `?${qs}` : '';
 }

@@ -1,14 +1,16 @@
 ---
 run: run-jobhunter-010
-generated: 2026-08-10T20:35:30Z
+generated: 2026-08-10T20:38:00Z
 ---
 
 # Code Review: run-jobhunter-010
 
-## schema-stage-migration
-**Approve** — column + idempotent remap.
+All three confirm items auto-approved per user request.
 
-## stage-api-and-mark-applied
-**Approve** — filter/validate/markApplied wired; legacy `status=applied|rejected` maps to funnel stages for UI cutover.
+| Item | Verdict |
+|------|---------|
+| schema-stage-migration | Approve |
+| stage-api-and-mark-applied | Approve |
+| funnel-stage-ui | Approve — fixed duplicate `</section>` in JobDetail during review |
 
-Auto-fixes: none. Suggestions deferred (user: no confirmation).
+No further suggestions.
