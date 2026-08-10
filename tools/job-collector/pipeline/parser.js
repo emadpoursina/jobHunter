@@ -1,5 +1,6 @@
 import { inferCountryCode } from '../collectors/base.js';
 import { callLlm, resolveTaskLlm } from '../server/llm.js';
+import { loadAgentPrompt } from './agentSkills.js';
 import { readRepoFile } from './repoFiles.js';
 
 const MAX_RAW_TEXT = 3000;
@@ -39,7 +40,7 @@ const DEFAULT_PARSER_PROMPT = `You are an expert job offer analyst. Extract stru
 // Build the parser system prompt from the agent file and candidate summary
 async function buildSystemPrompt() {
   const agentPath = `${AGENTS_DIR}/job-offer-research.md`;
-  let basePrompt = await readRepoFile(agentPath);
+  let basePrompt = await loadAgentPrompt(agentPath);
 
   if (!basePrompt) {
     console.warn(`[WARN] [parser] Agent file not found at ${agentPath}, using default prompt`);

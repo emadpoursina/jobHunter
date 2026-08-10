@@ -1,3 +1,7 @@
+---
+skills: [ats-cv-rules]
+---
+
 # Agent: CV Generator (v3)
 
 ## Goal

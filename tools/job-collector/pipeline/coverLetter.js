@@ -1,4 +1,5 @@
 import { callLlm, resolveTaskLlm } from '../server/llm.js';
+import { loadAgentPrompt } from './agentSkills.js';
 import { readRepoFile } from './repoFiles.js';
 
 const COVER_LETTER_MAX_TOKENS = 2000;
@@ -32,7 +33,7 @@ export function sanitizeCoverLetterOutput(raw) {
 
 async function buildSystemPrompt() {
   const agentPath = `${AGENTS_DIR}/cover-letter-generator.md`;
-  const agentPrompt = await readRepoFile(agentPath);
+  const agentPrompt = await loadAgentPrompt(agentPath);
 
   if (!agentPrompt) {
     console.warn(`[WARN] [coverLetter] Agent file not found at ${agentPath}, using default prompt`);

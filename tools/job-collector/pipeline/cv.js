@@ -1,4 +1,5 @@
 import { callLlm, resolveTaskLlm } from '../server/llm.js';
+import { loadAgentPrompt } from './agentSkills.js';
 import { readRepoFile } from './repoFiles.js';
 
 const CV_MAX_TOKENS = 2000;
@@ -20,7 +21,7 @@ const DEFAULT_CV_PROMPT = `Write a truthful, natural-sounding, ATS-friendly CV i
 // Load the CV generator agent file or fall back to the default system prompt
 async function buildSystemPrompt() {
   const agentPath = `${AGENTS_DIR}/cv-generator.md`;
-  const agentPrompt = await readRepoFile(agentPath);
+  const agentPrompt = await loadAgentPrompt(agentPath);
 
   if (!agentPrompt) {
     console.warn(`[WARN] [cv] Agent file not found at ${agentPath}, using default prompt`);
@@ -79,11 +80,11 @@ Generate the tailored CV now.`;
 }
 
 // Generate a tailored CV in Markdown for a saved job record
-export async function generateCv(job) {
+export async function generateCv(job, { llmCall = callLlm } = {}) {
   const system = await buildSystemPrompt();
   const user = await buildUserMessage(job);
   const taskLlm = resolveTaskLlm('cv');
-  const cvMarkdown = await callLlm({
+  const cvMarkdown = await llmCall({
     system,
     user,
     maxTokens: CV_MAX_TOKENS,

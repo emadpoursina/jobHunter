@@ -12,6 +12,48 @@ workspace:
   run_scope_history: []
   scanned_at: 2026-07-18T11:15:18Z
 intents:
+  - id: agent-skills
+    title: Shared agent skill library
+    status: in_progress
+    created: 2026-08-10T18:59:25Z
+    brief: .specs-fire/intents/agent-skills/brief.md
+    work_items:
+      - id: skill-loader-module
+        title: Skill loader module
+        complexity: medium
+        mode: confirm
+        status: completed
+        depends_on: []
+        run_id: run-jobhunter-008
+        completed_at: 2026-08-10T19:36:50.522Z
+      - id: wire-skills-into-pipelines
+        title: Wire skills into all four agent pipelines
+        complexity: medium
+        mode: confirm
+        status: completed
+        depends_on:
+          - skill-loader-module
+        run_id: run-jobhunter-008
+        completed_at: 2026-08-10T19:36:50.522Z
+      - id: starter-skill-and-docs
+        title: Starter skill + skills README
+        complexity: low
+        mode: autopilot
+        status: completed
+        depends_on:
+          - skill-loader-module
+        run_id: run-jobhunter-008
+        completed_at: 2026-08-10T19:36:50.522Z
+      - id: skills-self-checks
+        title: Skills loader and pipeline self-checks
+        complexity: medium
+        mode: confirm
+        status: completed
+        depends_on:
+          - skill-loader-module
+          - wire-skills-into-pipelines
+        run_id: run-jobhunter-008
+        completed_at: 2026-08-10T19:36:50.522Z
   - id: linkedin-easy-apply-filler
     title: LinkedIn Easy Apply form filler
     status: completed
@@ -244,3 +286,20 @@ runs:
           mode: autopilot
       started: 2026-08-07T21:58:42.040Z
       completed: 2026-08-07T22:00:00.770Z
+    - id: run-jobhunter-008
+      scope: wide
+      work_items:
+        - id: skill-loader-module
+          intent: agent-skills
+          mode: confirm
+        - id: wire-skills-into-pipelines
+          intent: agent-skills
+          mode: confirm
+        - id: starter-skill-and-docs
+          intent: agent-skills
+          mode: autopilot
+        - id: skills-self-checks
+          intent: agent-skills
+          mode: confirm
+      started: 2026-08-10T19:15:05.670Z
+      completed: 2026-08-10T19:36:50.522Z

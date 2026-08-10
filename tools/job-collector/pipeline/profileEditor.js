@@ -4,7 +4,7 @@ import {
   parseProfileText,
   saveProfileMarkdown,
 } from './profile.js';
-import { readRepoFile } from './repoFiles.js';
+import { loadAgentPrompt } from './agentSkills.js';
 
 const AGENTS_DIR = process.env.AGENTS_DIR ?? 'docs/agents';
 const PROFILE_UPDATE_MAX_TOKENS = 16000;
@@ -30,7 +30,7 @@ export function sanitizeProfileProposal(raw) {
 
 async function buildSystemPrompt() {
   const agentPath = `${AGENTS_DIR}/profile-editor.md`;
-  const agentPrompt = await readRepoFile(agentPath);
+  const agentPrompt = await loadAgentPrompt(agentPath);
 
   if (!agentPrompt) {
     console.warn(`[WARN] [profileEditor] Agent file not found at ${agentPath}, using default prompt`);
