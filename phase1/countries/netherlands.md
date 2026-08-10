@@ -1,6 +1,6 @@
 # Country: Netherlands (NL)
 
-- **Priority rank:** 3
+- **Priority rank:** 4
 - **Target role:** Full-stack / backend JavaScript developer
 - **Migration route via job offer:** Highly Skilled Migrant (Kennismigrant) — employer must be IND-recognised sponsor
 - **Language requirement:** English sufficient for tech (9/10 sampled offers); Dutch rarely required

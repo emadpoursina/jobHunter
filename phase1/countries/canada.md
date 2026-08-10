@@ -1,6 +1,6 @@
 # Country: Canada (CA)
 
-- **Priority rank:** 2
+- **Priority rank:** 1
 - **Target role:** Full-stack / backend JavaScript developer
 - **Migration route via job offer:** Global Talent Stream (GTS) → work permit; Express Entry for PR
 - **Language requirement:** English (French only for Montreal roles)

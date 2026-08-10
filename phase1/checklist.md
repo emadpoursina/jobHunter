@@ -18,6 +18,10 @@ These countries are **excluded** from the priority list regardless of tech oppor
 
 ## Step 1: Priority country selection
 
+### 2026-08 pivot — English-first focus
+
+Germany was **demoted from #1 to secondary** because professional German is not yet in place (A1). Effort is re-weighted toward **English-speaking and English-first** markets: Canada, Ireland, UK lead, followed by the English working-language EU pair (Netherlands, Portugal). Re-activate Germany once German reaches B1+.
+
 ### Scoring criteria
 
 Each country is scored on 5 factors (1–5 scale):
@@ -34,10 +38,10 @@ Each country is scored on 5 factors (1–5 scale):
 
 | Rank | Country | Score | Key advantage |
 |------|---------|-------|---------------|
-| 1 | [Germany](countries/germany.md) | 23/25 | EU Blue Card; already learning German (A1) |
-| 2 | [Canada](countries/canada.md) | 22/25 | Express Entry / GTS — PR without employer in some paths |
-| 3 | [Netherlands](countries/netherlands.md) | 21/25 | 30% tax ruling; fast Kennismigrant processing |
-| 4 | [Ireland](countries/ireland.md) | 21/25 | Big tech HQs; Critical Skills permit |
+| 1 | [Canada](countries/canada.md) | 22/25 | Global Talent Stream / Express Entry — PR without employer in some paths; English |
+| 2 | [Ireland](countries/ireland.md) | 21/25 | Critical Skills permit; big-tech HQs; English native |
+| 3 | [United Kingdom](countries/united-kingdom.md) | 20/25 | Skilled Worker visa; strong market; English native |
+| 4 | [Netherlands](countries/netherlands.md) | 21/25 | 30% tax ruling; fast Kennismigrant processing; English work environment |
 | 5 | [Portugal](countries/portugal.md) | 20/25 | Tech Visa — easiest EU entry; stepping stone |
 
 See each country file under [`countries/`](countries/) for visa routes, job boards, and sampling status.
@@ -46,24 +50,29 @@ See each country file under [`countries/`](countries/) for visa routes, job boar
 
 | Country | Reason for secondary |
 |---|---|
-| UK | Skilled Worker Visa available, good market, but post-Brexit complexity and cost of living |
+| **Germany** | **Demoted from #1 — EU Blue Card strong, but German at A1 is a language blocker. Return when B1+.** |
 | Sweden | Strong tech scene, but Swedish language increasingly needed outside Stockholm |
 | Finland | Growing tech market, but smaller and more competitive entry |
 | Czech Republic | EU Blue Card, Prague growing fast, lower competition |
+
+> Note: UK moved from this table up into the top-5 priority tier.
 
 ---
 
 ## Step 2: Job offer research
 
-Target: **10 offers × 5 countries = 50 job offers total**
+Target: **10 offers × 5 priority countries = 50 job offers total**
 
 | Country | Status | File |
 |---------|--------|------|
-| Germany | ✅ 10 offers | [`job-offers/by-country/de/research.md`](job-offers/by-country/de/research.md) |
 | Canada | ✅ 10 offers | [`job-offers/by-country/ca/research.md`](job-offers/by-country/ca/research.md) |
+| Ireland | Pending | - |
+| United Kingdom | Pending | - |
 | Netherlands | ✅ 10 offers | [`job-offers/by-country/nl/research.md`](job-offers/by-country/nl/research.md) |
 | Portugal | ✅ 10 offers | [`job-offers/by-country/pt/research.md`](job-offers/by-country/pt/research.md) |
-| Ireland | ⏳ Pending | — |
+| Germany | 🗄️ Archived (10) — deprioritized | [`job-offers/by-country/de/research.md`](job-offers/by-country/de/research.md) |
+
+**Next sampling round:** Ireland and United Kingdom (both 0/10) are the highest-priority gap.
 
 ### Target job titles
 
@@ -93,14 +102,15 @@ Market frequency: [`skills/requirements-summary.md`](skills/requirements-summary
 ## Execution checklist
 
 - [x] **Step 1** — 5 priority countries selected
-- [x] **Step 2** — Research 10 job offers for Germany
+- [x] **Step 1** — 2026-08 pivot: promote English-first markets, demote Germany to secondary
 - [x] **Step 2** — Research 10 job offers for Canada
 - [x] **Step 2** — Research 10 job offers for Netherlands
-- [ ] **Step 2** — Research 10 job offers for Ireland
 - [x] **Step 2** — Research 10 job offers for Portugal
+- [ ] **Step 2** — Research 10 job offers for Ireland (now priority #2)
+- [ ] **Step 2** — Research 10 job offers for United Kingdom (now priority #3)
 - [x] **Step 3** — Complete skill gap table from collected offers
 - [ ] **Hand off to Phase 3** — Build learning plan from gap list (see [`../phase3/backlog.md`](../phase3/backlog.md))
 
 ---
 
-*Next: Ireland job-offer research; begin closing critical gaps (AWS, Testing, CI/CD) in parallel with applications.*
+*Next: Ireland and United Kingdom job-offer research; begin closing critical gaps (AWS, Testing, CI/CD) in parallel with applications.*

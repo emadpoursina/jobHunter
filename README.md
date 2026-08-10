@@ -200,8 +200,8 @@ jobHunter/
 
 ## Status
 
-**Phase 1 (partial):** Five priority countries defined ([`phase1/countries/`](phase1/countries/)). Job-offer research complete for Germany, Canada, Netherlands, Portugal (40 offers). Skill gap report updated ([`phase1/skills/gap-report.md`](phase1/skills/gap-report.md)). Ireland offers pending.
+**Phase 1 (2026-08 pivot):** Priority countries re-ranked toward **English-first markets — Canada, Ireland, UK, Netherlands, Portugal** — with **Germany demoted to secondary** while German is below B1 ([`phase1/countries/`](phase1/countries/)). Job-offer research complete for Canada, Netherlands, Portugal (30 offers); Germany (10) archived. Ireland + UK offers pending. Skill gap report updated ([`phase1/skills/gap-report.md`](phase1/skills/gap-report.md)).
 
-**Phase 2 (in progress):** Master profile complete ([`phase2/profile/master-profile.md`](phase2/profile/master-profile.md)). CV generator agent ready ([`docs/agents/cv-generator.md`](docs/agents/cv-generator.md)). Germany Phase 1 corpus archived — collect **live** offers (~90 days) before creating offer files in `phase2/offers/`.
+**Phase 2 (in progress):** Master profile complete ([`phase2/profile/master-profile.md`](phase2/profile/master-profile.md)) — relocation priority now Canada → Ireland → UK → Netherlands → Portugal. CV generator agent ready ([`docs/agents/cv-generator.md`](docs/agents/cv-generator.md)). Focus live offer collection on **Canada, Ireland, UK** before creating offer files in `phase2/offers/`.
 
-**Next:** Find live Germany roles with visa sponsorship; Ireland job-offer research; close critical gaps (AWS, Jest, CI/CD) via [`phase3/backlog.md`](phase3/backlog.md) in parallel with applications.
+**Next:** Ireland + UK job-offer research (0/10 each); close critical gaps (AWS, Jest, CI/CD) via [`phase3/backlog.md`](phase3/backlog.md) in parallel with applications. Germany stays on hold until B1+ German.

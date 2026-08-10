@@ -1,7 +1,7 @@
 # Master Profile — Backend Developer
 
 > Emad Poursina  
-> Version: 2.3 — Updated 2026-08-08
+> Version: 2.4 — Updated 2026-08-10 (English-first relocation pivot)
 > This document is the single source of truth for generating tailored CVs.
 
 ---
@@ -16,7 +16,7 @@ Telegram:          @emad_poursina
 LinkedIn:          https://www.linkedin.com/in/emadpoursina/
 GitHub:            https://github.com/emadpoursina
 Location:          Iran
-Seeking:           Relocation — Netherlands, Canada, Ireland, Germany, Portugal
+Seeking:           Relocation — Canada, Ireland, UK, Netherlands, Portugal
 Work Authorization: Requires employer-sponsored work authorization
 Languages:         Farsi (Native), English (Fluent), German (A1 — learning)
 ```
@@ -37,7 +37,7 @@ owning architecture and delivery across full-stack JavaScript projects.
 Before engineering became the full-time focus, ran a web design business — handling sales,
 clients, content, and pricing — which built a commercial instinct that shows up in how
 technical decisions get framed and communicated to non-technical stakeholders.
-Seeking senior backend roles in English-speaking countries (Netherlands, Canada, Ireland) and Germany;
+Seeking senior backend roles in English-speaking countries (Canada, Ireland, UK) and English-first EU tech hubs (Netherlands, Portugal);
 available with one month notice and requires employer-sponsored work authorization.
 
 ---
@@ -642,16 +642,16 @@ Target Role:            Senior Backend Engineer / Senior Full-Stack Engineer
 Preferred Stack:        Node.js / NestJS / TypeScript / PostgreSQL
 Open to:                Backend-heavy full-stack roles, serverless architectures
 Minimum salary:
-  - Germany:            €55,000/year
-  - Netherlands:        €65,000/year
   - Canada:             C$90,000/year
   - Ireland:            €55,000/year
+  - United Kingdom:     £65,000/year
+  - Netherlands:        €65,000/year
   - Portugal:           €40,000/year
 Expected salary (opening position for applications, senior backend band, gross/year):
-  - Germany:            €68,000 – €75,000
-  - Netherlands:        €75,000 – €85,000
   - Canada:             C$105,000 – C$120,000
   - Ireland:            €65,000 – €75,000
+  - United Kingdom:     £80,000 – £95,000
+  - Netherlands:        €75,000 – €85,000
   - Portugal:           €45,000 – €55,000
   Notes:                 Expected is the opening ask on applications, not the floor.
                          Floors above are the walk-away minimum. Always quote gross/year
@@ -660,7 +660,7 @@ Expected salary (opening position for applications, senior backend band, gross/y
 Work type:              Remote or hybrid (open to on-site for right opportunity)
 Work authorization:     Requires employer-sponsored work authorization
 Earliest start date:    1 month notice
-Relocation priority:    Netherlands → Canada → Ireland → Germany → Portugal
+Relocation priority:    Canada → Ireland → United Kingdom → Netherlands → Portugal
 Deal breakers:          No unpaid overtime; no 24/7 on-call without compensation;
                         roles requiring skills marked "Learning" as mandatory without ramp-up time
 ```
@@ -699,7 +699,7 @@ Open source:    fa.javascript.info (Persian translation of Modern JavaScript Tut
 I'm a backend engineer with 7+ years of production Node.js experience, currently
 backend and DevOps lead on VoiceDash — a live AI dictation SaaS — where I own
 the full deployment stack, release process, and code review. I'm seeking a senior
-backend role in the Netherlands, Canada, Ireland, or Germany and am available with
+backend role in Canada, Ireland, the UK, or the Netherlands and am available with
 one month's notice. The role requires employer-sponsored work authorization.
 ```
 
@@ -735,15 +735,22 @@ I built the Socket.IO audio streaming layer that the whole product runs on — i
 to be reliable, low-latency, and recoverable without the user noticing."
 
 [TAG: relocation / Netherlands / NL]
-"The Netherlands is my top target — specifically because of the density of
-Node.js-first product companies and the practical path to a residence permit for
-engineers with sponsored roles. English is the working language on most teams there,
-which is where I operate best."
+"The Netherlands is one of my priority targets — alongside the UK and Ireland —
+because of its density of Node.js-first product companies and the practical path to a
+residence permit for sponsored engineers. English is the working language on most teams
+there, which is where I operate best."
 
 [TAG: relocation / Germany / DE]
-"Germany is high on my list — I've been deliberately targeting Berlin, Hamburg, and Munich
-roles. My German is still early, but it's not a blocker for English-first engineering teams,
-and I'm committed to improving it after I've relocated."
+"Germany is a secondary target for now — my German is still early (A1), so I'm focusing
+relocation effort on English-speaking and English-first teams in Canada, Ireland, the UK,
+and the Netherlands first. I'd revisit German roles once I can work there at a professional
+level, or for an explicitly English-first Berlin team."
+
+[TAG: relocation / English-first / Canada / UK / pivot]
+"I'm deliberately prioritizing English-speaking and English-first engineering markets —
+Canada, Ireland, the UK, and the Netherlands — so I can be fully effective from day one.
+German is not yet at a professional level, so German-first roles move to the back of the
+queue rather than the front."
 
 [TAG: SaaS / product / startup]
 "I've been building a SaaS from the backend up — VoiceDash isn't a client project,
@@ -914,13 +921,13 @@ Use expected ranges from §9 as the opening ask — not the floor.
 If a posting includes a salary, the agent checks §9 to confirm compatibility
 and includes a one-line salary statement if the field is non-null.
 
-| Country   | Code | Opening ask (gross/year)   | Floor (walk-away) |
-|-----------|------|----------------------------|-------------------|
-| Germany   | DE   | €68,000 – €75,000          | €55,000           |
-| Netherlands | NL | €75,000 – €85,000          | €65,000           |
-| Canada    | CA   | C$105,000 – C$120,000      | C$90,000          |
-| Ireland   | IE   | €65,000 – €75,000          | €55,000           |
-| Portugal  | PT   | €45,000 – €55,000          | €40,000           |
+| Country       | Code | Opening ask (gross/year)   | Floor (walk-away) |
+|---------------|------|----------------------------|-------------------|
+| Canada        | CA   | C$105,000 – C$120,000      | C$90,000          |
+| Ireland       | IE   | €65,000 – €75,000          | €55,000           |
+| United Kingdom| GB   | £80,000 – £95,000          | £65,000           |
+| Netherlands   | NL   | €75,000 – €85,000          | €65,000           |
+| Portugal      | PT   | €45,000 – €55,000          | €40,000           |
 
 Phrasing: "My expected salary for this role is [range] gross per year;
 I'm happy to discuss further."

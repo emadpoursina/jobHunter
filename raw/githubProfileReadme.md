@@ -39,4 +39,4 @@ Repo goes public when the backend is solid and tested.
 
 ---
 
-Open to relocation · Germany (primary) · EU Blue Card · Available immediately
+Open to relocation · Canada (primary) · Ireland · UK · English-first EU (Netherlands, Portugal) · Open to visa sponsorship · Available immediately

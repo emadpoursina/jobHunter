@@ -1,6 +1,6 @@
 # Country: Ireland (IE)
 
-- **Priority rank:** 4
+- **Priority rank:** 2
 - **Target role:** Full-stack / backend JavaScript developer
 - **Migration route via job offer:** Critical Skills Employment Permit — software developers on eligible list
 - **Language requirement:** English (native country)
