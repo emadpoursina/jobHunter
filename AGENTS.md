@@ -144,7 +144,7 @@ jobHunter/
 Always start Hermes **inside the jobHunter folder** so it loads this AGENTS.md at the top of context. From inside the container:
 
 ```bash
-docker exec -it -w /workspace/jobHunter hermes /opt/hermes/.venv/bin/hermes
+docker compose exec -it -w /workspace/jobHunter hermes-jobhunter /opt/hermes/.venv/bin/hermes
 ```
 
 This ensures context discovery walks the folder tree and loads per-phase AGENTS.md files as you work.

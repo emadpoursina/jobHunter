@@ -113,10 +113,10 @@ This will:
 Verify the container is running:
 
 ```bash
-docker ps | grep hermes
+docker ps | grep hermes-jobhunter
 ```
 
-You should see `hermes` running. Check logs:
+You should see `hermes-jobhunter` running. Check logs:
 
 ```bash
 docker compose logs -f
@@ -129,7 +129,7 @@ docker compose logs -f
 Open an interactive Hermes chat session **scoped to your jobHunter folder** so it auto-discovers `AGENTS.md`:
 
 ```bash
-docker exec -it -w /workspace/jobHunter hermes /opt/hermes/.venv/bin/hermes
+docker compose exec -it -w /workspace/jobHunter hermes-jobhunter /opt/hermes/.venv/bin/hermes
 ```
 
 This will:
@@ -244,7 +244,7 @@ If this works, Hermes is fully wired.
 
 ```bash
 # 1. Open a Hermes session
-docker exec -it -w /workspace/jobHunter hermes /opt/hermes/.venv/bin/hermes
+docker compose exec -it -w /workspace/jobHunter hermes-jobhunter /opt/hermes/.venv/bin/hermes
 
 # Inside the Hermes CLI:
 > I want to apply to [Company] for [Role]. Here's the JD:
@@ -293,10 +293,10 @@ docker exec -it -w /workspace/jobHunter hermes /opt/hermes/.venv/bin/hermes
 docker compose logs -f
 
 # Resource usage
-docker stats hermes
+docker stats hermes-jobhunter
 
 # Verify volumes are mounted correctly
-docker inspect hermes | grep -A 10 Mounts
+docker inspect hermes-jobhunter | grep -A 10 Mounts
 ```
 
 ### Upgrade Hermes
@@ -420,7 +420,7 @@ This is expected. Voice mode works, but you won't get local audio playback. Use 
 Make sure you ran the session with the correct working directory:
 
 ```bash
-docker exec -it -w /workspace/jobHunter hermes /opt/hermes/.venv/bin/hermes
+docker compose exec -it -w /workspace/jobHunter hermes-jobhunter /opt/hermes/.venv/bin/hermes
                       ^^^^^^^^^^^^^^ this must be set
 ```
 

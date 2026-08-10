@@ -1,7 +1,7 @@
 services:
-  hermes:
+  hermes-jobhunter:
     image: nousresearch/hermes-agent:latest
-    container_name: hermes
+    container_name: hermes-jobhunter
     restart: unless-stopped
     command: gateway run
     

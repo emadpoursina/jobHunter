@@ -23,7 +23,7 @@ docker compose up -d
 ### Open a Hermes CLI Session
 
 ```bash
-docker exec -it -w /workspace/jobHunter hermes /opt/hermes/.venv/bin/hermes
+docker compose exec -it -w /workspace/jobHunter hermes-jobhunter /opt/hermes/.venv/bin/hermes
 ```
 
 ### Stop the Container
@@ -107,7 +107,7 @@ These are commands you type after opening a Hermes session (see "Open a Hermes C
 ### Check if Hermes is Running
 
 ```bash
-docker ps | grep hermes
+docker ps | grep hermes-jobhunter
 ```
 
 ### Restart the Container
@@ -126,13 +126,13 @@ docker compose up -d
 ### See Resource Usage
 
 ```bash
-docker stats hermes
+docker stats hermes-jobhunter
 ```
 
 ### SSH into the Container (Debugging)
 
 ```bash
-docker exec -it hermes bash
+docker compose exec -it hermes-jobhunter bash
 ```
 
 ---
@@ -215,7 +215,7 @@ Expected inside Docker. Use Telegram/Discord for voice if needed.
 Verify working directory when opening the session:
 
 ```bash
-docker exec -it -w /workspace/jobHunter hermes /opt/hermes/.venv/bin/hermes
+docker compose exec -it -w /workspace/jobHunter hermes-jobhunter /opt/hermes/.venv/bin/hermes
                       ^^^^^^^^^^^^ must be set
 ```
 
