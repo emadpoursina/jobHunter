@@ -30,6 +30,16 @@ async function copyToClipboard(text, onSuccess) {
   onSuccess?.();
 }
 
+// Trigger a browser download of a PDF blob
+function downloadPdf(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement('a');
+  anchor.href = url;
+  anchor.download = filename;
+  anchor.click();
+  URL.revokeObjectURL(url);
+}
+
 export default function JobDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -53,6 +63,8 @@ export default function JobDetail() {
   const [copiedPath, setCopiedPath] = useState(false);
   const [applyUrlInput, setApplyUrlInput] = useState('');
   const [savingApplyUrl, setSavingApplyUrl] = useState(false);
+  const [convertingCvPdf, setConvertingCvPdf] = useState(false);
+  const [convertingCoverLetterPdf, setConvertingCoverLetterPdf] = useState(false);
 
   // Show a dismissible alert for 5 seconds
   const showAlert = useCallback((message, type = 'err') => {
@@ -227,6 +239,42 @@ export default function JobDetail() {
       setGeneratingCoverLetter(false);
       setCoverLetterGenBaseline(null);
       showAlert(err.message);
+    }
+  }
+
+  // Convert the saved CV markdown to PDF and download it
+  async function handleDownloadCvPdf() {
+    if (!cvMarkdown) return;
+
+    setConvertingCvPdf(true);
+    setAlert(null);
+
+    try {
+      const blob = await api.downloadCvPdf(id);
+      downloadPdf(blob, 'Emad-Poursina-Cv.pdf');
+      showAlert('PDF downloaded.', 'info');
+    } catch (err) {
+      showAlert(err.message);
+    } finally {
+      setConvertingCvPdf(false);
+    }
+  }
+
+  // Convert the saved cover letter markdown to PDF and download it
+  async function handleDownloadCoverLetterPdf() {
+    if (!coverLetterMarkdown) return;
+
+    setConvertingCoverLetterPdf(true);
+    setAlert(null);
+
+    try {
+      const blob = await api.downloadCoverLetterPdf(id);
+      downloadPdf(blob, 'Emad-Poursina-Cover-Letter.pdf');
+      showAlert('PDF downloaded.', 'info');
+    } catch (err) {
+      showAlert(err.message);
+    } finally {
+      setConvertingCoverLetterPdf(false);
     }
   }
 
@@ -545,6 +593,14 @@ export default function JobDetail() {
               <button
                 type="button"
                 className="btn"
+                onClick={handleDownloadCvPdf}
+                disabled={convertingCvPdf || generatingCv}
+              >
+                {convertingCvPdf ? 'Converting…' : 'Download PDF'}
+              </button>
+              <button
+                type="button"
+                className="btn"
                 onClick={handleGenerateCv}
                 disabled={generatingCv}
               >
@@ -621,6 +677,14 @@ export default function JobDetail() {
               <Link to={`/jobs/${id}/cover-letter`} className="btn btn-primary">
                 Open full cover letter
               </Link>
+              <button
+                type="button"
+                className="btn"
+                onClick={handleDownloadCoverLetterPdf}
+                disabled={convertingCoverLetterPdf || generatingCoverLetter}
+              >
+                {convertingCoverLetterPdf ? 'Converting…' : 'Download PDF'}
+              </button>
               <button
                 type="button"
                 className="btn"

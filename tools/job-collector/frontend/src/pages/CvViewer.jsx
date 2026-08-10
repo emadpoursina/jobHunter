@@ -27,8 +27,8 @@ function cvFilename(job) {
   return `${slug || `job-${job.id}`}-cv.md`;
 }
 
-function cvPdfFilename(job) {
-  return cvFilename(job).replace(/\.md$/, '.pdf');
+function cvPdfFilename() {
+  return 'Emad-Poursina-Cv.pdf';
 }
 
 // Trigger a browser download of a PDF blob
@@ -180,7 +180,7 @@ export default function CvViewer() {
 
     try {
       const blob = await api.downloadCvPdf(id);
-      downloadPdf(blob, cvPdfFilename(job));
+      downloadPdf(blob, cvPdfFilename());
       showAlert('PDF downloaded.', 'info');
     } catch (err) {
       showAlert(err.message);

@@ -25,8 +25,8 @@ function coverLetterFilename(job) {
   return `${slug || `job-${job.id}`}-cover-letter.md`;
 }
 
-function coverLetterPdfFilename(job) {
-  return coverLetterFilename(job).replace(/\.md$/, '.pdf');
+function coverLetterPdfFilename() {
+  return 'Emad-Poursina-Cover-Letter.pdf';
 }
 
 function downloadPdf(blob, filename) {
@@ -171,7 +171,7 @@ export default function CoverLetterViewer() {
 
     try {
       const blob = await api.downloadCoverLetterPdf(id);
-      downloadPdf(blob, coverLetterPdfFilename(job));
+      downloadPdf(blob, coverLetterPdfFilename());
       showAlert('PDF downloaded.', 'info');
     } catch (err) {
       showAlert(err.message);
