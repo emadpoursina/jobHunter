@@ -1,0 +1,47 @@
+services:
+  hermes:
+    image: nousresearch/hermes-agent:latest
+    container_name: hermes
+    restart: unless-stopped
+    command: gateway run
+    
+    # Expose gateway API and optional dashboard
+    ports:
+      - "8642:8642"      # Gateway API server (OpenAI-compatible)
+      - "9119:9119"      # Dashboard (optional, enable with HERMES_DASHBOARD=1)
+    
+    # Two volumes: Hermes's persistent brain, and your jobHunter repo
+    volumes:
+      # ~/.hermes/jobhunter contains config, memory, skills, sessions, logs
+      # All agent state survives container restarts and upgrades
+      # This keeps each Hermes agent isolated in its own subdirectory
+      - ~/.hermes/jobhunter:/opt/data
+      
+      # Mount your jobHunter repo so Hermes can read/edit files
+      # Adjust the path if your repo is in a different location
+      - ${PWD}:/workspace/jobHunter
+    
+    # Environment variables (optional)
+    # Uncomment to pass API keys via env instead of .env file:
+    # environment:
+    #   - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+    #   - OPENAI_API_KEY=${OPENAI_API_KEY}
+    #   - HERMES_DASHBOARD=1
+    
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+          cpus: "2.0"
+        reservations:
+          memory: 2G
+          cpus: "1.0"
+    
+    # Optional: if you need browser automation (web search tool)
+    # add shared memory for Playwright/Chromium:
+    # shm_size: 1G
+    
+    # Optional: if you want the dashboard enabled
+    # environment:
+    #   - HERMES_DASHBOARD=1
