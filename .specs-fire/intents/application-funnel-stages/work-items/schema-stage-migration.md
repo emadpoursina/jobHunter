@@ -4,9 +4,11 @@ title: Schema + stage migration
 intent: application-funnel-stages
 complexity: medium
 mode: confirm
-status: pending
+status: completed
 depends_on: []
 created: 2026-08-10T20:03:30Z
+run_id: run-jobhunter-010
+completed_at: 2026-08-10T20:33:46.035Z
 ---
 
 # Work Item: Schema + stage migration

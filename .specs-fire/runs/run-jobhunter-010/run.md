@@ -12,18 +12,18 @@ work_items:
   - id: stage-api-and-mark-applied
     intent: application-funnel-stages
     mode: confirm
-    status: in_progress
-    current_phase: plan
-    checkpoint_state: none
+    status: completed
+    current_phase: review
+    checkpoint_state: approved
     current_checkpoint: plan
   - id: funnel-stage-ui
     intent: application-funnel-stages
     mode: confirm
-    status: pending
-    current_phase: null
+    status: in_progress
+    current_phase: plan
     checkpoint_state: none
-    current_checkpoint: null
-current_item: stage-api-and-mark-applied
+    current_checkpoint: plan
+current_item: funnel-stage-ui
 status: in_progress
 started: 2026-08-10T20:32:07.532Z
 completed: null
@@ -36,12 +36,12 @@ batch (3 work items)
 
 ## Work Items
 1. **schema-stage-migration** (confirm) — completed
-2. **stage-api-and-mark-applied** (confirm) — in_progress
-3. **funnel-stage-ui** (confirm) — pending
+2. **stage-api-and-mark-applied** (confirm) — completed
+3. **funnel-stage-ui** (confirm) — in_progress
 
 
 ## Current Item
-stage-api-and-mark-applied (confirm)
+funnel-stage-ui (confirm)
 
 ## Files Created
 (none yet)

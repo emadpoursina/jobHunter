@@ -4,9 +4,12 @@ title: Stage API + mark-applied wiring
 intent: application-funnel-stages
 complexity: medium
 mode: confirm
-status: pending
-depends_on: [schema-stage-migration]
+status: completed
+depends_on:
+  - schema-stage-migration
 created: 2026-08-10T20:03:30Z
+run_id: run-jobhunter-010
+completed_at: 2026-08-10T20:35:35.237Z
 ---
 
 # Work Item: Stage API + mark-applied wiring

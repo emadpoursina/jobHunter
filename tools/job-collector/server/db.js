@@ -184,7 +184,7 @@ function addColumnIfMissing(table, column, type) {
   }
 }
 
-// Return jobs matching optional status, source, and country filters
+// Return jobs matching optional status, source, country, and application_stage filters
 export function getJobs(filters = {}) {
   const conditions = [];
   const params = [];
@@ -200,6 +200,10 @@ export function getJobs(filters = {}) {
   if (filters.country_code ?? filters.countryCode) {
     conditions.push('country_code = ?');
     params.push(filters.country_code ?? filters.countryCode);
+  }
+  if (filters.application_stage ?? filters.applicationStage) {
+    conditions.push('application_stage = ?');
+    params.push(filters.application_stage ?? filters.applicationStage);
   }
 
   const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
@@ -252,49 +256,106 @@ export function deleteJob(id) {
   return result.changes > 0;
 }
 
-// Partially update a job by id
+// Partially update a job by id.
+// Throws Error with code VALIDATION_ERROR when application_stage is invalid.
 export function updateJob(id, fields) {
-  const row = normalizeJobInput(fields);
+  const existing = getJobById(id);
+  if (!existing) return null;
+
+  const normalized = { ...fields };
+
+  // Backward-compat: long-lived status=applied|rejected → funnel stage + pipeline status
+  if (normalized.status === 'applied') {
+    normalized.applicationStage = 'sent';
+    normalized.status = inferPipelineStatus(existing);
+  } else if (normalized.status === 'rejected') {
+    normalized.applicationStage = 'rejected';
+    normalized.status = inferPipelineStatus(existing);
+  }
+
+  const row = normalizeJobInput(normalized);
   const columns = Object.keys(row);
 
-  if (columns.length === 0) return getJobById(id);
+  if (columns.length === 0) return existing;
+
+  if (Object.prototype.hasOwnProperty.call(row, 'application_stage')) {
+    const stage = row.application_stage;
+    if (!APPLICATION_STAGES.includes(stage)) {
+      const err = new Error(
+        `Invalid application_stage "${stage}". Allowed: ${APPLICATION_STAGES.join(', ')}`,
+      );
+      err.code = 'VALIDATION_ERROR';
+      throw err;
+    }
+  }
 
   const assignments = columns.map((col) => `${col} = ?`).join(', ');
   sqlite
     .prepare(`UPDATE jobs SET ${assignments} WHERE id = ?`)
     .run(...columns.map((col) => row[col]), id);
 
-  // Status-only "Mark applied" path must stamp applied_at (first time only)
-  if (row.status === 'applied') {
+  // sent ⇒ stamp applied_at once (first-wins); also covers legacy status=applied mapping
+  if (row.application_stage === 'sent') {
     stampAppliedAt(id);
   }
 
   return getJobById(id);
 }
 
-// Mark a job as applied; first application wins, subsequent calls are no-ops
+// Mark a job as applied: application_stage=sent, stamp applied_at (first wins)
 export function markApplied(id, { appliedUrl = null } = {}) {
   const row = sqlite
-    .prepare('SELECT applied_at, apply_url FROM jobs WHERE id = ?')
+    .prepare('SELECT applied_at, apply_url, cv_md_path, title FROM jobs WHERE id = ?')
     .get(id);
   if (!row) return null;
 
+  const pipelineStatus = inferPipelineStatusRow(row);
+
   if (row.applied_at) {
-    // Keep status in sync even when the timestamp was already recorded
+    // Keep funnel stage in sync even when the timestamp was already recorded
     sqlite
-      .prepare("UPDATE jobs SET status = 'applied' WHERE id = ? AND status != 'applied'")
-      .run(id);
+      .prepare(
+        `UPDATE jobs
+         SET application_stage = 'sent',
+             status = CASE
+               WHEN status IN ('applied', 'rejected') THEN ?
+               ELSE status
+             END
+         WHERE id = ?`,
+      )
+      .run(pipelineStatus, id);
     return getJobById(id);
   }
 
   const url = appliedUrl || row.apply_url || null;
   sqlite
     .prepare(
-      "UPDATE jobs SET status = 'applied', applied_at = datetime('now'), applied_url = ? WHERE id = ?",
+      `UPDATE jobs
+       SET application_stage = 'sent',
+           status = CASE
+             WHEN status IN ('applied', 'rejected') THEN ?
+             ELSE status
+           END,
+           applied_at = datetime('now'),
+           applied_url = ?
+       WHERE id = ?`,
     )
-    .run(url, id);
+    .run(pipelineStatus, url, id);
 
+  // If status was already a pipeline value, leave it; if still applied/rejected, fixed above.
+  // Fresh mark-applied on a normal pipeline job: only set stage + stamps (status unchanged).
   return getJobById(id);
+}
+
+// Infer collector/CV pipeline status from job fields (camel or snake)
+export function inferPipelineStatus(job) {
+  if (job.cvMdPath ?? job.cv_md_path) return 'cv_generated';
+  if (job.title) return 'parsed';
+  return 'raw';
+}
+
+function inferPipelineStatusRow(row) {
+  return inferPipelineStatus(row);
 }
 
 // Stamp applied_at / applied_url once when a job becomes applied

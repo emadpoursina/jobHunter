@@ -1,17 +1,9 @@
-// Self-check for server/db.js applied_at + application_stage migration
+// Self-check for server/db.js applied_at + application_stage
 // Run: cd tools/job-collector && bun run server/db.self-check.js
-// Asserts:
-//   1. markApplied sets applied_at + status=applied
-//   2. markApplied is idempotent — second call does not change applied_at
-//   3. updateJob({ status: 'applied' }) stamps applied_at (UI "Mark applied" path)
-//   4. application_stage column exists; migrate() is idempotent
-//   5. status=applied → application_stage=sent + pipeline status fallback
-//   6. status=rejected → application_stage=rejected + pipeline status fallback
-//   7. Cleanup: throwaway rows deleted
-// Exits 0 on success, 1 on failure. No test framework.
 import {
   insertJob,
   getJobById,
+  getJobs,
   markApplied,
   updateJob,
   deleteJob,
@@ -58,7 +50,6 @@ function main() {
   const ids = [];
 
   try {
-    // --- markApplied path ---
     const sourceUrl = `selfcheck-applied-${Date.now()}`;
     const id = insertJob({
       source: 'selfcheck',
@@ -78,14 +69,26 @@ function main() {
       inserted.applicationStage === 'not_started',
       `new job defaults application_stage=not_started ("${inserted.applicationStage}")`,
     );
+    assert(
+      inserted.status === 'raw' || inserted.status === 'parsed',
+      `new job has pipeline status ("${inserted.status}")`,
+    );
 
     const first = markApplied(id, { appliedUrl: 'https://example.com/apply' });
     assert(first !== null, 'markApplied returns job row');
-    assert(first.status === 'applied', `markApplied sets status=applied ("${first.status}")`);
+    assert(
+      first.applicationStage === 'sent',
+      `markApplied sets application_stage=sent ("${first.applicationStage}")`,
+    );
+    assert(
+      first.status !== 'applied',
+      `markApplied does not leave long-lived status=applied ("${first.status}")`,
+    );
     assert(first.appliedAt !== null && first.appliedAt !== '', `applied_at set ("${first.appliedAt}")`);
     assert(first.appliedUrl === 'https://example.com/apply', 'applied_url stored');
 
     const firstAppliedAt = first.appliedAt;
+    const firstStatus = first.status;
 
     const second = markApplied(id, { appliedUrl: 'https://different.com' });
     assert(second !== null, 'second markApplied returns job row');
@@ -97,8 +100,12 @@ function main() {
       second.appliedUrl === 'https://example.com/apply',
       'idempotent: applied_url not overwritten by second call',
     );
+    assert(
+      second.applicationStage === 'sent' && second.status === firstStatus,
+      'idempotent: stage/status stable on second markApplied',
+    );
 
-    // --- updateJob status=applied path (UI "Mark applied" / bulk) ---
+    // --- updateJob status=applied maps to stage sent (UI cutover) ---
     const sourceUrl2 = `selfcheck-status-applied-${Date.now()}`;
     const id2 = insertJob({
       source: 'selfcheck',
@@ -118,7 +125,14 @@ function main() {
     assert(!before.appliedAt, 'fresh job has no applied_at');
 
     const viaStatus = updateJob(id2, { status: 'applied' });
-    assert(viaStatus.status === 'applied', 'updateJob sets status=applied');
+    assert(
+      viaStatus.applicationStage === 'sent',
+      `updateJob status=applied → application_stage=sent ("${viaStatus.applicationStage}")`,
+    );
+    assert(
+      viaStatus.status === 'parsed',
+      `updateJob status=applied → pipeline parsed ("${viaStatus.status}")`,
+    );
     assert(
       viaStatus.appliedAt !== null && viaStatus.appliedAt !== '',
       `updateJob stamps applied_at ("${viaStatus.appliedAt}")`,
@@ -135,24 +149,40 @@ function main() {
       `updateJob does not overwrite existing applied_at ("${again.appliedAt}")`,
     );
 
-    // --- application_stage migration mapping ---
-    migrateApplicationStages();
-    const remappedApplied = getJobById(id);
+    // --- direct applicationStage=sent stamps applied_at ---
+    const id4 = insertJob({
+      source: 'selfcheck',
+      sourceUrl: `selfcheck-stage-sent-${Date.now()}`,
+      rawText: 'selfcheck stage sent',
+      title: 'Stage Sent Job',
+      company: 'Selfcheck Co',
+    });
+    if (!id4) {
+      console.error('  FAIL  insertJob #4 returned null');
+      process.exit(1);
+    }
+    ids.push(id4);
+    const viaStage = updateJob(id4, { applicationStage: 'sent' });
+    assert(viaStage.applicationStage === 'sent', 'PATCH-style stage=sent works');
+    assert(Boolean(viaStage.appliedAt), 'stage=sent stamps applied_at once');
+
+    // --- invalid stage throws VALIDATION_ERROR ---
+    let threw = false;
+    try {
+      updateJob(id4, { applicationStage: 'bogus' });
+    } catch (err) {
+      threw = err?.code === 'VALIDATION_ERROR';
+    }
+    assert(threw, 'invalid application_stage throws VALIDATION_ERROR');
+
+    // --- getJobs filter by application_stage ---
+    const filtered = getJobs({ application_stage: 'sent' });
     assert(
-      remappedApplied.applicationStage === 'sent',
-      `applied → application_stage=sent ("${remappedApplied.applicationStage}")`,
-    );
-    assert(
-      remappedApplied.status === 'parsed',
-      `applied status falls back to parsed when titled ("${remappedApplied.status}")`,
+      filtered.some((j) => j.id === id) && filtered.every((j) => j.applicationStage === 'sent'),
+      'getJobs filters by application_stage=sent',
     );
 
-    const remappedViaStatus = getJobById(id2);
-    assert(
-      remappedViaStatus.applicationStage === 'sent',
-      `status-applied path also remaps to sent ("${remappedViaStatus.applicationStage}")`,
-    );
-
+    // --- legacy migrate remap still works for leftover status=rejected ---
     const id3 = insertJob({
       source: 'selfcheck',
       sourceUrl: `selfcheck-rejected-${Date.now()}`,
@@ -166,23 +196,21 @@ function main() {
       process.exit(1);
     }
     ids.push(id3);
-    updateJob(id3, { status: 'rejected' });
-    migrateApplicationStages();
-    const remappedRejected = getJobById(id3);
+    // Force legacy status via raw path: updateJob maps rejected → stage
+    const viaRejected = updateJob(id3, { status: 'rejected' });
     assert(
-      remappedRejected.applicationStage === 'rejected',
-      `rejected → application_stage=rejected ("${remappedRejected.applicationStage}")`,
+      viaRejected.applicationStage === 'rejected',
+      `status=rejected → application_stage=rejected ("${viaRejected.applicationStage}")`,
     );
     assert(
-      remappedRejected.status === 'cv_generated',
-      `rejected status falls back to cv_generated when CV path set ("${remappedRejected.status}")`,
+      viaRejected.status === 'cv_generated',
+      `status=rejected → pipeline cv_generated ("${viaRejected.status}")`,
     );
 
     migrateApplicationStages();
     assert(
-      getJobById(id3).applicationStage === 'rejected' &&
-        getJobById(id3).status === 'cv_generated',
-      'second migrateApplicationStages leaves remapped rows unchanged',
+      getJobById(id3).applicationStage === 'rejected',
+      'migrateApplicationStages leaves already-mapped rows alone',
     );
   } finally {
     for (const id of ids) {

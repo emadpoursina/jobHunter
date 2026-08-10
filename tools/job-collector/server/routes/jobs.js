@@ -1,14 +1,15 @@
 import { Router } from 'express';
-import { deleteJob, getJobById, getJobs, markApplied, updateJob } from '../db.js';
+import {
+  APPLICATION_STAGES,
+  deleteJob,
+  getJobById,
+  getJobs,
+  inferPipelineStatus,
+  markApplied,
+  updateJob,
+} from '../db.js';
 
 const router = Router();
-
-// Resolve pipeline status when clearing applied/rejected decision
-function inferPipelineStatus(job) {
-  if (job.cvMdPath ?? job.cv_md_path) return 'cv_generated';
-  if (job.title) return 'parsed';
-  return 'raw';
-}
 
 // Parse and validate a numeric job id from route params
 function parseJobId(rawId) {
@@ -38,14 +39,20 @@ export function normalizeApplyUrl(value) {
   }
 }
 
-// Return all jobs, optionally filtered by status, source, or country
+// Return all jobs, optionally filtered by status, source, country, or application_stage
 router.get('/', (req, res) => {
-  const { status, source, country_code: countryCode } = req.query;
+  const {
+    status,
+    source,
+    country_code: countryCode,
+    application_stage: applicationStage,
+  } = req.query;
   const filters = {};
 
   if (status) filters.status = status;
   if (source) filters.source = source;
   if (countryCode) filters.country_code = countryCode;
+  if (applicationStage) filters.application_stage = applicationStage;
 
   res.json({ jobs: getJobs(filters) });
 });
@@ -102,6 +109,21 @@ router.patch('/:id', (req, res) => {
     updates.status = inferPipelineStatus(existing);
   }
 
+  // Accept camelCase or snake_case for stage; validate before write
+  if ('application_stage' in updates && !('applicationStage' in updates)) {
+    updates.applicationStage = updates.application_stage;
+    delete updates.application_stage;
+  }
+  if ('applicationStage' in updates) {
+    const stage = updates.applicationStage;
+    if (!APPLICATION_STAGES.includes(stage)) {
+      return res.status(400).json({
+        error: `Invalid application_stage "${stage}". Allowed: ${APPLICATION_STAGES.join(', ')}`,
+        code: 'VALIDATION_ERROR',
+      });
+    }
+  }
+
   if ('applyUrl' in updates) {
     const normalized = normalizeApplyUrl(updates.applyUrl);
     if (normalized && typeof normalized === 'object' && 'error' in normalized) {
@@ -113,8 +135,18 @@ router.patch('/:id', (req, res) => {
     updates.applyUrl = normalized;
   }
 
-  const job = updateJob(id, updates);
-  res.json({ job });
+  try {
+    const job = updateJob(id, updates);
+    res.json({ job });
+  } catch (err) {
+    if (err?.code === 'VALIDATION_ERROR') {
+      return res.status(400).json({
+        error: err.message,
+        code: 'VALIDATION_ERROR',
+      });
+    }
+    throw err;
+  }
 });
 
 // Mark a job as applied (first application wins; idempotent)

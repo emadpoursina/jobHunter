@@ -1,26 +1,14 @@
 ---
 run: run-jobhunter-010
-work_item: schema-stage-migration
-intent: application-funnel-stages
-generated: 2026-08-10T20:34:00Z
+generated: 2026-08-10T20:35:30Z
 ---
 
-# Code Review: Schema + stage migration
+# Code Review: run-jobhunter-010
 
-## Summary
+## schema-stage-migration
+**Approve** — column + idempotent remap.
 
-Added `application_stage` column + idempotent legacy status remap. No history table. Self-check green.
+## stage-api-and-mark-applied
+**Approve** — filter/validate/markApplied wired; legacy `status=applied|rejected` maps to funnel stages for UI cutover.
 
-## Auto-fixes
-
-(none)
-
-## Findings
-
-| Severity | Finding | Action |
-|----------|---------|--------|
-| Info | `markApplied` still writes `status=applied` until next work item | Deferred by design |
-
-## Verdict
-
-**Approve**
+Auto-fixes: none. Suggestions deferred (user: no confirmation).

@@ -39,3 +39,25 @@ Add `jobs.application_stage` via `addColumnIfMissing` (default `not_started`), d
 - `markApplied` / PATCH wiring deferred to next work item.
 ---
 *Plan auto-approved (user: no confirmation). Execution follows.*
+
+---
+
+## Work Item: stage-api-and-mark-applied
+
+### Approach
+
+Wire `application_stage` through getJobs filter, updateJob validation/stamping, markApplied → `sent` + pipeline status, and PATCH/GET routes. Map legacy `status: 'applied'|'rejected'` writes to funnel stages for UI cutover.
+
+### Files to Modify
+
+| File | Changes |
+|------|---------|
+| `tools/job-collector/server/db.js` | Filter, validate stage, markApplied, status→stage mapping |
+| `tools/job-collector/server/routes/jobs.js` | GET filter, PATCH validation |
+| `tools/job-collector/server/db.self-check.js` | Stage API behavior asserts |
+
+### Tests
+
+| Test File | Coverage |
+|-----------|----------|
+| `server/db.self-check.js` | validate / filter / mark-applied stage |
