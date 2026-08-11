@@ -658,9 +658,10 @@ Expected salary (opening position for applications, senior backend band, gross/y
                          and the currency of the target country. If a form forces a single
                          number, use ~5% below the top of the range to leave negotiation room.
 Work type:              Remote or hybrid (open to on-site for right opportunity)
-Work authorization:     Requires employer-sponsored work authorization
+Work authorization:     Primary strategy requires employer-sponsored work authorization for relocation and an in-country job. Spain is a contingency only for a Digital Nomad Visa / remote-salary strategy; it is not an active Spanish-employer target.
 Earliest start date:    1 month notice
-Relocation priority:    Canada → Ireland → United Kingdom → Netherlands → Portugal
+Relocation priority (active sponsored-employer search): Canada → Ireland → United Kingdom → Netherlands → Portugal
+Spain:                  Contingency / remote-first option only — do not prioritize Spanish-employer offers unless explicitly re-evaluated.
 Deal breakers:          No unpaid overtime; no 24/7 on-call without compensation;
                         roles requiring skills marked "Learning" as mandatory without ramp-up time
 ```
