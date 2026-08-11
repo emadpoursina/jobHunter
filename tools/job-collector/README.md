@@ -134,6 +134,7 @@ In **Settings → Task models**, override provider/model for **Parse offer** and
 - **Manual input** — paste job text or a URL on the Dashboard; parse, review, save
 - **Browser extraction** — run a console script in your own browser (LinkedIn, Indeed, or any site), paste JSON, import — bypasses headless 403/CAPTCHA blocks
 - **LinkedIn / Indeed scrapers** — Playwright-based collectors with run controls on the Dashboard
+- **Country presets** — `uk` and `ireland` collectors pre-scoped to the UK / Ireland (HiringCafe engine, fixed location, offers route to `by-country/gb/` and `by-country/ie/`)
 - **Jobs list** — filter by status, source, country
 - **Job detail** — view parsed fields, generate CV, mark applied / rejected / neutral
 - **CV viewer** — rendered markdown with copy / download
@@ -202,6 +203,19 @@ tools/job-collector/
 ```
 
 ---
+
+## Collector defaults (English-first pivot)
+
+After the 2026-08 pivot, generic collectors (LinkedIn / Indeed / HiringCafe) default to
+**Canada** (lead priority market), and the new `uk` / `ireland` presets are pre-scoped to
+those countries. `germantechjobs` is a DE-only board and is **disabled by default** —
+enable it only if you re-target Germany. Indeed's default subdomain is now `uk` (was `de`)
+and its browser locale/timezone are derived from the configured location instead of a
+hardcoded Germany profile. Country routing is automatic (`uk`→`GB`, `ireland`→`IE`,
+`canada`→`CA`, `netherlands`→`NL`, `portugal`→`PT`).
+
+Note: collector defaults are seeded on a fresh install. For an existing DB, apply the
+country/location and queries you want in **Settings** (the presets are available there too).
 
 ## Data storage
 

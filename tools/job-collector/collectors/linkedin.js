@@ -277,9 +277,9 @@ export default {
   configSchema: {
     queries: {
       type: 'array',
-      description: 'Search strings, e.g. ["backend engineer Berlin"]',
+      description: 'Search strings, e.g. ["backend engineer London"]',
     },
-    location: { type: 'string', description: 'Location filter, e.g. "Germany"' },
+    location: { type: 'string', description: 'Location filter, e.g. "Canada"' },
     maxResults: {
       type: 'number',
       default: 10,

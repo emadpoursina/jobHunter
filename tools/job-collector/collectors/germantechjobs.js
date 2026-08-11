@@ -142,12 +142,12 @@ function toOffer(item, queryMatched) {
 
 const collector = {
   name: SOURCE,
-  label: 'GermanTechJobs',
+  label: 'GermanTechJobs (DE only — deprecated after English-first pivot)',
   configSchema: {
     queries: {
       type: 'array',
       description:
-        'Keywords for roles you want (matched → LLM parse). Non-matches are skipped.',
+        'DE-only board. Deprecated after the English-first pivot — use UK/Ireland/priority presets instead.',
     },
     location: {
       type: 'string',

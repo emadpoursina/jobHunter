@@ -378,7 +378,7 @@ const collector = {
     },
     location: {
       type: 'string',
-      description: 'Optional place filter (geocoded), e.g. "Germany" or "Berlin"',
+      description: 'Optional place filter (geocoded), e.g. "Canada" or "London"',
     },
     maxResults: {
       type: 'number',

@@ -23,6 +23,8 @@ const SOURCE_OPTIONS = [
   { value: 'indeed', label: 'Indeed' },
   { value: 'germantechjobs', label: 'GermanTechJobs' },
   { value: 'hiringcafe', label: 'HiringCafe' },
+  { value: 'uk', label: 'UK (HiringCafe)' },
+  { value: 'ireland', label: 'Ireland (HiringCafe)' },
 ];
 
 const SORT_OPTIONS = [

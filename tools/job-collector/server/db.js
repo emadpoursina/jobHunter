@@ -60,7 +60,17 @@ const DEFAULT_SETTINGS = {
     cover_letter: { ...DEFAULT_LLM_TASK },
     profile_update: { ...DEFAULT_LLM_TASK },
   },
-  collectors: {},
+  collectors: {
+    // English-first pivot default: point generic sources at the lead priority market
+    linkedin: { enabled: true, queries: ['backend engineer', 'full-stack engineer', 'node.js engineer'], location: 'Canada', maxResults: 10 },
+    indeed: { enabled: true, queries: ['backend engineer', 'full-stack engineer', 'node.js engineer'], location: 'Canada', maxResults: 10 },
+    hiringcafe: { enabled: true, queries: ['backend engineer', 'full-stack engineer', 'node.js engineer'], location: 'Canada', maxResults: 10 },
+    // New-market presets pre-scoped to priority countries
+    uk: { enabled: true, queries: ['backend engineer', 'full-stack engineer', 'node.js engineer', 'senior full-stack', 'visa sponsorship'], location: '', maxResults: 10 },
+    ireland: { enabled: true, queries: ['backend engineer', 'full-stack engineer', 'node.js engineer', 'senior full-stack', 'visa sponsorship'], location: '', maxResults: 10 },
+    // DE-only board disabled by default after the English-first pivot
+    germantechjobs: { enabled: false, queries: [], location: 'Germany', maxResults: 10 },
+  },
 };
 
 mkdirSync(path.dirname(DB_PATH), { recursive: true });

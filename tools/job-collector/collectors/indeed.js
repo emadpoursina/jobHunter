@@ -5,7 +5,7 @@ const USER_AGENT =
   'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
 const NAV_TIMEOUT = 30_000;
 const MAX_BLOCKED_RETRIES = 2;
-const DEFAULT_SUBDOMAIN = 'de';
+const DEFAULT_SUBDOMAIN = 'uk';
 
 // Indeed country subdomain map — ISO code → Indeed subdomain (verified 2026-06)
 const COUNTRY_SUBDOMAIN = {
@@ -69,10 +69,25 @@ function normalizeQueries(config = {}) {
   return [];
 }
 
-// Map a location string to an Indeed subdomain (defaults to de.indeed.com)
+// Map a location string to an Indeed subdomain (defaults to uk.indeed.com)
 function resolveSubdomain(location) {
   const code = inferCountryCode(location);
   return COUNTRY_SUBDOMAIN[code] ?? DEFAULT_SUBDOMAIN;
+}
+
+// Browser locale/timezone per country — used instead of a hardcoded Germany profile
+const COUNTRY_LOCALE = {
+  DE: { locale: 'de-DE', timezone: 'Europe/Berlin', accept: 'de-DE,de;q=0.9,en-US;q=0.8,en;q=0.7' },
+  GB: { locale: 'en-GB', timezone: 'Europe/London', accept: 'en-GB,en;q=0.9' },
+  IE: { locale: 'en-IE', timezone: 'Europe/Dublin', accept: 'en-IE,en;q=0.9' },
+  CA: { locale: 'en-CA', timezone: 'America/Toronto', accept: 'en-CA,en;q=0.9,fr-CA;q=0.6' },
+  NL: { locale: 'nl-NL', timezone: 'Europe/Amsterdam', accept: 'nl-NL,nl;q=0.9,en;q=0.8' },
+  PT: { locale: 'pt-PT', timezone: 'Europe/Lisbon', accept: 'pt-PT,pt;q=0.9,en;q=0.8' },
+};
+function resolveLocale(code) {
+  return (
+    COUNTRY_LOCALE[code] ?? { locale: 'en-US', timezone: 'UTC', accept: 'en-US,en;q=0.9' }
+  );
 }
 
 // Build the Indeed jobs search URL with a 30-day posted filter
@@ -289,9 +304,9 @@ export default {
   configSchema: {
     queries: {
       type: 'array',
-      description: 'Search strings, e.g. ["backend engineer Berlin"]',
+      description: 'Search strings, e.g. ["backend engineer London"]',
     },
-    location: { type: 'string', description: 'Location filter, e.g. "Germany"' },
+    location: { type: 'string', description: 'Location filter, e.g. "Canada"' },
     maxResults: {
       type: 'number',
       default: 10,
@@ -308,6 +323,7 @@ export default {
         ? Math.min(Math.floor(config.maxResults), 50)
         : 10;
     const subdomain = resolveSubdomain(location);
+    const locale = resolveLocale(inferCountryCode(location));
 
     if (queries.length === 0) {
       const err = new Error('At least one query must be provided in config.queries');
@@ -320,11 +336,11 @@ export default {
     const sharedBrowser = await getBrowser();
     const context = await sharedBrowser.newContext({
       userAgent: USER_AGENT,
-      locale: 'de-DE',
-      timezoneId: 'Europe/Berlin',
+      locale: locale.locale,
+      timezoneId: locale.timezone,
       viewport: { width: 1920, height: 1080 },
       extraHTTPHeaders: {
-        'Accept-Language': 'de-DE,de;q=0.9,en-US;q=0.8,en;q=0.7',
+        'Accept-Language': locale.accept,
       },
     });
     const page = await context.newPage();

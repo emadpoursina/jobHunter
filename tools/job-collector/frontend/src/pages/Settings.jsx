@@ -4,7 +4,7 @@ import { api } from '../api.js';
 const DEFAULT_COLLECTOR_CONFIG = {
   enabled: false,
   queries: [],
-  location: '',
+  location: 'Canada',
   maxResults: 10,
 };
 
@@ -543,7 +543,7 @@ export default function Settings() {
                     <input
                       id={`${collector.name}-location`}
                       type="text"
-                      placeholder="e.g. Germany"
+                      placeholder="e.g. Canada"
                       value={config.location ?? ''}
                       onChange={(e) =>
                         updateCollector(collector.name, 'location', e.target.value)
