@@ -41,6 +41,10 @@ async function main() {
     const httpError = await fetchApplyPage('https://example.test/login');
     assert(httpError.status === 'http-error' && httpError.html === null, 'maps non-OK responses to http-error');
 
+    globalThis.fetch = async () => new Response('<main><input name="only-one"></main>', { status: 200 });
+    const unusable = await fetchApplyPage('https://example.test/csr-shell');
+    assert(unusable.status === 'unusable' && unusable.html === null, 'maps CSR-like shells to unusable fallback');
+
     globalThis.fetch = async () => {
       const error = new Error('timed out');
       error.name = 'AbortError';

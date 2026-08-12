@@ -4,9 +4,12 @@ title: Grounding verification
 intent: html-grounded-apply-script
 complexity: low
 mode: autopilot
-status: pending
-depends_on: [wire-page-html-into-apply-route]
+status: completed
+depends_on:
+  - wire-page-html-into-apply-route
 created: 2026-08-12T08:55:28Z
+run_id: run-jobhunter-012
+completed_at: 2026-08-12T09:08:54.998Z
 ---
 
 # Work Item: Grounding verification

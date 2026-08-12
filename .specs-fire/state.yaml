@@ -48,9 +48,11 @@ intents:
         title: Grounding verification
         complexity: low
         mode: autopilot
-        status: pending
+        status: completed
         depends_on:
           - wire-page-html-into-apply-route
+        run_id: run-jobhunter-012
+        completed_at: 2026-08-12T09:08:54.998Z
   - id: application-funnel-stages
     title: Application funnel stages
     status: in_progress
@@ -418,3 +420,11 @@ runs:
           mode: confirm
       started: 2026-08-12T08:59:52.346Z
       completed: 2026-08-12T09:06:51.161Z
+    - id: run-jobhunter-012
+      scope: single
+      work_items:
+        - id: grounding-verification
+          intent: html-grounded-apply-script
+          mode: autopilot
+      started: 2026-08-12T09:07:36.441Z
+      completed: 2026-08-12T09:08:54.998Z

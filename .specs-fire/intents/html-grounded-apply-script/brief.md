@@ -1,8 +1,9 @@
 ---
 id: html-grounded-apply-script
 title: HTML-grounded apply script generation
-status: in_progress
+status: completed
 created: 2026-08-12T08:50:38Z
+completed_at: 2026-08-12T09:08:55.004Z
 ---
 
 # Intent: HTML-grounded apply script generation
