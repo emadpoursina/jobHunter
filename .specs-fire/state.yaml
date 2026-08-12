@@ -12,6 +12,39 @@ workspace:
   run_scope_history: []
   scanned_at: 2026-07-18T11:15:18Z
 intents:
+  - id: html-grounded-apply-script
+    title: HTML-grounded apply script generation
+    status: in_progress
+    created: 2026-08-12T08:50:38Z
+    brief: .specs-fire/intents/html-grounded-apply-script/brief.md
+    work_items:
+      - id: page-fetcher-module
+        title: Page fetcher module
+        complexity: medium
+        mode: confirm
+        status: pending
+        depends_on: []
+      - id: grounded-apply-agent-prompt
+        title: Grounded apply-form agent
+        complexity: medium
+        mode: confirm
+        status: pending
+        depends_on: []
+      - id: wire-page-html-into-apply-route
+        title: Wire pageHtml into apply route + UI
+        complexity: medium
+        mode: confirm
+        status: pending
+        depends_on:
+          - page-fetcher-module
+          - grounded-apply-agent-prompt
+      - id: grounding-verification
+        title: Grounding verification
+        complexity: low
+        mode: autopilot
+        status: pending
+        depends_on:
+          - wire-page-html-into-apply-route
   - id: application-funnel-stages
     title: Application funnel stages
     status: in_progress
@@ -247,7 +280,34 @@ intents:
         run_id: run-jobhunter-007
         completed_at: 2026-08-07T22:00:00.770Z
 runs:
-  active: []
+  active:
+    - id: run-jobhunter-011
+      scope: batch
+      work_items:
+        - id: page-fetcher-module
+          intent: html-grounded-apply-script
+          mode: confirm
+          status: completed
+          current_phase: review
+          checkpoint_state: approved
+          current_checkpoint: plan
+          completed_at: 2026-08-12T09:01:37.502Z
+        - id: grounded-apply-agent-prompt
+          intent: html-grounded-apply-script
+          mode: confirm
+          status: in_progress
+          current_phase: plan
+          checkpoint_state: none
+          current_checkpoint: plan
+        - id: wire-page-html-into-apply-route
+          intent: html-grounded-apply-script
+          mode: confirm
+          status: pending
+          current_phase: null
+          checkpoint_state: none
+          current_checkpoint: null
+      current_item: grounded-apply-agent-prompt
+      started: 2026-08-12T08:59:52.346Z
   completed:
     - id: run-jobhunter-001
       scope: batch
