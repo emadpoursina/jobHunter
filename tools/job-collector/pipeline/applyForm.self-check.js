@@ -32,6 +32,14 @@ async function main() {
   assert(/never auto-submit|do not auto-submit/i.test(prompt), 'prompt forbids auto-submit');
   assert(/EEO|demographic/i.test(prompt), 'prompt forbids EEO/demographic answers');
   assert(/__APPLY_CTX__/.test(prompt), 'prompt uses __APPLY_CTX__ injection contract');
+  assert(/pageHtml/.test(prompt), 'prompt documents pageHtml grounding input');
+  assert(/id.*name.*data-testid/i.test(prompt), 'prompt defines grounded selector priority');
+  assert(/never invent a selector/i.test(prompt), 'prompt forbids invented grounded selectors');
+  assert(/per-field.*fallback/i.test(prompt), 'prompt requires per-field fallback');
+  assert(/setNativeValue/.test(prompt), 'prompt requires React-safe value writes');
+  assert(/combobox/i.test(prompt) && /shadow root/i.test(prompt), 'prompt covers custom and shadow-DOM controls');
+  assert(/MutationObserver/.test(prompt), 'prompt requires mutation-based step waiting');
+  assert(/console\.table/.test(prompt) && /grounded/i.test(prompt), 'prompt reports grounded versus fallback runs');
   assert(/applyUrl|company careers|ATS/i.test(prompt), 'prompt targets company-site / ATS forms');
   assert(/urlHost/i.test(prompt), 'prompt includes urlHost for host-aware hints');
   assert(
@@ -62,6 +70,7 @@ async function main() {
     pdfPath: '/tmp/CV_Test.pdf',
     urlHost: 'boards.greenhouse.io',
     answers: { 'why do you want to join': 'I build Node.js systems.' },
+    pageHtml: '<form id="application-form"><input id="first-name" name="firstName"><input name="email"></form>',
   };
 
   const userMsg = `Produce the company-site apply form fill-assist userscript for this context. Read all values from __APPLY_CTX__.

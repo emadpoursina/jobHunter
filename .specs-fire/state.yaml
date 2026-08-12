@@ -295,18 +295,19 @@ runs:
         - id: grounded-apply-agent-prompt
           intent: html-grounded-apply-script
           mode: confirm
+          status: completed
+          current_phase: review
+          checkpoint_state: approved
+          current_checkpoint: plan
+          completed_at: 2026-08-12T09:03:54.264Z
+        - id: wire-page-html-into-apply-route
+          intent: html-grounded-apply-script
+          mode: confirm
           status: in_progress
           current_phase: plan
           checkpoint_state: none
           current_checkpoint: plan
-        - id: wire-page-html-into-apply-route
-          intent: html-grounded-apply-script
-          mode: confirm
-          status: pending
-          current_phase: null
-          checkpoint_state: none
-          current_checkpoint: null
-      current_item: grounded-apply-agent-prompt
+      current_item: wire-page-html-into-apply-route
       started: 2026-08-12T08:59:52.346Z
   completed:
     - id: run-jobhunter-001

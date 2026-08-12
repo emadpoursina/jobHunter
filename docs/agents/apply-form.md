@@ -30,6 +30,7 @@ const __APPLY_CTX__ = {
   pdfPath: '/absolute/path/to/CV.pdf',
   urlHost: 'careers.example.com', // hostname of applyUrl (or fallback)
   answers: { 'why do you want to join': '...', 'cover letter': '...' },
+  pageHtml: '<form id="application-form">...</form>' /* or null */,
 };
 ```
 
@@ -39,6 +40,23 @@ The `profile` object fields are exactly: `fullName`, `email`, `phone`, `telegram
 
 The `answers` map is keyed by the lowercased, trimmed question text. It may be empty or
 partial — the script must tolerate missing keys.
+
+`pageHtml` is a trimmed snapshot of the real apply page fetched at generation time. It is
+ground truth when present, but the live DOM may drift by paste time. Never hardcode values or
+skip existence checks because a selector appeared in the snapshot.
+
+## Selector grounding
+
+When `pageHtml` is a string, prefer selectors that are visibly present in that snapshot in this
+priority order: `id` > `name` > `data-testid`/`data-qa`/`data-automation-id` > stable
+tag-plus-class > a structural path from a landmark. Never invent a selector absent from
+`pageHtml`.
+
+Ground each field independently. This is a per-field fallback: if a field is absent from
+`pageHtml`, the snapshot is `null`, or a grounded selector is missing from the live DOM, fall
+back only for that field to label,
+`aria-label`, `placeholder`, and `name` matching. Do not discard grounding for every field
+because one field needs fallback.
 
 ## Script requirements
 
@@ -77,10 +95,11 @@ multi-step wizard on the same origin. The script should:
 5. End with the form ready for human review. Log a summary reminding the user to upload CV
    manually if needed and to click Submit themselves when `SUBMIT` is false.
 
-### Host-aware hints (`urlHost`)
+### Host-aware hints (`urlHost`, fallback only)
 
-When `__APPLY_CTX__.urlHost` matches known ATS hosts, prefer these conventions before generic
-label matching:
+When `pageHtml` is absent or incomplete for a field, and `__APPLY_CTX__.urlHost` matches a known
+ATS host, use these conventions before generic label matching. `pageHtml` always takes priority
+when present:
 
 | Host pattern | Notes |
 |--------------|-------|
@@ -96,9 +115,10 @@ If `urlHost` does not match a known pattern, use generic label / aria-label / pl
 
 ### Field filling
 
-Map profile fields to inputs by matching the input's visible label, associated `<label>`,
+For each field, first choose the most specific selector actually present in `pageHtml` using the
+grounding priority above. Otherwise match the input's visible label, associated `<label>`,
 `aria-label`, `placeholder`, or `name` attribute (in that order). Use text-contains matching,
-case-insensitive:
+case-insensitive, and never act on a selector without checking that the element exists.
 
 - Full name → `profile.fullName` (split across first/last name fields on first space if needed).
 - Email → `profile.email`.
@@ -129,6 +149,28 @@ A pasted console script cannot attach a real file by path — if the upload fiel
 after the attempt, highlight it red and `console.warn` telling the user to upload
 `__APPLY_CTX__.pdfPath` manually. Never claim success when the upload did not register.
 
+### React-safe writes and custom controls
+
+For text and textarea fields, use the native prototype setter and dispatch both `input` and
+`change` events. Never use a bare `el.value = value`, because React-controlled ATS forms may not
+observe the change:
+
+```js
+function setNativeValue(el, value) {
+  const proto = el.tagName === 'TEXTAREA'
+    ? window.HTMLTextAreaElement.prototype
+    : window.HTMLInputElement.prototype;
+  const setter = Object.getOwnPropertyDescriptor(proto, 'value').set;
+  setter.call(el, value);
+  el.dispatchEvent(new Event('input', { bubbles: true }));
+  el.dispatchEvent(new Event('change', { bubbles: true }));
+}
+```
+
+Handle custom `role="combobox"`/`role="listbox"` controls by opening the trigger and polling
+`[role="option"]` elements for a case-insensitive answer match. Query through nested shadow roots
+when ATS components isolate form controls there.
+
 ### Free-text and custom questions
 
 For each text question on the form:
@@ -157,8 +199,12 @@ field you could not map or chose to skip. Outline inputs only — not page chrom
 
 ### Robustness
 
-- Wrap each major section in try/catch. On failure, `console.warn` and continue.
-- At the end, `console.log` a summary: fields filled, skipped, resume upload status, and
+- Wrap the whole script in an async IIFE and each individual field fill in its own try/catch.
+  One bad field must never abort the rest.
+- For multi-step forms, wait for new fields with a `MutationObserver`, capped at five seconds,
+  rather than relying only on guessed fixed delays.
+- At the end, use `console.table` with `{ label, selector, matched, filled, reason }` per field,
+  resume-upload status, whether the run was grounded (`pageHtml` present) or fallback-only, and
   `urlHost`. Remind the user to review red-outlined fields and submit manually when
   `SUBMIT === false`.
 

@@ -4,8 +4,10 @@ title: Wire pageHtml into apply route + UI
 intent: html-grounded-apply-script
 complexity: medium
 mode: confirm
-status: pending
-depends_on: [page-fetcher-module, grounded-apply-agent-prompt]
+status: in_progress
+depends_on:
+  - page-fetcher-module
+  - grounded-apply-agent-prompt
 created: 2026-08-12T08:55:28Z
 ---
 

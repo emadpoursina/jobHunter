@@ -31,3 +31,36 @@
   `tools/job-collector` directory and failed to locate the script. The test was
   rerun with the absolute script path and passed; this was an invocation-path
   issue, not a product failure.
+
+---
+
+## Work Item: grounded-apply-agent-prompt
+
+### Test Results
+
+- Command: `cd tools/job-collector && bun run pipeline/applyForm.self-check.js`
+- Passed: 21
+- Failed: 0
+- Skipped: 0
+- Coverage: Not instrumented; prompt anchors and the available LLM round-trip
+  passed.
+
+### Acceptance Criteria Validation
+
+- [x] `pageHtml` is documented as a string or `null` on `__APPLY_CTX__`.
+- [x] Grounded selector priority is documented as `id` > `name` > data
+  attributes > stable class/structure.
+- [x] Invented selectors are forbidden and fallback is per field.
+- [x] Safety anchors remain: `SUBMIT = false`, no auto-submit, demographic
+  and consent skips, and no hardcoded PII.
+- [x] React-safe writes, async IIFE, per-field try/catch, combobox,
+  shadow-DOM, MutationObserver, and grounded/fallback reporting are required.
+- [x] Host hints remain fallback-only.
+- [x] The self-check validates the new prompt contract and its optional LLM
+  round-trip passed.
+
+### Notes
+
+- The first self-check run found one missing literal phrase in the prompt
+  assertion. The prompt was clarified to say “per-field fallback” and the
+  complete check then passed.

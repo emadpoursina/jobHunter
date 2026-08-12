@@ -34,3 +34,39 @@
 
 Review complete. The security item is recorded as a future hardening concern
 and was not expanded beyond this work item’s raw-fetch scope.
+
+---
+
+## Work Item: grounded-apply-agent-prompt
+
+### Review Summary
+
+| Category | Auto-fixed | Suggestions | Skipped |
+|---|---:|---:|---:|
+| Code quality | 0 | 0 | 0 |
+| Security | 0 | 0 | 0 |
+| Architecture | 0 | 0 | 0 |
+| Testing | 0 | 0 | 0 |
+
+### Reviewed Files
+
+- `docs/agents/apply-form.md`
+- `tools/job-collector/pipeline/applyForm.self-check.js`
+
+### Findings
+
+- The updated prompt preserves the dry-run and human-submit safety boundary,
+  makes snapshot selectors authoritative when available, and limits fallback
+  to individual fields.
+- The self-check covers the new contract and the optional LLM round-trip.
+- No mechanical issues, hardcoded secrets, unsafe prompt instructions, or
+  linter findings were found.
+
+### Verification
+
+- `bun run pipeline/applyForm.self-check.js` passed, including the available
+  LLM round-trip assertions.
+
+### Status
+
+Review complete with no pending suggestions.

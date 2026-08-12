@@ -4,9 +4,11 @@ title: Grounded apply-form agent
 intent: html-grounded-apply-script
 complexity: medium
 mode: confirm
-status: in_progress
+status: completed
 depends_on: []
 created: 2026-08-12T08:55:28Z
+run_id: run-jobhunter-011
+completed_at: 2026-08-12T09:03:54.264Z
 ---
 
 # Work Item: Grounded apply-form agent
