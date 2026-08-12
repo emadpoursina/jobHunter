@@ -4,11 +4,13 @@ title: Wire pageHtml into apply route + UI
 intent: html-grounded-apply-script
 complexity: medium
 mode: confirm
-status: in_progress
+status: completed
 depends_on:
   - page-fetcher-module
   - grounded-apply-agent-prompt
 created: 2026-08-12T08:55:28Z
+run_id: run-jobhunter-011
+completed_at: 2026-08-12T09:06:51.161Z
 ---
 
 # Work Item: Wire pageHtml into apply route + UI

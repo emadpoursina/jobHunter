@@ -58,3 +58,41 @@ None.
 ### Tests
 
 - `cd tools/job-collector && bun run pipeline/applyForm.self-check.js`
+
+---
+
+## Work Item: wire-page-html-into-apply-route
+
+### Approach
+
+- Fetch the apply page after URL validation and before building the LLM context,
+  using the metadata-returning page fetcher so the route can log the outcome.
+- Add `pageHtml` to the existing single-call context and return `grounded` plus
+  `fetchStatus` alongside the generated script without changing profile, CV, or
+  answer gathering.
+- Keep fetch failures soft: log the status and continue with `pageHtml: null`.
+- Normalize the new response fields in the frontend API helper and show a clear
+  grounded/fallback status in Job Detail next to the generated script.
+- Extend the route self-check assertions for the new response contract when the
+  happy path is available.
+
+### Files to Create
+
+None.
+
+### Files to Modify
+
+- `tools/job-collector/server/routes/apply.js` — fetch, log, inject, and
+  respond with grounding metadata.
+- `tools/job-collector/server/routes/apply.self-check.js` — verify metadata in
+  the route response.
+- `tools/job-collector/frontend/src/api.js` — normalize grounding response
+  fields.
+- `tools/job-collector/frontend/src/pages/JobDetail.jsx` — retain and display
+  grounding status.
+- `tools/job-collector/frontend/src/index.css` — style the status label.
+
+### Tests
+
+- `cd tools/job-collector && REPO_ROOT=/path/to/jobHunter bun run server/routes/apply.self-check.js`
+- `cd tools/job-collector && bun run build`

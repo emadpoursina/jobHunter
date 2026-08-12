@@ -1,7 +1,7 @@
 ---
 id: html-grounded-apply-script
 title: HTML-grounded apply script generation
-status: pending
+status: in_progress
 created: 2026-08-12T08:50:38Z
 ---
 

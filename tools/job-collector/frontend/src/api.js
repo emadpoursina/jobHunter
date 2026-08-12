@@ -74,7 +74,14 @@ export const api = {
   },
 
   // Apply
-  generateApplyScript: (id) => request('POST', '/apply/script', { jobId: id }),
+  generateApplyScript: async (id) => {
+    const data = await request('POST', '/apply/script', { jobId: id });
+    return {
+      ...data,
+      grounded: data.grounded === true,
+      fetchStatus: data.fetchStatus ?? 'unknown',
+    };
+  },
   markApplied: (id, appliedUrl) => request('POST', `/jobs/${id}/applied`, { appliedUrl }),
 
   // Profile

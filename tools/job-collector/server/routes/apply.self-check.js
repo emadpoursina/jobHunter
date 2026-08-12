@@ -152,7 +152,13 @@ async function main() {
     assert(result.status === 200, `route returns 200 (got ${result.status})`);
     assert(typeof result.data?.script === 'string' && result.data.script.length > 0, 'response has non-empty script');
     assert(typeof result.data?.pdfPath === 'string' && result.data.pdfPath.length > 0, 'response has pdfPath');
+    assert(typeof result.data?.grounded === 'boolean', 'response has grounded boolean');
+    assert(
+      ['ok', 'timeout', 'http-error', 'unusable', 'network-error'].includes(result.data?.fetchStatus),
+      `response has fetchStatus (got ${result.data?.fetchStatus})`,
+    );
     assert(result.data.script.includes('__APPLY_CTX__'), 'script contains __APPLY_CTX__');
+    assert(result.data.script.includes('pageHtml'), 'script context contains pageHtml');
     assert(/const\s+SUBMIT\s*=\s*false/i.test(result.data.script), 'script contains `const SUBMIT = false`');
   } finally {
     if (throwawayId) deleteJob(throwawayId);

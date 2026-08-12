@@ -415,6 +415,19 @@ select:focus {
   word-break: break-all;
 }
 
+.apply-grounding {
+  margin: 0.5rem 0;
+  font-size: 13px;
+}
+
+.apply-grounding.is-grounded {
+  color: var(--green);
+}
+
+.apply-grounding.is-fallback {
+  color: var(--text2);
+}
+
 .btn-sm {
   padding: 4px 10px;
   font-size: 12px;

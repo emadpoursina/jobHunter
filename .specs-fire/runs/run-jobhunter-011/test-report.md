@@ -64,3 +64,35 @@
 - The first self-check run found one missing literal phrase in the prompt
   assertion. The prompt was clarified to say “per-field fallback” and the
   complete check then passed.
+
+---
+
+## Work Item: wire-page-html-into-apply-route
+
+### Test Results
+
+- Route command: `PORT=3199 REPO_ROOT=/Users/emad/Projects/playground/jobHunter bun run server/routes/apply.self-check.js`
+- Passed: 11
+- Failed: 0
+- Skipped: 0
+- Build command: `cd tools/job-collector && bun run build`
+- Build: Passed
+
+### Acceptance Criteria Validation
+
+- [x] The route fetches apply HTML after URL validation and injects usable
+  markup or `null` into `__APPLY_CTX__.pageHtml`.
+- [x] Existing profile, CV PDF, URL host, answer generation, and single LLM
+  call remain in place.
+- [x] Response includes `grounded` and `fetchStatus`.
+- [x] Fetch outcomes are logged and failures continue through fallback
+  generation.
+- [x] Job Detail displays grounded versus fallback status.
+- [x] Frontend API normalization preserves the script and exposes the new
+  fields.
+
+### Notes
+
+- The initial route check used an existing server on port 3061 and therefore
+  exercised stale code. It was rerun on isolated port 3199 and passed against
+  the modified route.

@@ -5,6 +5,7 @@ import { getJobById } from '../db.js';
 import { getParsedProfile } from '../../pipeline/profile.js';
 import { cvToPdf } from '../../pipeline/cvPdf.js';
 import { readRepoFile } from '../../pipeline/repoFiles.js';
+import { fetchApplyPage } from '../../pipeline/pageFetcher.js';
 
 const router = Router();
 
@@ -137,6 +138,16 @@ router.post('/script', asyncHandler(async (req, res) => {
     });
   }
 
+  let pageResult;
+  try {
+    pageResult = await fetchApplyPage(applyUrl);
+  } catch {
+    pageResult = { html: null, status: 'network-error' };
+  }
+  const fetchStatus = pageResult.status;
+  const grounded = typeof pageResult.html === 'string' && pageResult.html.length > 0;
+  console.log(`[INFO] [apply] Page fetch for job ${jobId}: ${fetchStatus}`);
+
   const answers = await generateAnswers(job, profile);
 
   const ctx = {
@@ -150,6 +161,7 @@ router.post('/script', asyncHandler(async (req, res) => {
     pdfPath,
     urlHost,
     answers,
+    pageHtml: grounded ? pageResult.html : null,
   };
 
   const userMsg = `Produce the company-site apply form fill-assist userscript for this context. The user is on the company careers/ATS page. Read all values from __APPLY_CTX__.
@@ -182,7 +194,7 @@ Emit the script only.`;
   const script = `const __APPLY_CTX__ = ${JSON.stringify(ctx)};\n${scriptBody.trim()}`;
 
   console.log(`[INFO] [apply] Generated apply script for job ${jobId} (${script.length} chars)`);
-  res.json({ script, warnings: [], pdfPath });
+  res.json({ script, warnings: [], pdfPath, grounded, fetchStatus });
 }));
 
 export default router;

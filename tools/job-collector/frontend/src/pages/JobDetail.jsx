@@ -58,6 +58,8 @@ export default function JobDetail() {
   const [applyScript, setApplyScript] = useState(null);
   const [applyPdfPath, setApplyPdfPath] = useState(null);
   const [applyWarnings, setApplyWarnings] = useState([]);
+  const [applyGrounded, setApplyGrounded] = useState(null);
+  const [applyFetchStatus, setApplyFetchStatus] = useState(null);
   const [copiedScript, setCopiedScript] = useState(false);
   const [alert, setAlert] = useState(null);
   const [copiedPath, setCopiedPath] = useState(false);
@@ -285,12 +287,16 @@ export default function JobDetail() {
     setApplyScript(null);
     setApplyPdfPath(null);
     setApplyWarnings([]);
+    setApplyGrounded(null);
+    setApplyFetchStatus(null);
 
     try {
       const data = await api.generateApplyScript(id);
       setApplyScript(data.script);
       setApplyPdfPath(data.pdfPath ?? null);
       setApplyWarnings(Array.isArray(data.warnings) ? data.warnings : []);
+      setApplyGrounded(data.grounded === true);
+      setApplyFetchStatus(data.fetchStatus ?? 'unknown');
       showAlert(
         'Apply script ready. Open the company apply page, paste into DevTools, review fields, then submit yourself.',
         'info',
@@ -770,6 +776,11 @@ export default function JobDetail() {
                   <strong>PDF:</strong> <code className="file-path">{applyPdfPath}</code>
                 </p>
               )}
+              <p className={`apply-grounding ${applyGrounded ? 'is-grounded' : 'is-fallback'}`}>
+                <strong>HTML grounding:</strong>{' '}
+                {applyGrounded ? 'Grounded in the fetched apply page' : 'Fallback selectors only'}
+                {applyFetchStatus && ` (${applyFetchStatus})`}
+              </p>
               {applyWarnings.length > 0 && (
                 <ul className="apply-warnings">
                   {applyWarnings.map((w) => (
