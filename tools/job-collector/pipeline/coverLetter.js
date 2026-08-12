@@ -23,6 +23,12 @@ export function sanitizeCoverLetterOutput(raw) {
 
   text = text.replace(/^here is your cover letter:?\s*\n+/i, '');
 
+  // Drop traditional city/date letterhead if the model still emits it
+  text = text.replace(
+    /^[A-Za-zÀ-ÿ][A-Za-zÀ-ÿ .'-]{0,40},\s+(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},\s+\d{4}\s*\n+/i,
+    '',
+  );
+
   const metaIdx = text.search(
     /(?:\n\n|\r\n\r\n)(?:---\s*)?(?:\*\*)?(?:Notes?|Rationale|Commentary|Explanation|Summary)(?:\*\*)?:/i,
   );

@@ -5,6 +5,7 @@
 //   2. readRepoFile round-trips the written content
 //   3. writeCoverLetterMd refuses empty input
 //   4. sanitizeCoverLetterOutput strips trailing Notes:/rationale blocks
+//   5. sanitizeCoverLetterOutput strips leading city/date letterhead
 // Exits 0 on success, 1 on failure. No test framework.
 import { mkdtemp, rm } from 'fs/promises';
 import { tmpdir } from 'os';
@@ -35,7 +36,7 @@ async function main() {
       company: 'Acme GmbH',
       title: 'Senior Backend Engineer',
     };
-    const sample = 'Amsterdam, July 30, 2026\n\nDear Hiring Team at Acme GmbH,\n\nSample letter body.\n';
+    const sample = 'Dear Hiring Team at Acme GmbH,\n\nSample letter body.\n';
 
     const relativePath = await writeCoverLetterMd(job, sample);
     assert(
@@ -58,7 +59,7 @@ async function main() {
     }
     assert(refusedEmpty, 'writeCoverLetterMd refuses empty input');
 
-    const withNotes = `Amsterdam, Aug 1, 2026
+    const withNotes = `Amsterdam, August 1, 2026
 
 Dear Hiring Team,
 
@@ -70,7 +71,8 @@ Emad Poursina
 Notes: Based on the 50% match score, the letter emphasizes Docker.`;
     const cleaned = sanitizeCoverLetterOutput(withNotes);
     assert(!/Notes:/i.test(cleaned), 'sanitizeCoverLetterOutput removes trailing Notes block');
-    assert(cleaned.includes('Dear Hiring Team'), 'sanitizeCoverLetterOutput keeps letter body');
+    assert(!/^Amsterdam,/i.test(cleaned), 'sanitizeCoverLetterOutput strips city/date letterhead');
+    assert(cleaned.startsWith('Dear Hiring Team'), 'sanitizeCoverLetterOutput keeps letter body');
   } finally {
     process.env.REPO_ROOT = prevRepoRoot;
     await rm(tempRoot, { recursive: true, force: true });

@@ -898,10 +898,10 @@ ALWAYS include:
   (exact phrase — no variation, no named visa, no "EU Blue Card")
 - Closing links: LinkedIn (https://www.linkedin.com/in/emadpoursina/)
   and GitHub (https://github.com/emadpoursina) on separate lines after sign-off
-- City in header: Iran (current base) — use target city (e.g. Amsterdam / Berlin) only if the posting asks for local applicants and relocation is being offered
 - Sign-off: "Best regards, Emad Poursina" — no "Sincerely", no "Kind regards"
 
 NEVER include:
+- City/date letterhead (e.g. "Amsterdam, August 1, 2026" or "Iran, …") — start with the greeting
 - "I look forward to hearing from you" — rephrase every time
 - "I am writing to express my interest in..." — always cut this opener
 - "passionate", "dynamic", "synergy", "results-driven", "team player"
