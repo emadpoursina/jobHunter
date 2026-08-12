@@ -4,7 +4,7 @@ hermes-up:
 	docker compose up -d
 
 hermes-chat: hermes-up
-	docker compose exec -it -w /workspace/jobHunter hermes-jobhunter /opt/hermes/.venv/bin/hermes
+	docker compose exec -it -w /workspace/jobHunter hermes-jobhunter /opt/hermes/.venv/bin/hermes --tui
 
 hermes-down:
 	docker compose down
