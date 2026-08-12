@@ -68,8 +68,9 @@ export async function fetchApplyPage(url) {
   }
 }
 
-export async function fetchApplyPageHtml(url) {
-  return (await fetchApplyPage(url)).html;
+export async function fetchApplyPageHtml(url, options = {}) {
+  const result = await fetchApplyPage(url);
+  return options.withStatus ? result : result.html;
 }
 
 export {

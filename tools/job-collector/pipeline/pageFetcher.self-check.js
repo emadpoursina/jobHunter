@@ -36,6 +36,8 @@ async function main() {
     const success = await fetchApplyPage('https://example.test/apply');
     assert(success.status === 'ok' && success.html === trimmed, 'returns usable HTML with ok status');
     assert(await fetchApplyPageHtml('https://example.test/apply') === trimmed, 'simple helper returns HTML only');
+    const metadata = await fetchApplyPageHtml('https://example.test/apply', { withStatus: true });
+    assert(metadata.status === 'ok' && metadata.html === trimmed, 'HTML helper exposes optional status metadata');
 
     globalThis.fetch = async () => new Response('blocked', { status: 401 });
     const httpError = await fetchApplyPage('https://example.test/login');

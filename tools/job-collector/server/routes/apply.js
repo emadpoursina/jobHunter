@@ -5,7 +5,7 @@ import { getJobById } from '../db.js';
 import { getParsedProfile } from '../../pipeline/profile.js';
 import { cvToPdf } from '../../pipeline/cvPdf.js';
 import { readRepoFile } from '../../pipeline/repoFiles.js';
-import { fetchApplyPage } from '../../pipeline/pageFetcher.js';
+import { fetchApplyPageHtml } from '../../pipeline/pageFetcher.js';
 
 const router = Router();
 
@@ -140,7 +140,7 @@ router.post('/script', asyncHandler(async (req, res) => {
 
   let pageResult;
   try {
-    pageResult = await fetchApplyPage(applyUrl);
+    pageResult = await fetchApplyPageHtml(applyUrl, { withStatus: true });
   } catch {
     pageResult = { html: null, status: 'network-error' };
   }
