@@ -19,32 +19,54 @@ bunx playwright install chromium
 
 ---
 
-## Quick start
+## Run on host (recommended — no Docker)
+
+No database server is needed: SQLite is built into Bun (`bun:sqlite`) and the data lives in a plain file at `data/jobs.db`.
+
+### Production (single port)
+
+One process serves the API **and** the built UI on `http://localhost:3061`:
 
 ```bash
 cd tools/job-collector
-cp .env.example .env
+cp .env.example .env      # first time only
 bun install
+bun run build             # build the React UI into frontend/dist
+bun run start             # API + UI on :3061
+```
+
+Verify:
+
+```bash
+curl http://localhost:3061/api/health
+# → {"ok":true}
+```
+
+From the repo root, the Makefile wraps the whole flow:
+
+```bash
+make jc-start    # install + build + start (single port :3061)
+make jc-stop     # stop the native server
+```
+
+### Development (hot reload)
+
+Two processes — API on `:3061` and Vite on `:5173` (proxies `/api` to the API):
+
+```bash
+cd tools/job-collector
 bun run dev
 ```
 
-This starts:
-
-- API server on `http://localhost:3001`
-- Vite frontend on `http://localhost:5173` (proxies `/api` to the server)
-
-Verify the server:
-
 ```bash
-curl http://localhost:3001/api/health
-# → {"ok":true}
+make jc-dev      # same thing from the repo root
 ```
 
 ---
 
-## Docker
+## Docker (optional, no longer required)
 
-Requires Docker and an LLM API key (set in `.env` or Settings).
+The Docker stack still works if you prefer it. Requires Docker and an LLM API key (set in `.env` or Settings).
 
 ```bash
 cd tools/job-collector
@@ -52,14 +74,7 @@ cp -n .env.example .env   # optional; compose overrides REPO_ROOT
 bun run stack:up          # builds image + starts (rebuilds UI on each up)
 ```
 
-`stack:up` runs `docker compose up --build`, so frontend changes are baked into the image. Use `bun run dev` for live Vite reload during UI work; use Docker when you want the single-port stack on `:3061`.
-
 Then open `http://localhost:3061` (API + UI in one process).
-
-```bash
-curl http://localhost:3061/api/health
-# → {"ok":true}
-```
 
 | Volume | Purpose |
 |--------|---------|
@@ -67,6 +82,8 @@ curl http://localhost:3061/api/health
 | `../..` → `/repo` | jobHunter repo root (profile, agents, offers, generated CVs) |
 
 Stop: `bun run stack:down`.
+
+> Both modes share the same `data/jobs.db` file, so you can switch freely without copying data.
 
 ---
 
