@@ -1,5 +1,7 @@
 # Phase 0 — Networking
 
+> Mode: Access — warm intros / referrals. Access finds the door; Operate sends.
+
 Warm paths and referrals alongside cold applications.
 
 | File | Purpose |

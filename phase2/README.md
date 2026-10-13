@@ -1,5 +1,7 @@
 # Phase 2 — Applications
 
+> Mode: Operate (default) — applications out. Identity lives here: `profile/master-profile.md` is the only source of facts for CVs. Funnel source of truth is job-collector `application_stage`; `applications/pipeline.md` is legacy, do not sync or revive.
+
 **Goal:** One consistent identity; every application customized, reviewed, and tracked.
 
 | Folder | Purpose |

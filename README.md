@@ -12,43 +12,66 @@ Personal workflow for finding, qualifying, and applying to **backend / full-stac
 
 ---
 
+## Operating model — five session modes
+
+Pick **one primary mode per session**. Default = **Operate** (most sessions send applications).
+
+| Mode | Folder(s) | Spec |
+|------|-----------|------|
+| Foundation — market + visa + gaps | `phase1/` | `docs/agents/job-offer-research.md` |
+| Operate — applications out (**default**) | `phase2/` + `tools/job-collector/` | `docs/agents/cv-generator.md` |
+| Improve — close gaps + evidence | `phase3/` | `docs/agents/project-profile-extractor.md` |
+| Access — warm intros / referrals | `networking/` | — |
+| Scoreboard — conversion by country | `metrics/` | counts from job-collector `application_stage` |
+
+Folders stay as-is; "Phase 0–3" below are these modes mapped to their existing folders, not four equal parallel phases.
+
+**Four sources of truth (named once, used consistently):**
+
+- Who you are: `phase2/profile/master-profile.md`
+- Market vs you: `phase1/skills/gap-report.md`
+- Funnel stage: job-collector `application_stage` on jobs (SQLite)
+- What to learn next: `phase3/backlog.md`
+
+Supporting (not sources of truth): `phase1/skills/requirements-summary.md`, `phase1/checklist.md`, `phase2/applications/feedback.md`, `phase3/skill-map.md`, `phase3/flagship-project.md`, `metrics/by-country.md`, `networking/contacts.md` + `networking/outreach-log.md`. Legacy unused: `phase2/applications/pipeline.md` — do not sync or revive.
+
+**Hard rules:**
+
+1. 100% human review of CV, cover letter, and follow-up before send. No exceptions.
+2. Never modify offer files after they are submitted. Log learning in `phase2/applications/feedback.md`.
+3. Do not wait for all skill gaps to close before applying.
+4. One primary mode per session. Default = Operate.
+5. Master profile is the only source of facts for CVs.
+
+---
+
 ## Project architecture overview
 
-Four phases form a loop. **Phase 2 and Phase 3 run in parallel** — do not wait until all skill gaps are closed before applying.
+Five modes share one loop, mapped to the folders below. **Default session = Operate.** Improve runs on its own cadence; do not wait until all skill gaps are closed before applying.
 
 ```mermaid
-flowchart LR
-  subgraph P0["Phase 0 — Networking"]
-    N0[Contacts & communities] --> N1[Referrals & outreach]
+flowchart TD
+  subgraph session["One session = one primary mode"]
+    F[Foundation]
+    O[Operate default]
+    I[Improve]
+    A[Access]
+    S[Scoreboard]
   end
 
-  subgraph P1["Phase 1 — Research & skill gap"]
-    A[Select 5 priority countries] --> B["10–15 offers per country"]
-    B --> C[Extract skills + visa context]
-    C --> D[Skill gap report]
-  end
-
-  subgraph P2["Phase 2 — Profile & applications"]
-    E[Master profile] --> F["AI CV draft → 100% human review"]
-    F --> G[Submit application]
-    G --> H[Track pipeline + feedback]
-  end
-
-  subgraph P3["Phase 3 — Close skill gaps"]
-    J[Prioritize gaps] --> K[Learning plan]
-    K --> L[Evidence & profile update]
-  end
-
-  N1 --> G
-  D --> E
-  D --> J
-  H --> D
-  H --> J
-  L --> B
-  L --> F
+  F -->|gap-report.md| O
+  F -->|gap-report.md| I
+  O -->|human review then send| JC[job-collector application_stage]
+  O -->|feedback.md themes| I
+  I -->|evidence| MP[master-profile.md]
+  MP --> O
+  A -->|warm job| JC
+  JC --> S
+  S -->|shift country / fit| F
+  S -->|shift targeting| O
 ```
 
-### Phase 0 — Networking & referrals
+### Mode: Access — Networking & referrals (folder `networking/`, formerly "Phase 0")
 
 **Goal:** Access hidden market and warm introductions alongside cold applications.
 
@@ -64,7 +87,7 @@ flowchart LR
 
 ---
 
-### Phase 1 — Research & skill gap analysis
+### Mode: Foundation — Research & skill gap analysis (folder `phase1/`)
 
 **Goal:** Understand demand, visa feasibility, and skill expectations before scaling applications.
 
@@ -90,7 +113,7 @@ flowchart LR
 
 ---
 
-### Phase 2 — Profile, tailored applications & pipeline
+### Mode: Operate — Profile, tailored applications & pipeline (folders `phase2/` + `tools/job-collector/`, default mode)
 
 **Goal:** One consistent identity; every application customized and reviewed.
 
@@ -110,7 +133,7 @@ flowchart LR
 
 ---
 
-### Phase 3 — Close skill gaps (parallel with Phase 2)
+### Mode: Improve — Close skill gaps, parallel with Operate (folder `phase3/`)
 
 **Goal:** Reduce gaps from Phase 1 and real signals from Phase 2 while applications continue.
 
@@ -127,7 +150,7 @@ flowchart LR
 
 ---
 
-### Cross-cutting: metrics
+### Mode: Scoreboard — metrics (folder `metrics/`; counts from job-collector `application_stage`)
 
 Track per **priority country** and overall:
 
@@ -156,32 +179,32 @@ jobHunter/
 │       ├── cv-generator.md            # Phase 2 — tailored CV + Gaps Disclosure
 │       └── project-profile-extractor.md
 │
-├── networking/                        # Phase 0
+├── networking/                        # Mode: Access
 │   ├── README.md
 │   ├── contacts.md
 │   └── outreach-log.md
 │
-├── phase1/                            # Phase 1 — skill gap analysis
+├── phase1/                            # Mode: Foundation — skill gap analysis
 │   ├── README.md
 │   ├── checklist.md                   # Country selection & execution status
 │   ├── countries/                     # Priority countries + visa notes
 │   ├── job-offers/                    # Research corpus (by-country/*/research.md)
 │   └── skills/                        # Gap report + market requirements
 │
-├── phase2/                            # Phase 2 — applications
+├── phase2/                            # Mode: Operate (default) — applications
 │   ├── README.md
 │   ├── profile/                       # Master profile
 │   ├── offers/                        # Live offer files to apply to
 │   ├── documents/                     # AI prompts & generated CVs
 │   └── applications/                  # Pipeline tracking
 │
-├── phase3/                            # Phase 3 — learning & gap closure
+├── phase3/                            # Mode: Improve — learning & gap closure
 │   ├── README.md
 │   ├── skill-map.md                   # Full curriculum + flagship layers
 │   ├── backlog.md
 │   └── flagship-project.md
 │
-└── metrics/                           # Cross-cutting — conversion by country
+└── metrics/                           # Mode: Scoreboard — conversion by country
     ├── README.md
     └── by-country.md
 ```
@@ -200,8 +223,8 @@ jobHunter/
 
 ## Status
 
-**Phase 1 (2026-08 pivot):** Priority countries re-ranked toward **English-first markets — Canada, Ireland, UK, Netherlands, Portugal** — with **Germany demoted to secondary** while German is below B1 ([`phase1/countries/`](phase1/countries/)). Job-offer research complete for Canada, Netherlands, Portugal (30 offers); Germany (10) archived. Ireland + UK offers pending. Skill gap report updated ([`phase1/skills/gap-report.md`](phase1/skills/gap-report.md)).
+**Foundation (2026-08 pivot):** Priority countries re-ranked toward **English-first markets — Canada, Ireland, UK, Netherlands, Portugal** — with **Germany demoted to secondary** while German is below B1 ([`phase1/countries/`](phase1/countries/)). Job-offer research complete for Canada, Netherlands, Portugal (30 offers); Germany (10) archived. Ireland + UK offers pending. Skill gap report updated ([`phase1/skills/gap-report.md`](phase1/skills/gap-report.md)).
 
-**Phase 2 (in progress):** Master profile complete ([`phase2/profile/master-profile.md`](phase2/profile/master-profile.md)) — relocation priority now Canada → Ireland → UK → Netherlands → Portugal. CV generator agent ready ([`docs/agents/cv-generator.md`](docs/agents/cv-generator.md)). Focus live offer collection on **Canada, Ireland, UK** before creating offer files in `phase2/offers/`.
+**Operate (in progress):** Master profile complete ([`phase2/profile/master-profile.md`](phase2/profile/master-profile.md)) — relocation priority now Canada → Ireland → UK → Netherlands → Portugal. CV generator agent ready ([`docs/agents/cv-generator.md`](docs/agents/cv-generator.md)). Focus live offer collection on **Canada, Ireland, UK** before creating offer files in `phase2/offers/`.
 
-**Next:** Ireland + UK job-offer research (0/10 each); close critical gaps (AWS, Jest, CI/CD) via [`phase3/backlog.md`](phase3/backlog.md) in parallel with applications. Germany stays on hold until B1+ German.
+**Next:** Ireland + UK job-offer research (0/10 each); close critical gaps (AWS, Jest, CI/CD) via [`phase3/backlog.md`](phase3/backlog.md) while Operate continues. Germany stays on hold until B1+ German.

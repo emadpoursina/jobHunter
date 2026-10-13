@@ -1,4 +1,6 @@
-# Phase 3 — Close Skill Gaps
+# Mode: Improve — Close Skill Gaps
+
+> Mode: Improve. Apply while gaps remain; do not wait for all skill gaps to close before applying.
 
 When working in this folder, follow the spec at:
 - `docs/agents/project-profile-extractor.md`

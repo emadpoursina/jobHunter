@@ -1,5 +1,7 @@
 # Phase 3 — Learning
 
+> Mode: Improve — close gaps + evidence. Apply while gaps remain; do not wait for all skill gaps to close before applying.
+
 | File | Purpose |
 |------|---------|
 | [`skill-map.md`](skill-map.md) | What to learn and how it maps to the flagship project |
