@@ -1,5 +1,7 @@
 # Phase 1 — Skill gap analysis
 
+> Mode: Foundation — market + visa + gaps. Pick one primary mode per session (default = Operate).
+
 **Goal:** Understand market demand, visa feasibility, and skill expectations before scaling applications.
 
 | Folder | Purpose |

@@ -2,7 +2,7 @@
 
 ## What This Project Is
 
-A structured workflow for finding, qualifying, and applying to **backend / full-stack JavaScript** roles with **migration via employer visa sponsorship**. The repo is organized into phases that run in parallel, with agent-driven automation at key steps.
+A structured workflow for finding, qualifying, and applying to **backend / full-stack JavaScript** roles with **migration via employer visa sponsorship**. Sessions use **one of five modes** (default = Operate). Folder names stay historical (`phase1/` …); they are not four equal parallel phases.
 
 **Target role:** Backend / Node.js engineer (NestJS, full-stack JavaScript)  
 **Experience:** 7+ years, mid–senior band  
@@ -11,66 +11,60 @@ A structured workflow for finding, qualifying, and applying to **backend / full-
 
 ---
 
-## The Four-Phase Loop
+## Operating Model — Five Session Modes
 
-All phases run in parallel once Phase 1 baseline is complete. Phase 2 and Phase 3 especially overlap.
+Pick **one primary mode per session**. Default = **Operate** (most sessions send applications). Folders are unchanged; the old "Phase 0–3" names are historical labels for these modes, not four equal parallel phases.
 
-### Phase 0 — Networking & Referrals
-- **Goal:** Hidden market access, warm introductions
-- **Tasks:** Map diaspora communities, track local meetups, manage outreach
-- **Outputs:** Contact list, referral log, warm-path applications
-- **Folder:** `networking/`
-- **When:** Ongoing, feeds into Phase 2 applications
-
-### Phase 1 — Research & Skill Gap Analysis
+### Mode: Foundation — market + visa + gaps
 - **Goal:** Understand market demand, visa feasibility, skill expectations
-- **Tasks:** 
-  1. Choose 5 priority countries → `phase1/countries/`
-  2. Collect 10–15 representative job offers per country → `phase1/job-offers/by-country/<code>/`
-  3. Extract immigration context (work-permit route, language, sponsorship likelihood)
-  4. Merge job offer skills into requirements corpus
-  5. Compare your profile → gap report
-- **Key File:** `phase1/skills/gap-report.md` (source of truth for market demands)
-- **Outputs:** Country files, offer research corpus, skill gap report
+- **Folder:** `phase1/`
+- **Tasks:**
+ 1. Choose 5 priority countries → `phase1/countries/`
+ 2. Collect 10–15 representative job offers per country → `phase1/job-offers/by-country/<code>/`
+ 3. Extract immigration context (work-permit route, language, sponsorship likelihood)
+ 4. Merge job offer skills into requirements corpus (`phase1/skills/requirements-summary.md`, supporting — not a source of truth)
+ 5. Compare your profile → gap report (`phase1/skills/gap-report.md`, source of truth for market-vs-you)
 - **Agent Spec:** `docs/agents/job-offer-research.md`
 - **When:** First pass is foundational; re-sample live offers every 2 weeks to track market shifts
 
-### Phase 2 — Profile, Tailored Applications & Pipeline
+### Mode: Operate — applications out (DEFAULT most sessions)
 - **Goal:** One identity, every application human-reviewed before send
+- **Folders:** `phase2/` + `tools/job-collector/`
 - **Tasks:**
-  1. Maintain master profile → `phase2/profile/master-profile.md` (source of truth for who you are)
-  2. Create offer file per target role → `phase2/offers/_offer-template.md` (copypaste the JD)
-  3. AI generates tailored CV → `phase2/documents/generated/` (AI draft, 100% human review before send)
-  4. Submit and track pipeline state → job-collector (`application_stage` on jobs in SQLite)
-  5. Log recruiter/interview feedback → `phase2/applications/feedback.md`
-- **Key Files:**
-  - `phase2/profile/master-profile.md` — single source of truth, updated as skills ship
-  - `phase2/offers/<role-name>.md` — one per live job posting
-  - `phase2/documents/generated/CV_<Company>_<Role>_<Date>.md` — AI-generated tailored output
-  - job-collector — live funnel: sent → screening → interview → offer/rejection (`application_stage`)
-  - `phase2/applications/pipeline.md` — legacy; not maintained (no DB sync)
+ 1. Maintain master profile → `phase2/profile/master-profile.md` (source of truth for who you are; the only source of facts for CVs)
+ 2. Create offer file per target role → `phase2/offers/_offer-template.md` (copypaste the JD; never modify after submission)
+ 3. AI generates tailored CV → `phase2/documents/generated/` (AI draft, 100% human review of CV, cover letter, and follow-up before send — no exceptions)
+ 4. Submit and track funnel stage → job-collector (`application_stage` on jobs in SQLite — the source of truth for funnel stage)
+ 5. Log recruiter/interview feedback → `phase2/applications/feedback.md` (supporting — not a source of truth)
+- **Legacy:** `phase2/applications/pipeline.md` — unused, do not sync or revive
 - **Agent Spec:** `docs/agents/cv-generator.md`
-- **When:** Ongoing; Phase 1 research informs which offers to target
+- **When:** Ongoing; Foundation research informs which offers to target. Do not wait for all skill gaps to close before applying.
 
-### Phase 3 — Close Skill Gaps (Parallel with Phase 2)
-- **Goal:** Reduce gaps from Phase 1 and real interview feedback while applications continue
+### Mode: Improve — close gaps + evidence
+- **Goal:** Reduce gaps from Foundation and real Operate feedback while applications continue
+- **Folder:** `phase3/`
 - **Tasks:**
-  1. Merge Phase 1 gap report + Phase 2 feedback → prioritized backlog
-  2. Execute learning: courses, certs, open source, portfolio projects, language study
-  3. Add evidence to master profile
-  4. Re-sample offers periodically to confirm gaps are closing
-- **Key Files:**
-  - `phase3/skill-map.md` — full curriculum; maps to flagship project
-  - `phase3/flagship-project.md` — one showcase project that hits all critical gaps
-  - `phase3/backlog.md` — prioritized learning tasks
+ 1. Merge gap report + Operate feedback → prioritized backlog (`phase3/backlog.md`, source of truth for what to learn next)
+ 2. Execute learning: courses, certs, open source, portfolio projects, language study
+ 3. Add evidence to master profile
+ 4. Re-sample offers periodically to confirm gaps are closing
+- **Supporting (not sources of truth):** `phase3/skill-map.md`, `phase3/flagship-project.md`
 - **Agent Spec:** `docs/agents/project-profile-extractor.md`
-- **When:** Start in parallel with Phase 2; do NOT wait for all gaps to close before applying
+- **When:** Runs in parallel with Operate; do NOT wait for all gaps to close before applying
 
-### Cross-Cutting: Metrics
+### Mode: Access — warm intros / referrals
+- **Goal:** Hidden market access, warm introductions. Access finds the door; Operate sends.
+- **Folder:** `networking/`
+- **Tasks:** Map diaspora communities, track local meetups, manage outreach
+- **Outputs:** Contact list, referral log, warm-path applications (`networking/contacts.md` + `outreach-log.md`, supporting — not sources of truth)
+- **When:** Ongoing, feeds into Operate applications
+
+### Mode: Scoreboard — conversion by country
 - **Goal:** Visibility into conversion rates per country
+- **Folder:** `metrics/`
 - **Tasks:** Track applications sent, response rate, interview rate, offer rate, pipeline time
-- **File:** `metrics/by-country.md`
-- **When:** Updated weekly; feeds back into Phase 1 effort allocation
+- **File:** `metrics/by-country.md` (supporting — counts come from job-collector `application_stage`, not `pipeline.md`)
+- **When:** Updated weekly; feeds back into Foundation effort allocation
 
 ---
 
@@ -90,12 +84,12 @@ jobHunter/
 │       ├── cv-generator.md            # Phase 2 automation spec
 │       └── project-profile-extractor.md
 │
-├── networking/                        # Phase 0
+├── networking/                        # Mode: Access
 │   ├── README.md
 │   ├── contacts.md
 │   └── outreach-log.md
 │
-├── phase1/                            # Phase 1 — skill gap analysis
+├── phase1/                            # Mode: Foundation — skill gap analysis
 │   ├── README.md
 │   ├── checklist.md                   # Country selection & execution status
 │   ├── countries/                     # Priority countries + visa notes
@@ -108,7 +102,7 @@ jobHunter/
 │       ├── requirements-summary.md    # Merged across offers
 │       └── gap-report.md              # Your gaps vs. market
 │
-├── phase2/                            # Phase 2 — applications
+├── phase2/                            # Mode: Operate (default) — applications
 │   ├── README.md
 │   ├── profile/
 │   │   └── master-profile.md          # Single source of truth
@@ -124,14 +118,14 @@ jobHunter/
 │       ├── pipeline.md                # Legacy (unused; live tracker is job-collector)
 │       └── feedback.md                # Recruiter notes
 │
-├── phase3/                            # Phase 3 — learning & gaps
+├── phase3/                            # Mode: Improve — learning & gaps
 │   ├── README.md
 │   ├── skill-map.md                   # Full curriculum
 │   ├── flagship-project.md            # Showcase project spec
 │   ├── backlog.md                     # Prioritized tasks
 │   └── [learning artifacts go here]
 │
-└── metrics/                           # Cross-cutting
+└── metrics/                           # Mode: Scoreboard
     ├── README.md
     └── by-country.md                  # Conversion rates
 ```
@@ -150,23 +144,25 @@ docker compose exec -it -w /workspace/jobHunter hermes-jobhunter /opt/hermes/.ve
 
 This ensures context discovery walks the folder tree and loads per-phase AGENTS.md files as you work.
 
-### Phase-Specific Guidance
+### Mode-Specific Guidance
 
-Each phase directory should have its own `AGENTS.md` (see "Per-Phase Context Files" below) that points Hermes at the corresponding automation spec:
+Each mode directory has its own `AGENTS.md` (see "Per-Mode Context Files" below) that points Hermes at the corresponding automation spec:
 
-- **In `phase1/`:** Point to `docs/agents/job-offer-research.md` — research, extract skills, update gap report
-- **In `phase2/`:** Point to `docs/agents/cv-generator.md` — generate tailored CVs, track pipeline
-- **In `phase3/`:** Point to `docs/agents/project-profile-extractor.md` — update master profile as skills close
+- **In `phase1/` (Mode: Foundation):** Point to `docs/agents/job-offer-research.md` — research, extract skills, update gap report
+- **In `phase2/` (Mode: Operate, default):** Point to `docs/agents/cv-generator.md` — generate tailored CVs, track funnel in job-collector
+- **In `phase3/` (Mode: Improve):** Point to `docs/agents/project-profile-extractor.md` — update master profile as skills close
+- **In `networking/` (Mode: Access):** Warm intros feed Operate; link referrals to the matching job in job-collector (`application_stage`)
+- **In `metrics/` (Mode: Scoreboard):** Counts come from job-collector `application_stage`, not `pipeline.md`
 
-When Hermes reads files inside phase1/, phase2/, or phase3/, it will auto-discover and load the per-phase AGENTS.md. You don't need to repeat context each session.
+When Hermes reads files inside these folders, it will auto-discover and load the per-mode AGENTS.md. You don't need to repeat context each session.
 
-### Per-Phase Context Files
+### Per-Mode Context Files
 
 Create these three files (templates below); Hermes will discover them automatically:
 
 **`phase1/AGENTS.md`:**
 ```markdown
-# Phase 1 — Research & Skill Gap
+# Mode: Foundation — Research & Skill Gap
 
 When working in this folder, follow the spec at:
 - `docs/agents/job-offer-research.md`
@@ -181,24 +177,24 @@ When working in this folder, follow the spec at:
 
 **`phase2/AGENTS.md`:**
 ```markdown
-# Phase 2 — Profile & Applications
+# Mode: Operate — Profile & Applications (default)
 
 When working in this folder, follow the spec at:
 - `docs/agents/cv-generator.md`
 
 **Key files:**
-- `profile/master-profile.md` — single source of truth, update as Phase 3 closes gaps
+- `profile/master-profile.md` — single source of truth for who you are; the only source of facts for CVs. Update as Improve closes gaps
 - `offers/` — create one `.md` file per JD (use `_offer-template.md` as template)
 - `documents/generated/` — AI-generated tailored CVs go here, review 100% before sending
 - job-collector — live application funnel (`application_stage` on jobs)
 - `applications/pipeline.md` — legacy; not maintained
 
-**Before every send:** 100% human review of generated CV. No exceptions.
+**Before every send:** 100% human review of CV, cover letter, and follow-up. No exceptions.
 ```
 
 **`phase3/AGENTS.md`:**
 ```markdown
-# Phase 3 — Close Skill Gaps
+# Mode: Improve — Close Skill Gaps
 
 When working in this folder, follow the spec at:
 - `docs/agents/project-profile-extractor.md`
@@ -208,7 +204,7 @@ When working in this folder, follow the spec at:
 - `flagship-project.md` — one showcase that hits all critical gaps
 - `backlog.md` — prioritized learning tasks; update as Phase 2 feedback arrives
 
-**Parallel with Phase 2:** Do NOT wait for all gaps to close before applying. 
+**Parallel with Operate:** Do NOT wait for all gaps to close before applying. 
 Re-prioritize backlog weekly based on Phase 2 interview feedback.
 ```
 
@@ -216,25 +212,25 @@ Re-prioritize backlog weekly based on Phase 2 interview feedback.
 
 ## Conventions
 
-### Phase 1 — Research
+### Mode: Foundation — Research
 - **Offer corpus rule:** Backend/full-stack roles, same seniority band, posted within ~90 days
 - **Sources:** Company careers pages, LinkedIn, national job boards (not spam aggregators)
 - **Per country:** 10–15 offers minimum to spot skill patterns
 - **Frequency:** Initial sampling → then re-sample live offers every 2 weeks
 
-### Phase 2 — Applications
+### Mode: Operate — Applications (default)
 - **Master profile:** The source of truth; you manually review and approve all changes
-- **Generated CVs:** AI draft → 100% human review before send (no exceptions)
+- **Generated CVs:** AI draft → 100% human review of CV, cover letter, and follow-up before send (no exceptions)
 - **Offer files:** Create one `.md` per live JD; copy-paste the posting and metadata
-- **Pipeline tracking:** One line per application; update status as it moves (sent → screening → interview → offer/rejection)
+- **Funnel tracking:** Job-collector `application_stage` is the source of truth (sent → screening → interview → offer/rejection)
 - **Feedback log:** Recruiter notes, interview themes, rejection reasons → feeds Phase 3 prioritization
 
-### Phase 3 — Learning
+### Mode: Improve — Learning
 - **Flagship project:** One real, deployable project that demonstrates all critical gaps
 - **Evidence:** Add completed skills + proof (GitHub, certificate, project link) to master profile
 - **Re-sampling:** After each major milestone (gap closed, skill shipped), re-sample Phase 1 offers to confirm market expectations have shifted
 
-### Metrics
+### Mode: Scoreboard — Metrics
 - **Tracked:** Applications sent, response rate, interview rate, offer rate, pipeline time-to-outcome
 - **Per country:** Separate row in `metrics/by-country.md` so you can shift effort if one region underperforms
 - **Updated:** Weekly; feeds back into Phase 1 and Phase 3 prioritization
@@ -247,7 +243,7 @@ Re-prioritize backlog weekly based on Phase 2 interview feedback.
 - **Master profile is the single source of truth.** Keep it current as you ship skills. Phase 2 CV generator reads it for every tailored generation.
 - **Phase 1 research is iterative.** Every two weeks, re-sample live offers per priority country; do not rely on month-old data.
 - **100% human review before send.** This includes AI-generated CVs, cover letters, and follow-ups. No exceptions.
-- **Feedback loop:** Phase 2 rejections and interview notes inform Phase 3 prioritization and Phase 1 re-sampling.
+- **Feedback loop:** Operate rejections and interview notes inform Improve prioritization and Foundation re-sampling.
 
 ---
 
@@ -265,7 +261,7 @@ Each is a Hermes Skill candidate. Ask Hermes to "create a skill from docs/agents
 
 ## Session Workflow
 
-**Typical session when applying to a role:**
+**Typical session when applying to a role (Mode: Operate — one primary mode per session, default Operate):**
 
 1. Open Hermes session (cd into repo, exec docker command above)
 2. Copy the JD into `phase2/offers/<Company_Role_Date>.md`
@@ -285,7 +281,7 @@ Each is a Hermes Skill candidate. Ask Hermes to "create a skill from docs/agents
 
 ## Files NOT to Modify
 
-- This file (`AGENTS.md`) — edit only if project structure fundamentally changes
+- This file (`AGENTS.md`) — edit only if project structure fundamentally changes (P0 operating-model lock was an authorized exception)
 - `docs/agents/*.md` — these are automation specs; treat as read-only unless the procedure actually changes
 - Per-phase `AGENTS.md` files (once created) — these are context discovery hints, not working files
 

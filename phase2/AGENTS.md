@@ -1,4 +1,6 @@
-# Phase 2 — Profile & Applications
+# Mode: Operate — Profile & Applications (default)
+
+> Mode: Operate (default). Identity lives here; job-collector `application_stage` is the funnel source of truth; `applications/pipeline.md` is legacy.
 
 When working in this folder, follow the spec at:
 - `docs/agents/cv-generator.md`

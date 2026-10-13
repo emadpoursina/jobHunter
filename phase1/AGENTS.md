@@ -1,4 +1,6 @@
-# Phase 1 — Research & Skill Gap
+# Mode: Foundation — Research & Skill Gap
+
+> Mode: Foundation. Pick one primary mode per session (default = Operate).
 
 When working in this folder, follow the spec at:
 - `docs/agents/job-offer-research.md`
